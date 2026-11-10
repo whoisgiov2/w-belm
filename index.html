@@ -4,12 +4,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>w-belm | Web Elements & Micro-interactions Library</title>
+  <title>w-belm | Elementos y Micro-interacciones para Shopify</title>
   <link rel="icon" type="image/png" href="elements/bubb/spike.png">
   <style>
     :root {
       --hub-bg: #09090b;
-      --hub-card-bg: rgba(24, 24, 27, 0.75);
+      --hub-card-bg: rgba(24, 24, 27, 0.85);
       --hub-card-border: rgba(255, 255, 255, 0.1);
       --hub-text: #f8fafc;
       --hub-muted: #94a3b8;
@@ -40,7 +40,7 @@
     }
 
     .hub-container {
-      max-width: 1160px;
+      max-width: 1080px;
       margin: 0 auto;
       padding: 40px 24px;
       width: 100%;
@@ -51,9 +51,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-bottom: 32px;
+      padding-bottom: 28px;
       border-bottom: 1px solid var(--hub-card-border);
-      margin-bottom: 48px;
+      margin-bottom: 40px;
       flex-wrap: wrap;
       gap: 16px;
     }
@@ -65,14 +65,14 @@
     }
 
     .hub-logo {
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       object-fit: contain;
-      filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.5));
+      filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.5));
     }
 
     .hub-title {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 800;
       letter-spacing: -0.03em;
       background: linear-gradient(135deg, #ffffff 40%, #a5b4fc 100%);
@@ -88,8 +88,6 @@
       border-radius: 9999px;
       font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
       background: rgba(99, 102, 241, 0.15);
       border: 1px solid rgba(99, 102, 241, 0.35);
       color: #c7d2fe;
@@ -106,87 +104,69 @@
     /* Hero */
     .hub-hero {
       text-align: center;
-      max-width: 780px;
-      margin: 0 auto 56px auto;
+      max-width: 760px;
+      margin: 0 auto 48px auto;
     }
 
     .hub-hero h1 {
-      font-size: clamp(32px, 5vw, 48px);
+      font-size: clamp(28px, 4.5vw, 42px);
       font-weight: 800;
       letter-spacing: -0.03em;
-      line-height: 1.15;
-      margin-bottom: 16px;
+      line-height: 1.2;
+      margin-bottom: 14px;
     }
 
     .hub-hero p {
-      font-size: 17px;
+      font-size: 16px;
       color: var(--hub-muted);
       line-height: 1.6;
     }
 
-    /* Elements Grid */
+    /* Element Card */
     .hub-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 28px;
-      margin-bottom: 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-bottom: 56px;
     }
 
     .hub-card {
       background: var(--hub-card-bg);
       border: 1px solid var(--hub-card-border);
       border-radius: var(--hub-radius);
-      padding: 32px 28px;
+      padding: 32px;
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, box-shadow 0.3s ease;
-      position: relative;
-      overflow: hidden;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 28px;
+      align-items: center;
+      transition: transform 0.25s ease, border-color 0.25s ease;
     }
 
-    .hub-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, var(--hub-accent), transparent);
-      opacity: 0;
-      transition: opacity 0.3s;
+    @media (max-width: 768px) {
+      .hub-card {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
     }
 
     .hub-card:hover {
-      transform: translateY(-6px);
       border-color: rgba(99, 102, 241, 0.4);
-      box-shadow: 0 24px 50px -10px rgba(99, 102, 241, 0.25);
-    }
-
-    .hub-card:hover::before {
-      opacity: 1;
-    }
-
-    .hub-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
+      transform: translateY(-3px);
     }
 
     .hub-card-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
       background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 6px;
+      padding: 10px;
     }
 
     .hub-card-icon img {
@@ -195,69 +175,63 @@
       object-fit: contain;
     }
 
-    .hub-card-status {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 9999px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+    .hub-card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    .hub-status-active {
-      background: rgba(34, 197, 94, 0.15);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      color: #86efac;
-    }
-
-    .hub-status-template {
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      color: #7dd3fc;
-    }
-
-    .hub-status-planned {
-      background: rgba(148, 163, 184, 0.15);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      color: #cbd5e1;
+    .hub-card-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     .hub-card-title {
       font-size: 22px;
       font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 10px;
       color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+
+    .hub-card-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #86efac;
     }
 
     .hub-card-desc {
       font-size: 14px;
       color: var(--hub-muted);
-      line-height: 1.6;
-      margin-bottom: 20px;
-      flex-grow: 1;
+      line-height: 1.55;
     }
 
-    .hub-tags {
+    .hub-card-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 24px;
+      gap: 8px;
+      margin-top: 4px;
     }
 
-    .hub-tag {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 8px;
-      border-radius: 6px;
+    .hub-meta-pill {
+      font-size: 12px;
+      padding: 2px 8px;
       background: rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
       color: #cbd5e1;
     }
 
-    .hub-actions {
+    .hub-card-actions {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      min-width: 220px;
     }
 
     .hub-btn {
@@ -284,7 +258,6 @@
     .hub-btn-primary:hover {
       background: var(--hub-accent-hover);
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px var(--hub-accent-glow);
     }
 
     .hub-btn-secondary {
@@ -295,32 +268,60 @@
 
     .hub-btn-secondary:hover {
       background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.25);
     }
 
-    /* Architecture / Guide strip */
-    .hub-info-strip {
+    /* Integration Guide Section */
+    .hub-guide-section {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--hub-card-border);
       border-radius: var(--hub-radius);
       padding: 32px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
     }
 
-    .hub-info-col h3 {
-      font-size: 16px;
+    .hub-guide-section h2 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      color: #ffffff;
+    }
+
+    .hub-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .hub-step {
+      background: rgba(24, 24, 27, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 20px;
+    }
+
+    .hub-step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--hub-accent);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .hub-step h3 {
+      font-size: 15px;
       font-weight: 700;
       margin-bottom: 8px;
       color: #ffffff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
-    .hub-info-col p {
-      font-size: 13.5px;
+    .hub-step p {
+      font-size: 13px;
       color: var(--hub-muted);
       line-height: 1.5;
     }
@@ -357,126 +358,73 @@
       </div>
       <div class="hub-badge">
         <span class="hub-badge-dot"></span>
-        <span>Colección Activa</span>
+        <span>Shopify OS 2.0</span>
       </div>
     </header>
 
     <!-- Hero -->
     <section class="hub-hero">
-      <h1>Web Elements & Micro-interactions</h1>
+      <h1>Elementos & Micro-interacciones para Shopify</h1>
       <p>
-        Biblioteca modular de widgets interactivos y micro-interacciones de alto rendimiento para tiendas Shopify y la web moderna. 100% Vanilla JS, animaciones GPU a 60 FPS, diseño desacoplado y accesibilidad universal.
+        Componentes interactivos en JavaScript Vanilla y CSS puro, creados para reemplazar secciones, botones o banners por defecto en cualquier diseño de tienda Shopify sin afectar la velocidad de carga.
       </p>
     </section>
 
     <!-- Elements Catalog -->
     <main class="hub-grid">
-      <!-- Card 1: Bubb Widget -->
+      <!-- Elemento 1: Bubb Widget -->
       <article class="hub-card">
-        <div>
-          <div class="hub-card-header">
-            <div class="hub-card-icon">
-              <img src="elements/bubb/spike.png" alt="Bubb Icon">
-            </div>
-            <span class="hub-card-status hub-status-active">Producción v1.0</span>
+        <div class="hub-card-icon">
+          <img src="elements/bubb/spike.png" alt="Bubb Icon">
+        </div>
+        <div class="hub-card-body">
+          <div class="hub-card-top">
+            <h2 class="hub-card-title">Bubb — Asistente Flotante</h2>
+            <span class="hub-card-tag">Reemplazo de Widget / Botón</span>
           </div>
-          <h2 class="hub-card-title">Bubb — Asistente Flotante</h2>
           <p class="hub-card-desc">
-            Burbuja de jabón translúcida con física de fluidos, silueta óptica SVG de Spike, arrastre libre táctil y mouse (Pointer Events), memoria de posición en localStorage, micro-interacciones y panel reactivo "Welcome to The Chaos".
+            Burbuja de jabón translúcida interactiva. Reemplaza botones flotantes pesados de chat o formularios genéricos. Incluye física de fluidos, silueta óptica SVG de Spike, arrastre libre táctil y mouse con memoria de posición, modo oscuro y panel modal "Welcome to The Chaos".
           </p>
-          <div class="hub-tags">
-            <span class="hub-tag">Vanilla JS</span>
-            <span class="hub-tag">Pointer Drag</span>
-            <span class="hub-tag">SVG Filters</span>
-            <span class="hub-tag">Shopify OS 2.0</span>
-            <span class="hub-tag">Dark Mode</span>
-            <span class="hub-tag">A11y</span>
+          <div class="hub-card-meta">
+            <span class="hub-meta-pill">Reemplazo: Botones flotantes / Chat</span>
+            <span class="hub-meta-pill">Pointer Events (Arrastre libre)</span>
+            <span class="hub-meta-pill">100% Vanilla JS</span>
+            <span class="hub-meta-pill">Tema Claro / Oscuro</span>
           </div>
         </div>
-        <div class="hub-actions">
-          <a href="elements/bubb/index.html" class="hub-btn hub-btn-primary">Lanzar Prototipo Bubb →</a>
-          <a href="shopify/sections/bubb-widget.liquid" class="hub-btn hub-btn-secondary">Sección Shopify (.liquid)</a>
-        </div>
-      </article>
-
-      <!-- Card 2: Plantilla Base -->
-      <article class="hub-card">
-        <div>
-          <div class="hub-card-header">
-            <div class="hub-card-icon">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <path d="M3 9h18"/>
-                <path d="M9 21V9"/>
-              </svg>
-            </div>
-            <span class="hub-card-status hub-status-template">Starter Kit</span>
-          </div>
-          <h2 class="hub-card-title">Plantilla de Nuevos Elementos</h2>
-          <p class="hub-card-desc">
-            Estructura estandarizada con prefijo de aislamiento, panel de pruebas superior, schema para Shopify OS 2.0 y soporte automático para temas oscuros y reducción de movimiento.
-          </p>
-          <div class="hub-tags">
-            <span class="hub-tag">Boilerplate</span>
-            <span class="hub-tag">Namespace Scoping</span>
-            <span class="hub-tag">Double-click ready</span>
-            <span class="hub-tag">Schema Generator</span>
-          </div>
-        </div>
-        <div class="hub-actions">
-          <a href="elements/_template/index.html" class="hub-btn hub-btn-secondary">Ver Prototipo de Plantilla →</a>
-          <a href="elements/_template/README.md" class="hub-btn hub-btn-secondary">Guía de Uso</a>
-        </div>
-      </article>
-
-      <!-- Card 3: Próximos Elementos -->
-      <article class="hub-card" style="opacity: 0.85;">
-        <div>
-          <div class="hub-card-header">
-            <div class="hub-card-icon">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="8" x2="12" y2="16"/>
-                <line x1="8" y1="12" x2="16" y2="12"/>
-              </svg>
-            </div>
-            <span class="hub-card-status hub-status-planned">Próximamente</span>
-          </div>
-          <h2 class="hub-card-title">Espacio para Nuevos Elementos</h2>
-          <p class="hub-card-desc">
-            La arquitectura modular de <code>w-belm</code> permite crear y registrar nuevos componentes rápidamente: Chaos Banners, tarjetas de producto con efecto magnético 3D, drawers animados o badges dinámicos.
-          </p>
-          <div class="hub-tags">
-            <span class="hub-tag">Modular</span>
-            <span class="hub-tag">Sin Colisiones</span>
-            <span class="hub-tag">Escalable</span>
-          </div>
-        </div>
-        <div class="hub-actions">
-          <a href="docs/ARCHITECTURE.md" class="hub-btn hub-btn-secondary">Ver Arquitectura & Estándares</a>
+        <div class="hub-card-actions">
+          <a href="elements/bubb/index.html" class="hub-btn hub-btn-primary">Probar Prototipo Bubb →</a>
+          <a href="elements/bubb/README.md" class="hub-btn hub-btn-secondary">Guía de Integración</a>
+          <a href="shopify/sections/bubb-widget.liquid" class="hub-btn hub-btn-secondary">Código Liquid</a>
         </div>
       </article>
     </main>
 
-    <!-- Info Strip -->
-    <section class="hub-info-strip">
-      <div class="hub-info-col">
-        <h3>⚡ Cero Dependencias</h3>
-        <p>Todos los prototipos corren directamente abriendo su <code>index.html</code> con doble clic en cualquier navegador, sin herramientas de empaquetado ni servidores Node.</p>
-      </div>
-      <div class="hub-info-col">
-        <h3>🔒 Aislamiento Total</h3>
-        <p>Cada elemento utiliza su propio prefijo estricto (como <code>bb-</code>), asegurando compatibilidad absoluta con cualquier tema de Shopify.</p>
-      </div>
-      <div class="hub-info-col">
-        <h3>🛍️ Shopify OS 2.0</h3>
-        <p>Los archivos de la carpeta <code>shopify/</code> están listos para ser copiados directamente a los directorios <code>sections/</code> y <code>assets/</code> de tu tienda.</p>
+    <!-- Integration Guide Summary -->
+    <section class="hub-guide-section">
+      <h2>Cómo integrar cualquier elemento a tu diseño de Shopify</h2>
+      <div class="hub-steps">
+        <div class="hub-step">
+          <div class="hub-step-num">1</div>
+          <h3>Copiar al Tema</h3>
+          <p>Ve a <strong>Tienda online > Editar código</strong>. Pega los archivos <code>.liquid</code> en <code>sections/</code> y las imágenes en <code>assets/</code>.</p>
+        </div>
+        <div class="hub-step">
+          <div class="hub-step-num">2</div>
+          <h3>Reemplazar o Activar</h3>
+          <p>Oculta la sección vieja en el <strong>Personalizador de temas</strong> y añade la nueva sección, o insértala en <code>layout/theme.liquid</code> antes de <code>&lt;/body&gt;</code>.</p>
+        </div>
+        <div class="hub-step">
+          <div class="hub-step-num">3</div>
+          <h3>Ajustar a tu Marca</h3>
+          <p>Personaliza colores de acento, tipografías y enlaces directamente desde los controles visuales de Shopify sin alterar el código.</p>
+        </div>
       </div>
     </section>
 
     <!-- Footer -->
     <footer class="hub-footer">
-      <p>Repositorio: <a href="https://github.com/whoisgiov2/w-belm" target="_blank" rel="noopener">github.com/whoisgiov2/w-belm</a> • w-belm Elements Library</p>
+      <p>Repositorio: <a href="https://github.com/whoisgiov2/w-belm" target="_blank" rel="noopener">github.com/whoisgiov2/w-belm</a> • w-belm</p>
     </footer>
   </div>
 

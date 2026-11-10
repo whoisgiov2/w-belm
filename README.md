@@ -1,106 +1,111 @@
-# w-belm
+# w-belm — Elementos y Micro-interacciones para Shopify
 
-> **Web Elements & Micro-interactions Library**  
-> Colección modular de componentes interactivos, widgets flotantes y micro-interacciones de alto rendimiento para tiendas **Shopify (Online Store 2.0)** y aplicaciones web modernas.
-
-[![Shopify OS 2.0](https://img.shields.io/badge/Shopify-OS%202.0%20Ready-96bf48?logo=shopify&logoColor=white)](#-instalación-en-shopify)
-[![Vanilla JS](https://img.shields.io/badge/JavaScript-100%25%20Vanilla-f7df1e?logo=javascript&logoColor=black)](#-principios-técnicos)
-[![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-00b4d8)](#-principios-técnicos)
-[![GPU Accelerated](https://img.shields.io/badge/Animations-60%20FPS%20GPU-7928ca)](#-principios-técnicos)
+> Colección de componentes frontend interactivos (asistentes flotantes, banners, efectos hover, etc.) diseñados en **JavaScript Vanilla** y **CSS puro**, listos para reemplazar elementos por defecto en cualquier tienda **Shopify (Online Store 2.0)** sin romper el diseño existente.
 
 ---
 
-## 📂 Estructura del Repositorio
+## 📁 Estructura del Repositorio
 
-La carpeta y el repositorio están estructurados específicamente para escalar de forma ordenada conforme se agreguen nuevos elementos:
+La carpeta está organizada para que cada elemento cuente con su prototipo de prueba local y su archivo listo para instalar en Shopify:
 
-```
+```text
 w-belm/
-├── .gitignore                    # Reglas de exclusión de Git
-├── README.md                     # Documentación general del repositorio
-├── index.html                    # Showcase / Catálogo interactivo de elementos
-├── elements/                     # Directorio central de elementos individuales
-│   ├── bubb/                     # Elemento 1: Burbuja Asistente Flotante
-│   │   ├── index.html            # Prototipo ejecutable directamente con doble clic
-│   │   ├── style.css             # Estilos y animaciones aisladas (prefijo bb-)
-│   │   ├── spike.png             # Asset gráfico del elemento
-│   │   ├── bubb-widget.liquid    # Sección Shopify OS 2.0
-│   │   └── README.md             # Especificación técnica detallada de Bubb
-│   └── _template/                # Plantilla base para crear nuevos elementos
-│       ├── index.html            # Boilerplate del prototipo
-│       ├── style.css             # Boilerplate de estilos y variables
-│       ├── element.liquid        # Boilerplate de sección Shopify con schema
-│       └── README.md             # Checklist para desarrollo de nuevos elementos
-├── shopify/                      # Distribución lista para copiar en temas Shopify
-│   ├── sections/
-│   │   └── bubb-widget.liquid    # Secciones para la carpeta /sections del tema
-│   ├── assets/
-│   │   └── spike.png             # Assets para la carpeta /assets del tema
-│   └── README.md                 # Guía de instalación rápida en Shopify
-└── docs/
-    └── ARCHITECTURE.md           # Estándares de ingeniería y diseño
+├── README.md                      # Guía general de integración en tiendas Shopify
+├── .gitignore                     # Exclusiones de Git
+├── index.html                     # Visualizador local de los elementos disponibles
+│
+├── elements/                      # Componentes interactivos
+│   └── bubb/                      # Asistente flotante (Burbuja & Chaos Panel)
+│       ├── index.html             # Prototipo local (doble clic para probar)
+│       ├── style.css              # Estilos y micro-interacciones (prefijo bb-)
+│       ├── bubb-widget.liquid     # Sección para Shopify OS 2.0
+│       ├── spike.png              # Asset gráfico del logo / silueta
+│       └── README.md              # Guía específica de integración para Bubb
+│
+└── shopify/                       # Archivos listos para copiar a tu tema de Shopify
+    ├── sections/
+    │   └── bubb-widget.liquid     # Secciones listas para /sections/
+    ├── assets/
+    │   └── spike.png              # Imágenes listas para /assets/
+    └── README.md                  # Instrucciones rápidas de instalación en el tema
 ```
 
----
-
-## 🧩 Catálogo de Elementos
-
-### 1. [Bubb — Asistente Flotante & Chaos Panel](elements/bubb/)
-- **Estado**: `Producción v1.0`
-- **Prefijo de namespace**: `bb-`
-- **Características**:
-  - Burbuja translúcida con física de fluidos mediante gradientes radiales superpuestos y refracción óptica con `backdrop-filter`.
-  - Modo alternable **Silueta Spike** con filtro SVG óptico sobre la transparencia del logo.
-  - **Arrastre libre (Mouse y Táctil)** mediante Pointer Events API con umbral de 6px, sin interferir con clics ni micro-interacciones.
-  - Contenedor externo de posición separado (`transform: translate3d`) del contenedor de animaciones, previniendo colisiones de transforms.
-  - Confinamiento dinámico a la pantalla (*clamping*) considerando `safe-area-inset-*` y redimensionamiento móvil.
-  - Persistencia de posición en `localStorage` con recuperación automática al cargar.
-  - Control accesible por teclado: flechas mueven 10px (`Shift` = 40px), `Enter` / `Espacio` abren el panel.
-  - Micro-interacciones: pulso elástico de gelatina, gesto curioso cada 9s, y giro de 720° con rotación tras pasar el cursor más de 2 veces en ráfaga.
-  - Modal "Welcome to The Chaos" con apertura inteligente hacia el cuadrante con más espacio libre.
-  - Variante de color invertida para **Modo Oscuro** (`is-dark-theme`).
-  - Cumplimiento riguroso con `prefers-reduced-motion: reduce`.
-
-### 2. [Plantilla Base (`_template`)](elements/_template/)
-- Estructura preconfigurada para clonar y comenzar el desarrollo de cualquier nuevo elemento (`cb-`, `mc-`, etc.).
+*(Conforme se agreguen nuevos elementos como banners u hovers, cada uno tendrá su propia carpeta en `elements/<nombre>/` con su prototipo y archivo Liquid para reemplazar la sección correspondiente).*
 
 ---
 
-## ⚡ Cómo Probar en Local
+## 🛍️ Guía de Integración para Cualquier Tienda Shopify
 
-1. Clona el repositorio o descarga la carpeta.
-2. Abre cualquier archivo `index.html` con **doble clic**:
-   - `index.html`: Abre el portal / catálogo de todos los elementos.
-   - `elements/bubb/index.html`: Abre directamente el prototipo interactivo de Bubb con su barra de pruebas.
-   - `elements/_template/index.html`: Abre la plantilla base para desarrollo de nuevos componentes.
-3. No requiere Node.js, npm, bundlers ni servidores locales.
+Los elementos de este repositorio están pensados para **reemplazar o enriquecer componentes existentes** dentro de tu tienda (por ejemplo, reemplazar el botón flotante de chat/soporte por Bubb, o reemplazar un banner estático por uno interactivo).
 
----
+### Paso 1: Subir los archivos a tu tema de Shopify
 
-## 🛠️ Principios Técnicos Obligatorios
-
-1. **Aislamiento de Namespace**: Toda clase, ID, keyframe y variable CSS debe llevar el prefijo del elemento (ej. `bb-`).
-2. **Animaciones a 60 FPS**: Animar únicamente `transform` y `opacity` (y `border-radius` para deformaciones orgánicas). Jamás animar dimensiones ni posiciones de layout (`top`, `left`, `width`, `height`).
-3. **Cero Dependencias**: 100% Vanilla JavaScript y CSS nativo.
-4. **Pointer Events**: Uso de eventos de puntero unificados con `setPointerCapture` y `touch-action: none`.
-5. **Accesibilidad**: Navegación por teclado completa, `:focus-visible`, sincronización de estados ARIA y respeto a `prefers-reduced-motion`.
+1. En tu panel de administración de Shopify, ve a **Tienda online > Temas**.
+2. En tu tema actual (ej. *Dawn, Prestige, Impulse, Horizon, Sense*), haz clic en los tres puntos `···` y selecciona **Editar código**.
+3. **Secciones**: En la carpeta `sections/`, haz clic en *Agregar una nueva sección*, nómbrala `bubb-widget.liquid` y pega el contenido del archivo `shopify/sections/bubb-widget.liquid`.
+4. **Assets**: En la carpeta `assets/`, haz clic en *Agregar un nuevo recurso* y sube `shopify/assets/spike.png` (o el logo transparente de tu marca).
 
 ---
 
-## 🛍️ Instalación en Shopify
+### Paso 2: Cómo reemplazar o insertar el elemento en la página
 
-1. Copia los archivos dentro de `shopify/sections/` a la carpeta `sections/` de tu tema Shopify.
-2. Copia los archivos dentro de `shopify/assets/` a la carpeta `assets/` de tu tema.
-3. En `layout/theme.liquid`, agrega antes de `</body>`:
+Tienes dos formas de activar el elemento según cómo quieras que funcione en la tienda:
+
+#### Opción A: Desde el Editor Visual de Shopify (Recomendado)
+*Ideal para reemplazar secciones de página (banners, bloques interactivos) sin tocar código:*
+
+1. Ve a **Tienda online > Temas > Personalizar**.
+2. Si vas a **reemplazar un elemento existente** (por ejemplo, un banner o formulario anterior), haz clic sobre él en el menú izquierdo y selecciona **Ocultar** (ícono de ojo) o **Eliminar sección**.
+3. Haz clic en **Agregar sección** (en la parte inferior del menú de la página o en la barra lateral).
+4. Busca y selecciona **Bubb Asistente Flotante** (o el elemento que desees).
+5. Guarda los cambios.
+
+#### Opción B: Integración Global en `theme.liquid`
+*Ideal para elementos flotantes que deben acompañar al cliente en toda la navegación (como Bubb):*
+
+1. En **Editar código**, abre el archivo `layout/theme.liquid`.
+2. Ve al final del archivo y busca la etiqueta de cierre `</body>`.
+3. Justo **antes** de `</body>`, agrega la siguiente línea:
    ```liquid
    {% section 'bubb-widget' %}
    ```
-4. O agrégalo como sección mediante el Theme Customizer de Shopify.
-
-Consulta [shopify/README.md](shopify/README.md) y [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) para más detalles.
+4. Guarda el archivo. El widget aparecerá automáticamente en todas las páginas de la tienda (Home, Colecciones, Productos, Carrito, etc.).
 
 ---
 
-## 👤 Autor
+### Paso 3: Adaptar el diseño a la identidad de tu tienda
 
-- **whoisgiov2** ([github.com/whoisgiov2/w-belm](https://github.com/whoisgiov2/w-belm))
+Cada elemento está construido para sincronizarse fácilmente con los colores, fuentes y estilos de cualquier tema:
+
+1. **Colores de la marca**:
+   - En el Editor de Temas de Shopify, selecciona la sección agregada.
+   - Modifica el **Color de acento** para que coincida con el color principal de tu marca (por defecto `#4f46e5`).
+   - Puedes alternar entre **Modo Claro** y **Modo Oscuro (Colores Invertidos)** para tiendas con fondos oscuros.
+
+2. **Tipografía del tema**:
+   - El elemento hereda automáticamente la fuente tipográfica definida en tu tema de Shopify (`font-family: inherit;`), por lo que los textos se verán exactamente iguales al resto de tu tienda.
+
+3. **URLs y Redirecciones**:
+   - En el panel de configuración puedes definir a dónde llevan los botones. Por defecto:
+     - Botón *JOIN THE CHAOS*: redirige a la página de registro de clientes (`/account/register`).
+     - Enlace *¿yA tIEnES cuEnTa?*: redirige a la página de login (`/account/login`).
+
+4. **Modo Silueta vs Esférico**:
+   - Puedes elegir si quieres que la burbuja tome la silueta de tu logo (`is-spike-mode`) o si prefieres una burbuja esférica con el logo dentro.
+
+---
+
+### Paso 4: Pruebas y Verificación Responsive
+
+- **Dispositivos móviles (iPhone / Android)**: El elemento respeta automáticamente las zonas seguras (`env(safe-area-inset-bottom)`), evitando que se sobreponga con la barra de navegación del celular o botones de compra fijos.
+- **Arrastre libre**: El cliente puede arrastrar la burbuja a cualquier punto de la pantalla para apartarla si le estorba. La tienda recordará su posición en ese dispositivo.
+- **Accesibilidad**: Si un cliente tiene activada la reducción de movimiento en su sistema (*prefers-reduced-motion*), las animaciones intensas se apagan automáticamente y se reemplazan por transiciones suaves.
+
+---
+
+## 💻 Cómo Probar los Prototipos en Local
+
+No necesitas instalar Node.js, librerías ni configurar ningún servidor.
+
+1. Abre el archivo **[index.html](file:///c:/Users/crm/Downloads/Bubb/index.html)** en la raíz con doble clic para ver el catálogo de elementos disponibles.
+2. O abre directamente **[elements/bubb/index.html](file:///c:/Users/crm/Downloads/Bubb/elements/bubb/index.html)** con doble clic para interactuar con la burbuja, moverla por la pantalla, probar la explosión y usar su barra de pruebas superior.
