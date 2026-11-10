@@ -20,6 +20,11 @@
       background: radial-gradient(circle at 50% 50%, #131622 0%, #07080d 100%);
       color: #f8fafc;
     }
+
+    body.bb-demo-crimson {
+      background: radial-gradient(circle at 50% 50%, #1a0808 0%, #070202 100%);
+      color: #f8fafc;
+    }
   </style>
 </head>
 
@@ -161,6 +166,65 @@
               <feMergeNode in="bb-dark-cyan" />
               <feMergeNode in="bb-dark-spec" />
               <feMergeNode in="bb-dark-rim" />
+            </feMerge>
+          </filter>
+
+          <!-- Filtro óptico SVG para Variante Crimson (#780606) -->
+          <filter id="bb-spike-soap-filter-crimson" x="-25%" y="-25%" width="150%" height="150%"
+            color-interpolation-filters="sRGB">
+            <!-- 1. Cuerpo base translúcido con tinte vino profundo (#780606) -->
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0.47
+                    0 0 0 0 0.024
+                    0 0 0 0 0.024
+                    0 0 0 0.35 0" result="bb-crimson-base" />
+
+            <!-- 2. Cojín interior rubí / carmesí vibrante en el contorno interno -->
+            <feMorphology in="SourceAlpha" operator="erode" radius="4" result="bb-crimson-erode" />
+            <feComposite in="SourceAlpha" in2="bb-crimson-erode" operator="out" result="bb-crimson-band" />
+            <feGaussianBlur in="bb-crimson-band" stdDeviation="3.2" result="bb-crimson-blur" />
+            <feComposite in="bb-crimson-blur" in2="SourceAlpha" operator="in" result="bb-crimson-masked" />
+            <feColorMatrix in="bb-crimson-masked" type="matrix" values="0 0 0 0 0.88
+                    0 0 0 0 0.12
+                    0 0 0 0 0.16
+                    0 0 0 0.70 0" result="bb-crimson-cushion" />
+
+            <!-- 3. Refracción iridiscente rosa escarlata / ámbar desplazada -->
+            <feOffset in="bb-crimson-blur" dx="-4" dy="-4" result="bb-crimson-offset" />
+            <feComposite in="bb-crimson-offset" in2="SourceAlpha" operator="in" result="bb-crimson-irid-mask" />
+            <feColorMatrix in="bb-crimson-irid-mask" type="matrix" values="0 0 0 0 0.98
+                    0 0 0 0 0.32
+                    0 0 0 0 0.38
+                    0 0 0 0.55 0" result="bb-crimson-pink" />
+
+            <!-- 4. Iluminación especular 3D blanca brillante sobre los picos y cabeza -->
+            <feGaussianBlur in="SourceAlpha" stdDeviation="4.5" result="bb-crimson-bump" />
+            <feSpecularLighting in="bb-crimson-bump" surfaceScale="6.2" specularConstant="1.4" specularExponent="24"
+              lighting-color="#ffffff" result="bb-crimson-spec-raw">
+              <fePointLight x="-45" y="-55" z="92" />
+            </feSpecularLighting>
+            <feComposite in="bb-crimson-spec-raw" in2="SourceAlpha" operator="in" result="bb-crimson-spec" />
+
+            <!-- 5. Película perimetral blanca fina con sutil brillo rubí -->
+            <feMorphology in="SourceAlpha" operator="erode" radius="1.4" result="bb-crimson-rim-erode" />
+            <feComposite in="SourceAlpha" in2="bb-crimson-rim-erode" operator="out" result="bb-crimson-rim-raw" />
+            <feGaussianBlur in="bb-crimson-rim-raw" stdDeviation="0.35" result="bb-crimson-rim-soft" />
+            <feColorMatrix in="bb-crimson-rim-soft" type="matrix" values="0 0 0 0 1
+                    0 0 0 0 0.95
+                    0 0 0 0 0.95
+                    0 0 0 0.95 0" result="bb-crimson-rim" />
+
+            <!-- 6. Sombra exterior flotante con resplandor en #780606 -->
+            <feDropShadow in="SourceAlpha" dx="0" dy="7" stdDeviation="7" flood-color="#780606" flood-opacity="0.45"
+              result="bb-crimson-shadow" />
+
+            <!-- 7. Composición final de la silueta en Variante Crimson -->
+            <feMerge>
+              <feMergeNode in="bb-crimson-shadow" />
+              <feMergeNode in="bb-crimson-base" />
+              <feMergeNode in="bb-crimson-cushion" />
+              <feMergeNode in="bb-crimson-pink" />
+              <feMergeNode in="bb-crimson-spec" />
+              <feMergeNode in="bb-crimson-rim" />
             </feMerge>
           </filter>
         </defs>
@@ -884,13 +948,22 @@
         /* === FIN BLOQUE SHOPIFY === */
 
         /* Panel de pruebas: controles para pruebas locales (eliminar al integrar en Shopify) */
+        let currentThemeIndex = 0;
+        const themes = [
+          { name: 'Tema: Claro (Original)', rootClass: '', bodyClass: '' },
+          { name: 'Tema: Oscuro Invertido', rootClass: 'is-dark-theme', bodyClass: 'bb-demo-dark' },
+          { name: 'Tema: Crimson (#780606)', rootClass: 'is-crimson-theme', bodyClass: 'bb-demo-crimson' }
+        ];
+
         if (toggleThemeBtn) {
           toggleThemeBtn.addEventListener('click', () => {
-            const isDark = root.classList.toggle('is-dark-theme');
-            document.body.classList.toggle('bb-demo-dark', isDark);
-            toggleThemeBtn.textContent = isDark
-              ? 'Tema: Oscuro Invertido (Ver Claro)'
-              : 'Tema: Claro (Ver Oscuro)';
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            const theme = themes[currentThemeIndex];
+            root.classList.remove('is-dark-theme', 'is-crimson-theme');
+            document.body.classList.remove('bb-demo-dark', 'bb-demo-crimson');
+            if (theme.rootClass) root.classList.add(theme.rootClass);
+            if (theme.bodyClass) document.body.classList.add(theme.bodyClass);
+            toggleThemeBtn.textContent = theme.name;
             triggerJellyPulse();
           });
         }

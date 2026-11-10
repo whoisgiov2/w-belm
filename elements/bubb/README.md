@@ -35,8 +35,11 @@ Para que la burbuja aparezca flotando en todas las páginas de tu tienda:
 
 ### 3. Personalizarlo desde el Editor de Shopify
 Ve a **Personalizar tema** en el panel de Shopify. Podrás configurar:
-- **Modo visual**: Silueta de Spike o Burbuja esférica clásica.
-- **Variante de color**: Modo Claro (por defecto) o Modo Oscuro (colores invertidos para temas oscuros).
+- **Modo visual**: Silueta de Spike interactiva o Burbuja esférica clásica.
+- **Variante de color**: 
+  - **Crimson Caos (#780606)**: Diseñada con matices rojo carmesí / vino profundo para integrarse con la tienda.
+  - **Modo Claro (Original)**: Burbuja translúcida iridiscente con acento índigo.
+  - **Modo Oscuro (Invertido)**: Variante luminosa de alto contraste para temas negros.
 - **Logo personalizado**: Sube cualquier logo transparente en formato PNG o SVG.
 - **Tamaño y posición**: Ajusta el diámetro de la burbuja y los márgenes respecto a la esquina inferior derecha.
 - **URLs de destino**: Cambia los enlaces de registro y login si usas páginas personalizadas.
@@ -49,4 +52,4 @@ Abre el archivo `index.html` de esta carpeta con **doble clic**.
 Podrás:
 - Arrastrar la burbuja libremente con el mouse.
 - Probar el teclado (las flechas mueven la burbuja, `Enter` la abre).
-- Usar la barra de pruebas superior para cambiar a tema oscuro, forzar la explosión o alternar entre el modo silueta y esfera.
+- Usar la barra de pruebas superior para alternar entre el **Tema Claro**, **Tema Oscuro** y la nueva variante **Crimson (#780606)**, forzar la explosión o alternar entre el modo silueta y esfera.

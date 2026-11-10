@@ -1306,6 +1306,128 @@
   color: #a5b4fc;
 }
 
+/* ==========================================================================
+   11. VARIANTE CRIMSON / ROJO CAOS (#780606) (.is-crimson-theme)
+   ========================================================================== */
+#bb-root.is-crimson-theme {
+  --bb-accent: #780606;
+}
+
+/* 11.1. Silueta Spike en modo Crimson */
+#bb-root.is-crimson-theme .bb-bubble.is-spike-mode .bb-logo,
+[data-theme="crimson"] #bb-root .bb-bubble.is-spike-mode .bb-logo {
+  filter: url(#bb-spike-soap-filter-crimson);
+}
+
+@media (hover: hover) {
+  #bb-root.is-crimson-theme .bb-bubble.is-spike-mode.is-floating:hover .bb-logo,
+  [data-theme="crimson"] #bb-root .bb-bubble.is-spike-mode.is-floating:hover .bb-logo {
+    filter: url(#bb-spike-soap-filter-crimson) drop-shadow(0 0 12px rgba(220, 38, 38, 0.75)) brightness(1.12);
+  }
+}
+
+/* 11.2. Burbuja esférica con matices carmesí #780606 */
+#bb-root.is-crimson-theme .bb-bubble:not(.is-spike-mode),
+[data-theme="crimson"] #bb-root .bb-bubble:not(.is-spike-mode) {
+  border-color: rgba(255, 255, 255, 0.75);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.7) 8%, rgba(255, 255, 255, 0) 18%),
+    radial-gradient(circle at 38% 32%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.12) 28%, rgba(255, 255, 255, 0) 52%),
+    radial-gradient(circle at 72% 75%, rgba(244, 63, 94, 0.25) 0%, rgba(185, 28, 28, 0.28) 32%, rgba(120, 6, 6, 0.25) 58%, rgba(255, 255, 255, 0) 75%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, rgba(120, 6, 6, 0.06) 65%, rgba(185, 28, 28, 0.18) 100%);
+  box-shadow:
+    inset 0 0 14px 1px rgba(255, 255, 255, 0.5),
+    inset 0 0 3px 1px rgba(255, 255, 255, 0.75),
+    inset -3px -3px 12px 0px rgba(185, 28, 28, 0.3),
+    0 10px 26px -4px rgba(120, 6, 6, 0.4),
+    0 4px 14px -2px rgba(220, 38, 38, 0.3);
+}
+
+/* 11.3. Gotitas de explosión con matiz rubí */
+#bb-root.is-crimson-theme .bb-droplet {
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.95) 0%, rgba(254, 202, 202, 0.7) 45%, rgba(120, 6, 6, 0.45) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 6px rgba(185, 28, 28, 0.6);
+}
+
+/* 11.4. Panel Welcome to The Chaos con matices #780606 */
+#bb-root.is-crimson-theme .bb-panel,
+[data-theme="crimson"] #bb-root .bb-panel {
+  background: #0d0606;
+  border: 1px solid rgba(120, 6, 6, 0.38);
+  box-shadow:
+    0 24px 50px -10px rgba(0, 0, 0, 0.8),
+    0 0 28px -4px rgba(120, 6, 6, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+#bb-root.is-crimson-theme .bb-panel-close,
+[data-theme="crimson"] #bb-root .bb-panel-close {
+  background: #1c0a0a;
+  color: #fca5a5;
+  border: 1px solid rgba(120, 6, 6, 0.25);
+}
+
+#bb-root.is-crimson-theme .bb-panel-close:hover,
+[data-theme="crimson"] #bb-root .bb-panel-close:hover {
+  background: #2d0e0e;
+  color: #ffffff;
+  border-color: rgba(220, 38, 38, 0.5);
+}
+
+#bb-root.is-crimson-theme .bb-panel-logo,
+[data-theme="crimson"] #bb-root .bb-panel-logo {
+  filter: drop-shadow(0 0 8px rgba(185, 28, 28, 0.65));
+}
+
+#bb-root.is-crimson-theme .bb-panel-title,
+[data-theme="crimson"] #bb-root .bb-panel-title {
+  color: #ffffff;
+}
+
+#bb-root.is-crimson-theme .bb-chaos-desc,
+[data-theme="crimson"] #bb-root .bb-chaos-desc {
+  color: #fecaca;
+}
+
+#bb-root.is-crimson-theme .bb-btn-submit,
+[data-theme="crimson"] #bb-root .bb-btn-submit {
+  background: #780606;
+  color: #ffffff;
+  border-color: #991b1b;
+  box-shadow: 0 8px 22px -4px rgba(120, 6, 6, 0.6);
+}
+
+#bb-root.is-crimson-theme .bb-btn-submit:hover,
+[data-theme="crimson"] #bb-root .bb-btn-submit:hover {
+  background: #991b1b;
+  border-color: #b91c1c;
+  color: #ffffff;
+  box-shadow: 0 10px 26px -2px rgba(185, 28, 28, 0.7);
+}
+
+#bb-root.is-crimson-theme .bb-login-link,
+[data-theme="crimson"] #bb-root .bb-login-link {
+  color: #fca5a5;
+}
+
+#bb-root.is-crimson-theme .bb-login-link:hover,
+[data-theme="crimson"] #bb-root .bb-login-link:hover {
+  color: #ef4444;
+}
+
+#bb-root.is-crimson-theme .bb-success-text,
+[data-theme="crimson"] #bb-root .bb-success-text {
+  color: #f87171;
+}
+
+#bb-root.is-crimson-theme .bb-bubble:focus-visible,
+#bb-root.is-crimson-theme .bb-panel-close:focus-visible,
+#bb-root.is-crimson-theme .bb-btn-submit:focus-visible,
+#bb-root.is-crimson-theme .bb-login-link:focus-visible {
+  outline: 3px solid #780606;
+}
+
 /* Dispositivos móviles (≤ 480px) */
 @media (max-width: 480px) {
   .bb-panel-wrap {

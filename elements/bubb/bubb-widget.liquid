@@ -11,7 +11,7 @@
      personalizable desde el panel visual de Shopify.
 {% endcomment %}
 
-<div id="bb-root" class="bb-root-{{ section.id }}{% if section.settings.theme_variant == 'dark' %} is-dark-theme{% endif %}" aria-live="polite">
+<div id="bb-root" class="bb-root-{{ section.id }}{% if section.settings.theme_variant == 'dark' %} is-dark-theme{% elsif section.settings.theme_variant == 'crimson' %} is-crimson-theme{% endif %}" aria-live="polite">
   <!-- Filtro SVG óptico para convertir la silueta de Spike en película de jabón 3D -->
   <svg class="bb-svg-defs" width="0" height="0" aria-hidden="true" focusable="false">
     <defs>
@@ -103,6 +103,53 @@
           <feMergeNode in="bb-dark-cyan" />
           <feMergeNode in="bb-dark-spec" />
           <feMergeNode in="bb-dark-rim" />
+        </feMerge>
+      </filter>
+
+      <!-- Filtro óptico SVG para Variante Crimson (#780606) -->
+      <filter id="bb-spike-soap-filter-crimson-{{ section.id }}" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+        <feColorMatrix in="SourceAlpha" type="matrix" values="
+          0 0 0 0 0.47
+          0 0 0 0 0.024
+          0 0 0 0 0.024
+          0 0 0 0.35 0" result="bb-crimson-base" />
+        <feMorphology in="SourceAlpha" operator="erode" radius="4" result="bb-crimson-erode" />
+        <feComposite in="SourceAlpha" in2="bb-crimson-erode" operator="out" result="bb-crimson-band" />
+        <feGaussianBlur in="bb-crimson-band" stdDeviation="3.2" result="bb-crimson-blur" />
+        <feComposite in="bb-crimson-blur" in2="SourceAlpha" operator="in" result="bb-crimson-masked" />
+        <feColorMatrix in="bb-crimson-masked" type="matrix" values="
+          0 0 0 0 0.88
+          0 0 0 0 0.12
+          0 0 0 0 0.16
+          0 0 0 0.70 0" result="bb-crimson-cushion" />
+        <feOffset in="bb-crimson-blur" dx="-4" dy="-4" result="bb-crimson-offset" />
+        <feComposite in="bb-crimson-offset" in2="SourceAlpha" operator="in" result="bb-crimson-irid-mask" />
+        <feColorMatrix in="bb-crimson-irid-mask" type="matrix" values="
+          0 0 0 0 0.98
+          0 0 0 0 0.32
+          0 0 0 0 0.38
+          0 0 0 0.55 0" result="bb-crimson-pink" />
+        <feGaussianBlur in="SourceAlpha" stdDeviation="4.5" result="bb-crimson-bump" />
+        <feSpecularLighting in="bb-crimson-bump" surfaceScale="6.2" specularConstant="1.4" specularExponent="24" lighting-color="#ffffff" result="bb-crimson-spec-raw">
+          <fePointLight x="-45" y="-55" z="92" />
+        </feSpecularLighting>
+        <feComposite in="bb-crimson-spec-raw" in2="SourceAlpha" operator="in" result="bb-crimson-spec" />
+        <feMorphology in="SourceAlpha" operator="erode" radius="1.4" result="bb-crimson-rim-erode" />
+        <feComposite in="SourceAlpha" in2="bb-crimson-rim-erode" operator="out" result="bb-crimson-rim-raw" />
+        <feGaussianBlur in="bb-crimson-rim-raw" stdDeviation="0.35" result="bb-crimson-rim-soft" />
+        <feColorMatrix in="bb-crimson-rim-soft" type="matrix" values="
+          0 0 0 0 1
+          0 0 0 0 0.95
+          0 0 0 0 0.95
+          0 0 0 0 0.95 0" result="bb-crimson-rim" />
+        <feDropShadow in="SourceAlpha" dx="0" dy="7" stdDeviation="7" flood-color="#780606" flood-opacity="0.45" result="bb-crimson-shadow" />
+        <feMerge>
+          <feMergeNode in="bb-crimson-shadow" />
+          <feMergeNode in="bb-crimson-base" />
+          <feMergeNode in="bb-crimson-cushion" />
+          <feMergeNode in="bb-crimson-pink" />
+          <feMergeNode in="bb-crimson-spec" />
+          <feMergeNode in="bb-crimson-rim" />
         </feMerge>
       </filter>
     </defs>
@@ -201,9 +248,14 @@
     {%- assign bb_squash_factor = bb_squash_num -%}
   {%- endif -%}
 
+  {%- assign bb_accent_color = section.settings.accent_color -%}
+  {%- if section.settings.theme_variant == 'crimson' and bb_accent_color == '#4f46e5' or bb_accent_color == blank -%}
+    {%- assign bb_accent_color = '#780606' -%}
+  {%- endif -%}
+
   .bb-root-{{ section.id }} {
     --bb-size: {{ section.settings.bubble_size | default: 84 }}px;
-    --bb-accent: {{ section.settings.accent_color | default: '#4f46e5' }};
+    --bb-accent: {{ bb_accent_color | default: '#780606' }};
     --bb-right: {{ section.settings.position_right | default: 24 }}px;
     --bb-bottom: {{ section.settings.position_bottom | default: 24 }}px;
     --bb-float-time: {{ section.settings.float_speed | default: 4 }}s;
@@ -1030,6 +1082,121 @@
     color: #a5b4fc;
   }
 
+  /* ==========================================================================
+     VARIANTE CRIMSON / ROJO CAOS (#780606) (.is-crimson-theme)
+     ========================================================================== */
+  .bb-root-{{ section.id }}.is-crimson-theme {
+    --bb-accent: #780606;
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-bubble.is-spike-mode .bb-logo,
+  [data-theme="crimson"] .bb-root-{{ section.id }} .bb-bubble.is-spike-mode .bb-logo {
+    filter: url(#bb-spike-soap-filter-crimson-{{ section.id }});
+  }
+
+  @media (hover: hover) {
+    .bb-root-{{ section.id }}.is-crimson-theme .bb-bubble.is-spike-mode.is-floating:hover .bb-logo,
+    [data-theme="crimson"] .bb-root-{{ section.id }} .bb-bubble.is-spike-mode.is-floating:hover .bb-logo {
+      filter: url(#bb-spike-soap-filter-crimson-{{ section.id }}) drop-shadow(0 0 12px rgba(220, 38, 38, 0.75)) brightness(1.12);
+    }
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-bubble:not(.is-spike-mode),
+  [data-theme="crimson"] .bb-root-{{ section.id }} .bb-bubble:not(.is-spike-mode) {
+    border-color: rgba(255, 255, 255, 0.75);
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.7) 8%, rgba(255, 255, 255, 0) 18%),
+      radial-gradient(circle at 38% 32%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.12) 28%, rgba(255, 255, 255, 0) 52%),
+      radial-gradient(circle at 72% 75%, rgba(244, 63, 94, 0.25) 0%, rgba(185, 28, 28, 0.28) 32%, rgba(120, 6, 6, 0.25) 58%, rgba(255, 255, 255, 0) 75%),
+      radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, rgba(120, 6, 6, 0.06) 65%, rgba(185, 28, 28, 0.18) 100%);
+    box-shadow:
+      inset 0 0 14px 1px rgba(255, 255, 255, 0.5),
+      inset 0 0 3px 1px rgba(255, 255, 255, 0.75),
+      inset -3px -3px 12px 0px rgba(185, 28, 28, 0.3),
+      0 10px 26px -4px rgba(120, 6, 6, 0.4),
+      0 4px 14px -2px rgba(220, 38, 38, 0.3);
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-droplet {
+    background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.95) 0%, rgba(254, 202, 202, 0.7) 45%, rgba(120, 6, 6, 0.45) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 6px rgba(185, 28, 28, 0.6);
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-panel,
+  [data-theme="crimson"] .bb-root-{{ section.id }} .bb-panel {
+    background: #0d0606;
+    border: 1px solid rgba(120, 6, 6, 0.38);
+    box-shadow: 0 24px 50px -10px rgba(0, 0, 0, 0.8), 0 0 28px -4px rgba(120, 6, 6, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-panel-close,
+  [data-theme="crimson"] .bb-root-{{ section.id }} .bb-panel-close {
+    background: #1c0a0a;
+    color: #fca5a5;
+    border: 1px solid rgba(120, 6, 6, 0.25);
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-panel-close:hover,
+  [data-theme="crimson"] .bb-root-{{ section.id }} .bb-panel-close:hover {
+    background: #2d0e0e;
+    color: #ffffff;
+    border-color: rgba(220, 38, 38, 0.5);
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-panel-logo,
+  [data-theme="crimson"] .bb-root-{{ section.id }} .bb-panel-logo {
+    filter: drop-shadow(0 0 8px rgba(185, 28, 28, 0.65));
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-panel-title,
+  [data-theme="crimson"] .bb-root-{{ section.id }} .bb-panel-title {
+    color: #ffffff;
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-chaos-desc,
+  [data-theme="crimson"] .bb-root-{{ section.id }} .bb-chaos-desc {
+    color: #fecaca;
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-btn-submit,
+  [data-theme="crimson"] .bb-root-{{ section.id }} .bb-btn-submit {
+    background: #780606;
+    color: #ffffff;
+    border-color: #991b1b;
+    box-shadow: 0 8px 22px -4px rgba(120, 6, 6, 0.6);
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-btn-submit:hover,
+  [data-theme="crimson"] .bb-root-{{ section.id }} .bb-btn-submit:hover {
+    background: #991b1b;
+    border-color: #b91c1c;
+    color: #ffffff;
+    box-shadow: 0 10px 26px -2px rgba(185, 28, 28, 0.7);
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-login-link,
+  [data-theme="crimson"] .bb-root-{{ section.id }} .bb-login-link {
+    color: #fca5a5;
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-login-link:hover,
+  [data-theme="crimson"] .bb-root-{{ section.id }} .bb-login-link:hover {
+    color: #ef4444;
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-success-text,
+  [data-theme="crimson"] .bb-root-{{ section.id }} .bb-success-text {
+    color: #f87171;
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-bubble:focus-visible,
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-panel-close:focus-visible,
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-btn-submit:focus-visible,
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-login-link:focus-visible {
+    outline: 3px solid #780606;
+  }
+
   /* Accesibilidad y foco por teclado */
   .bb-root-{{ section.id }} .bb-bubble:focus-visible,
   .bb-root-{{ section.id }} .bb-panel-close:focus-visible,
@@ -1709,9 +1876,13 @@
     {
       "type": "select",
       "id": "theme_variant",
-      "label": "Variante de color (Claro / Oscuro Invertido)",
-      "default": "light",
+      "label": "Variante de color",
+      "default": "crimson",
       "options": [
+        {
+          "value": "crimson",
+          "label": "Crimson Caos (#780606)"
+        },
         {
           "value": "light",
           "label": "Modo Claro (Original)"
