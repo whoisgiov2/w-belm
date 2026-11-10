@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bubb Widget - Prototipo</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Estilos base mínimos de página para previsualización (Modo Claro y Modo Oscuro) */
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 50%, #f8fafc 0%, #e2e8f0 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      transition: background 0.35s ease, color 0.35s ease;
+    }
+
+    body.bb-demo-dark {
+      background: radial-gradient(circle at 50% 50%, #131622 0%, #07080d 100%);
+      color: #f8fafc;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- PANEL DE PRUEBAS: BORRAR AL INTEGRAR EN SHOPIFY -->
+  <aside id="bb-test-panel" class="bb-test-panel" aria-label="Controles de prueba">
+    <button id="bb-btn-toggle-theme" class="bb-test-btn bb-test-btn-accent" type="button">Tema: Claro (Ver Oscuro)</button>
+    <button id="bb-btn-toggle-mode" class="bb-test-btn bb-test-btn-accent" type="button">Modo: Silueta Spike</button>
+    <button id="bb-btn-jelly" class="bb-test-btn" type="button">Pulso Gelatina</button>
+    <button id="bb-btn-curious" class="bb-test-btn" type="button">Gesto Curioso</button>
+    <button id="bb-btn-spin" class="bb-test-btn" type="button">Giro Rotación</button>
+    <button id="bb-btn-reset-pos" class="bb-test-btn" type="button">Restablecer posición</button>
+    <button id="bb-btn-reset" class="bb-test-btn" type="button">Reiniciar ciclo</button>
+    <button id="bb-btn-force-pop" class="bb-test-btn" type="button">Forzar explosión</button>
+    <button id="bb-btn-open-form" class="bb-test-btn" type="button">Ver formulario</button>
+  </aside>
+  <!-- FIN PANEL DE PRUEBAS -->
+
+  <!-- === INICIO BLOQUE SHOPIFY === -->
+  <!-- ======================================================================
+       CONTENEDOR RAÍZ AISLADO (#bb-root)
+       Se integra en Shopify con pointer-events: none; z-index: 9999;
+       ====================================================================== -->
+  <div id="bb-root">
+      <!-- Filtro óptico SVG: transforma la silueta de spike.png en una burbuja de jabón 3D translúcida -->
+      <svg class="bb-svg-defs" aria-hidden="true" width="0" height="0" focusable="false">
+        <defs>
+          <filter id="bb-spike-soap-filter" x="-25%" y="-25%" width="150%" height="150%"
+            color-interpolation-filters="sRGB">
+            <!-- 1. Cuerpo base translúcido jabonoso (deja pasar los colores del fondo de la página) -->
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0.31
+                    0 0 0 0 0.27
+                    0 0 0 0 0.90
+                    0 0 0 0.32 0" result="bb-base-tint" />
+
+            <!-- 2. Cojín interior iridiscente cian/azul en el contorno interno y ojo de Spike -->
+            <feMorphology in="SourceAlpha" operator="erode" radius="4" result="bb-erode-deep" />
+            <feComposite in="SourceAlpha" in2="bb-erode-deep" operator="out" result="bb-inner-band" />
+            <feGaussianBlur in="bb-inner-band" stdDeviation="3.2" result="bb-inner-blur" />
+            <feComposite in="bb-inner-blur" in2="SourceAlpha" operator="in" result="bb-inner-masked" />
+            <feColorMatrix in="bb-inner-masked" type="matrix" values="0 0 0 0 0.58
+                    0 0 0 0 0.82
+                    0 0 0 0 1.00
+                    0 0 0 0.65 0" result="bb-soap-cushion" />
+
+            <!-- 3. Refracción iridiscente rosada/violeta desplazada abajo a la derecha -->
+            <feOffset in="bb-inner-blur" dx="-4" dy="-4" result="bb-irid-offset" />
+            <feComposite in="bb-irid-offset" in2="SourceAlpha" operator="in" result="bb-irid-masked" />
+            <feColorMatrix in="bb-irid-masked" type="matrix" values="0 0 0 0 0.94
+                    0 0 0 0 0.45
+                    0 0 0 0 0.82
+                    0 0 0 0.52 0" result="bb-irid-pink" />
+
+            <!-- 4. Iluminación especular 3D (volumen inflado de burbuja sobre los picos y cabeza) -->
+            <feGaussianBlur in="SourceAlpha" stdDeviation="4.5" result="bb-bump-map" />
+            <feSpecularLighting in="bb-bump-map" surfaceScale="6" specularConstant="1.3" specularExponent="24"
+              lighting-color="#ffffff" result="bb-spec-raw">
+              <fePointLight x="-45" y="-55" z="90" />
+            </feSpecularLighting>
+            <feComposite in="bb-spec-raw" in2="SourceAlpha" operator="in" result="bb-spec-highlight" />
+
+            <!-- 5. Película perimetral blanca fina (1.4px siguiendo cada pico, silueta y ojo) -->
+            <feMorphology in="SourceAlpha" operator="erode" radius="1.4" result="bb-erode-rim" />
+            <feComposite in="SourceAlpha" in2="bb-erode-rim" operator="out" result="bb-rim-raw" />
+            <feGaussianBlur in="bb-rim-raw" stdDeviation="0.35" result="bb-rim-soft" />
+            <feColorMatrix in="bb-rim-soft" type="matrix" values="0 0 0 0 1
+                    0 0 0 0 1
+                    0 0 0 0 1
+                    0 0 0 0.94 0" result="bb-white-rim" />
+
+            <!-- 6. Sombra exterior flotante con tinte azul/violeta -->
+            <feDropShadow in="SourceAlpha" dx="0" dy="8" stdDeviation="6" flood-color="#4f46e5" flood-opacity="0.28"
+              result="bb-drop-shadow" />
+
+            <!-- 7. Composición final de la burbuja con silueta de Spike (Modo Claro) -->
+            <feMerge>
+              <feMergeNode in="bb-drop-shadow" />
+              <feMergeNode in="bb-base-tint" />
+              <feMergeNode in="bb-soap-cushion" />
+              <feMergeNode in="bb-irid-pink" />
+              <feMergeNode in="bb-spec-highlight" />
+              <feMergeNode in="bb-white-rim" />
+            </feMerge>
+          </filter>
+
+          <!-- Filtro óptico SVG invertido para Modo Oscuro (#bb-spike-soap-filter-dark) -->
+          <filter id="bb-spike-soap-filter-dark" x="-25%" y="-25%" width="150%" height="150%"
+            color-interpolation-filters="sRGB">
+            <!-- 1. Cuerpo base nacarado/luminoso invertido para resaltar sobre fondos oscuros -->
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0.94
+                    0 0 0 0 0.96
+                    0 0 0 0 1.00
+                    0 0 0 0.24 0" result="bb-dark-base" />
+
+            <!-- 2. Cojín interior invertido violeta/magenta luminoso -->
+            <feMorphology in="SourceAlpha" operator="erode" radius="4" result="bb-dark-erode" />
+            <feComposite in="SourceAlpha" in2="bb-dark-erode" operator="out" result="bb-dark-band" />
+            <feGaussianBlur in="bb-dark-band" stdDeviation="3.2" result="bb-dark-blur" />
+            <feComposite in="bb-dark-blur" in2="SourceAlpha" operator="in" result="bb-dark-masked" />
+            <feColorMatrix in="bb-dark-masked" type="matrix" values="0 0 0 0 0.78
+                    0 0 0 0 0.52
+                    0 0 0 0 1.00
+                    0 0 0 0.72 0" result="bb-dark-cushion" />
+
+            <!-- 3. Refracción iridiscente cian eléctrico desplazada -->
+            <feOffset in="bb-dark-blur" dx="-4" dy="-4" result="bb-dark-offset" />
+            <feComposite in="bb-dark-offset" in2="SourceAlpha" operator="in" result="bb-dark-irid-mask" />
+            <feColorMatrix in="bb-dark-irid-mask" type="matrix" values="0 0 0 0 0.35
+                    0 0 0 0 0.95
+                    0 0 0 0 1.00
+                    0 0 0 0.65 0" result="bb-dark-cyan" />
+
+            <!-- 4. Iluminación especular 3D intensa sobre fondo oscuro -->
+            <feGaussianBlur in="SourceAlpha" stdDeviation="4.5" result="bb-dark-bump" />
+            <feSpecularLighting in="bb-dark-bump" surfaceScale="6.5" specularConstant="1.45" specularExponent="22"
+              lighting-color="#ffffff" result="bb-dark-spec-raw">
+              <fePointLight x="-45" y="-55" z="95" />
+            </feSpecularLighting>
+            <feComposite in="bb-dark-spec-raw" in2="SourceAlpha" operator="in" result="bb-dark-spec" />
+
+            <!-- 5. Película perimetral blanca/cian brillante (1.5px en cada púa y contorno del ojo) -->
+            <feMorphology in="SourceAlpha" operator="erode" radius="1.5" result="bb-dark-rim-erode" />
+            <feComposite in="SourceAlpha" in2="bb-dark-rim-erode" operator="out" result="bb-dark-rim-raw" />
+            <feColorMatrix in="bb-dark-rim-raw" type="matrix" values="0 0 0 0 1
+                    0 0 0 0 1
+                    0 0 0 0 1
+                    0 0 0 0.98 0" result="bb-dark-rim" />
+
+            <!-- 6. Resplandor exterior neón/violeta para despegarse del fondo oscuro -->
+            <feDropShadow in="SourceAlpha" dx="0" dy="6" stdDeviation="8" flood-color="#818cf8" flood-opacity="0.45"
+              result="bb-dark-glow" />
+
+            <!-- 7. Composición final de la silueta invertida en Modo Oscuro -->
+            <feMerge>
+              <feMergeNode in="bb-dark-glow" />
+              <feMergeNode in="bb-dark-base" />
+              <feMergeNode in="bb-dark-cushion" />
+              <feMergeNode in="bb-dark-cyan" />
+              <feMergeNode in="bb-dark-spec" />
+              <feMergeNode in="bb-dark-rim" />
+            </feMerge>
+          </filter>
+        </defs>
+      </svg>
+
+      <!-- Contenedor externo de posición (.bb-bubble-wrap): controla SOLO transform: translate3d de arrastre -->
+      <div class="bb-bubble-wrap" id="bb-bubble-wrap">
+        <!-- Burbuja interactiva interna: conserva flotación, rebote, micro-interacciones y explosión -->
+        <button class="bb-bubble is-spike-mode" id="bb-bubble" type="button" aria-label="Abrir formulario de contacto"
+          aria-expanded="false" aria-controls="bb-panel">
+          <span class="bb-spike-actor">
+            <img class="bb-logo" src="spike.png" alt="" draggable="false">
+            <img class="bb-spike-glint-img" src="spike.png" alt="" draggable="false" aria-hidden="true">
+          </span>
+          <span class="bb-glint" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <!-- Contenedor externo de posición del panel (.bb-panel-wrap): posiciona el panel junto a la burbuja -->
+      <!-- En Shopify: JOIN THE CHAOS redirige a {{ routes.account_register_url }} (/account/register) y ¿yA tIEnES cuEnTa? redirige a {{ routes.account_login_url }} (/account/login) -->
+      <div class="bb-panel-wrap" id="bb-panel-wrap">
+        <div class="bb-panel" id="bb-panel" role="dialog" aria-label="Welcome to The Chaos" hidden>
+          <button class="bb-panel-close" id="bb-panel-close" type="button" aria-label="Cerrar panel">&times;</button>
+
+          <div class="bb-panel-header">
+            <img class="bb-panel-logo" src="spike.png" alt="" draggable="false">
+            <h2 class="bb-panel-title">Welcome to<br>The Chaos</h2>
+          </div>
+
+          <div class="bb-form bb-chaos-body" id="bb-form">
+            <p class="bb-chaos-desc">Recibe alertas de lo más popular y obtén una sorpresa para tu cumpleaños.</p>
+
+            <a href="/account/register" class="bb-btn-submit bb-btn-chaos" id="bb-btn-join" role="button">JOIN THE CHAOS</a>
+
+            <div class="bb-login-wrap">
+              <a href="/account/login" class="bb-login-link" id="bb-link-login">¿yA tIEnES cuEnTa?</a>
+            </div>
+          </div>
+
+          <div class="bb-panel-success" id="bb-panel-success" hidden>
+            <p class="bb-success-text" id="bb-success-text">¡Bienvenido al Caos! Redirigiendo a registro...</p>
+          </div>
+        </div>
+      </div>
+  </div>
+  <!-- === FIN BLOQUE SHOPIFY === -->
+
+  <!-- ======================================================================
+       CONTROLADOR DE ESTADOS (VANILLA JAVASCRIPT)
+       ====================================================================== -->
+  <script>
+    /* === INICIO BLOQUE SHOPIFY === */
+    (function () {
+      'use strict';
+
+      function bbInit() {
+        const root = document.getElementById('bb-root');
+        const bubbleWrap = document.getElementById('bb-bubble-wrap') || document.querySelector('.bb-bubble-wrap');
+        const bubble = document.getElementById('bb-bubble') || document.querySelector('.bb-bubble');
+        const panelWrap = document.getElementById('bb-panel-wrap') || document.querySelector('.bb-panel-wrap');
+        const panel = document.getElementById('bb-panel');
+        const form = document.getElementById('bb-form');
+        const joinBtn = document.getElementById('bb-btn-join');
+        const loginLink = document.getElementById('bb-link-login');
+        const successMsg = document.getElementById('bb-panel-success');
+        const successText = document.getElementById('bb-success-text');
+        const panelCloseBtn = document.getElementById('bb-panel-close');
+
+        /* Elementos de prueba (excluidos de la copia a Shopify) */
+        const toggleThemeBtn = document.getElementById('bb-btn-toggle-theme');
+        const toggleModeBtn = document.getElementById('bb-btn-toggle-mode');
+        const jellyBtn = document.getElementById('bb-btn-jelly');
+        const curiousBtn = document.getElementById('bb-btn-curious');
+        const spinBtn = document.getElementById('bb-btn-spin');
+        const resetPosBtn = document.getElementById('bb-btn-reset-pos');
+        const resetBtn = document.getElementById('bb-btn-reset');
+        const forcePopBtn = document.getElementById('bb-btn-force-pop');
+        const openFormBtn = document.getElementById('bb-btn-open-form');
+
+        if (!bubble || !bubbleWrap || !root || !panel || !panelWrap) return;
+
+        /**
+         * Variable única de estado: 'hidden' | 'rising' | 'floating' | 'popping' | 'form-open' | 'closing' | 'reforming'
+         */
+        let currentState = 'hidden';
+        let riseTimeoutId = null;
+        let autoCloseTimeoutId = null;
+        let curiousIntervalId = null;
+        let hoverResetTimeoutId = null;
+        let hoverPassCount = 0;
+        let isHovered = false;
+        let formSubmitted = false;
+
+        // ====================================================================
+        // ESTADO DE ARRASTRE LIBRE (POINTER EVENTS + LOCALSTORAGE + CLAMP)
+        // ====================================================================
+        const STORAGE_KEY = 'bb_bubble_pos_v1';
+        const DRAG_THRESHOLD = 6;
+        let dragX = 0;
+        let dragY = 0;
+        let isPointerDown = false;
+        let isDragging = false;
+        let wasDragged = false;
+        let activePointerId = null;
+        let startClientX = 0;
+        let startClientY = 0;
+        let startDragX = 0;
+        let startDragY = 0;
+
+        function getViewportBounds() {
+          const vv = window.visualViewport;
+          return {
+            vw: vv ? vv.width : window.innerWidth,
+            vh: vv ? vv.height : window.innerHeight,
+            offsetLeft: vv ? vv.offsetLeft : 0,
+            offsetTop: vv ? vv.offsetTop : 0
+          };
+        }
+
+        function clampAndApplyPosition(targetX, targetY) {
+          const rect = bubbleWrap.getBoundingClientRect();
+          const baseLeft = rect.left - dragX;
+          const baseTop = rect.top - dragY;
+          const width = rect.width || 84;
+          const height = rect.height || 84;
+          const { vw, vh, offsetLeft, offsetTop } = getViewportBounds();
+          const margin = 12;
+
+          const minLeft = offsetLeft + margin;
+          const maxLeft = Math.max(minLeft, offsetLeft + vw - width - margin);
+          const minTop = offsetTop + margin;
+          const maxTop = Math.max(minTop, offsetTop + vh - height - margin);
+
+          dragX = Math.min(maxLeft - baseLeft, Math.max(minLeft - baseLeft, targetX));
+          dragY = Math.min(maxTop - baseTop, Math.max(minTop - baseTop, targetY));
+
+          bubbleWrap.style.setProperty('--bb-drag-x', `${dragX.toFixed(1)}px`);
+          bubbleWrap.style.setProperty('--bb-drag-y', `${dragY.toFixed(1)}px`);
+        }
+
+        function savePosition() {
+          try {
+            window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ x: dragX, y: dragY }));
+          } catch (err) {
+            // Ignorar si localStorage está bloqueado o falla
+          }
+        }
+
+        function loadSavedPosition() {
+          try {
+            const raw = window.localStorage.getItem(STORAGE_KEY);
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed.x === 'number' && typeof parsed.y === 'number' && isFinite(parsed.x) && isFinite(parsed.y)) {
+              clampAndApplyPosition(parsed.x, parsed.y);
+            }
+          } catch (err) {
+            // Si falla la lectura o el JSON, mantener posición por defecto (0, 0)
+          }
+        }
+
+        function resetPosition() {
+          dragX = 0;
+          dragY = 0;
+          bubbleWrap.style.setProperty('--bb-drag-x', '0px');
+          bubbleWrap.style.setProperty('--bb-drag-y', '0px');
+          try {
+            window.localStorage.removeItem(STORAGE_KEY);
+          } catch (err) {
+            // Ignorar si el storage falla
+          }
+          if (currentState === 'form-open') {
+            positionPanelNearBubble();
+          }
+        }
+
+        /**
+         * Calcula la posición del panel desde donde está la burbuja y lo abre hacia el lado con más espacio.
+         */
+        function positionPanelNearBubble() {
+          const bRect = bubbleWrap.getBoundingClientRect();
+          const pRect = panelWrap.getBoundingClientRect();
+          const pBaseLeft = pRect.left - (parseFloat(panelWrap.style.getPropertyValue('--bb-panel-x')) || 0);
+          const pBaseTop = pRect.top - (parseFloat(panelWrap.style.getPropertyValue('--bb-panel-y')) || 0);
+
+          const { vw, vh, offsetLeft, offsetTop } = getViewportBounds();
+          const margin = 16;
+          const pWidth = Math.min(340, vw - 32);
+          const pHeight = panel.offsetHeight || 245;
+
+          const bCenterX = bRect.left + bRect.width / 2;
+          const bCenterY = bRect.top + bRect.height / 2;
+
+          // Espacio disponible a cada lado de la burbuja
+          const spaceLeft = bCenterX - offsetLeft;
+          const spaceRight = (offsetLeft + vw) - bCenterX;
+          const spaceTop = bCenterY - offsetTop;
+          const spaceBottom = (offsetTop + vh) - bCenterY;
+
+          let desiredLeft;
+          let originX;
+          if (spaceLeft >= spaceRight) {
+            // Más espacio a la izquierda: alinear borde derecho del panel con borde derecho de la burbuja
+            desiredLeft = bRect.right - pWidth;
+            originX = 'right';
+          } else {
+            // Más espacio a la derecha: alinear borde izquierdo del panel con borde izquierdo de la burbuja
+            desiredLeft = bRect.left;
+            originX = 'left';
+          }
+
+          let desiredTop;
+          let originY;
+          if (spaceTop >= spaceBottom) {
+            // Más espacio arriba: alinear borde inferior del panel con borde inferior de la burbuja
+            desiredTop = bRect.bottom - pHeight;
+            originY = 'bottom';
+          } else {
+            // Más espacio abajo: alinear borde superior del panel con borde superior de la burbuja
+            desiredTop = bRect.top;
+            originY = 'top';
+          }
+
+          const clampedLeft = Math.min(offsetLeft + vw - pWidth - margin, Math.max(offsetLeft + margin, desiredLeft));
+          const clampedTop = Math.min(offsetTop + vh - pHeight - margin, Math.max(offsetTop + margin, desiredTop));
+
+          const panelX = clampedLeft - pBaseLeft;
+          const panelY = clampedTop - pBaseTop;
+
+          panelWrap.style.setProperty('--bb-panel-x', `${panelX.toFixed(1)}px`);
+          panelWrap.style.setProperty('--bb-panel-y', `${panelY.toFixed(1)}px`);
+          panel.style.transformOrigin = `${originY} ${originX}`;
+        }
+
+        /**
+         * Limpieza garantizada de nodos efímeros (gotitas y anillos) por evento y fallback de seguridad.
+         */
+        function removeNodeSafely(node, fallbackMs) {
+          let removed = false;
+          const clean = () => {
+            if (removed) return;
+            removed = true;
+            if (node && node.parentNode) node.parentNode.removeChild(node);
+          };
+          node.addEventListener('animationend', clean, { once: true });
+          setTimeout(clean, fallbackMs);
+        }
+
+        /**
+         * Micro-interacción 1: Pulso de gelatina (oscilación elástica de las púas de Spike por tensión superficial).
+         */
+        function triggerJellyPulse() {
+          if (currentState !== 'floating') return;
+          bubble.classList.remove('is-wobbling', 'is-curious', 'is-spinning');
+          void bubble.offsetHeight;
+          bubble.classList.add('is-wobbling');
+        }
+
+        /**
+         * Micro-interacción 2: Gesto curioso (Spike asoma e inclina su silueta para llamar la atención del cliente).
+         */
+        function triggerCuriousGesture() {
+          if (currentState !== 'floating') return;
+          bubble.classList.remove('is-wobbling', 'is-curious', 'is-spinning');
+          void bubble.offsetHeight;
+          bubble.classList.add('is-curious');
+        }
+
+        /**
+         * Micro-interacción 3: Giro en vueltas por rotación (se activa al pasar el mouse más de 2 veces por encima).
+         */
+        function triggerSpinRotation() {
+          if (currentState !== 'floating') return;
+          bubble.classList.remove('is-wobbling', 'is-curious', 'is-spinning');
+          void bubble.offsetHeight;
+          bubble.classList.add('is-spinning');
+        }
+
+        /**
+         * Muestra la burbuja subiendo desde abajo con la animación de entrada en zigzag (tras envío exitoso).
+         */
+        function showBubble() {
+          if (riseTimeoutId) {
+            clearTimeout(riseTimeoutId);
+            riseTimeoutId = null;
+          }
+
+          currentState = 'rising';
+          panel.hidden = true;
+          panel.classList.remove('is-open', 'is-closing');
+          bubble.hidden = false;
+          bubble.setAttribute('aria-expanded', 'false');
+          bubble.classList.remove('is-floating', 'is-popping', 'is-reforming', 'is-dragging', 'is-wobbling', 'is-curious', 'is-spinning');
+          void bubble.offsetHeight; // Forzar reflujo para reiniciar la animación
+          bubble.classList.add('is-rising');
+        }
+
+        /**
+         * Regenera la burbuja en su sitio con la animación inversa a la explosión (al cerrar sin enviar).
+         */
+        function reformBubble() {
+          currentState = 'reforming';
+          panel.hidden = true;
+          panel.classList.remove('is-open', 'is-closing');
+          bubble.hidden = false;
+          bubble.setAttribute('aria-expanded', 'false');
+          bubble.classList.remove('is-rising', 'is-floating', 'is-popping', 'is-dragging', 'is-wobbling', 'is-curious', 'is-spinning');
+
+          const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+          if (!prefersReducedMotion) {
+            // Anillo sutil de implosión que converge hacia el centro actual de la burbuja
+            const rect = bubbleWrap.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            const ring = document.createElement('div');
+            ring.className = 'bb-ring is-imploding';
+            ring.style.left = `${centerX}px`;
+            ring.style.top = `${centerY}px`;
+            root.appendChild(ring);
+            removeNodeSafely(ring, 450);
+          }
+
+          void bubble.offsetHeight; // Forzar reflujo
+          bubble.classList.add('is-reforming');
+        }
+
+        /**
+         * Detona la explosión de la burbuja (is-popping), shockwave y gotitas en 360°.
+         */
+        function popBubble() {
+          if (currentState !== 'floating') return;
+          currentState = 'popping';
+
+          bubble.setAttribute('aria-expanded', 'true');
+
+          // Coordenadas actuales de la burbuja (incluyendo posición arrastrada)
+          const rect = bubbleWrap.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+
+          bubble.classList.remove('is-rising', 'is-floating', 'is-dragging', 'is-wobbling', 'is-curious', 'is-spinning');
+          bubble.classList.add('is-popping');
+
+          const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+          if (!prefersReducedMotion) {
+            // Anillo fino blanco expansivo (450 ms)
+            const ring = document.createElement('div');
+            ring.className = 'bb-ring';
+            ring.style.left = `${centerX}px`;
+            ring.style.top = `${centerY}px`;
+            root.appendChild(ring);
+            removeNodeSafely(ring, 550);
+
+            // 12 gotitas translúcidas disparadas en 360° (50 a 110px)
+            for (let i = 0; i < 12; i++) {
+              const baseAngle = i * (360 / 12);
+              const jitter = Math.random() * 16 - 8;
+              const angleRad = ((baseAngle + jitter) * Math.PI) / 180;
+              const distance = 50 + Math.random() * 60;
+              const size = Math.floor(6 + Math.random() * 5);
+
+              const dx = Math.cos(angleRad) * distance;
+              const dy = Math.sin(angleRad) * distance;
+
+              const droplet = document.createElement('div');
+              droplet.className = 'bb-droplet';
+              droplet.style.width = `${size}px`;
+              droplet.style.height = `${size}px`;
+              droplet.style.left = `${centerX}px`;
+              droplet.style.top = `${centerY}px`;
+              droplet.style.setProperty('--dx', `${dx.toFixed(1)}px`);
+              droplet.style.setProperty('--dy', `${dy.toFixed(1)}px`);
+
+              root.appendChild(droplet);
+              removeNodeSafely(droplet, 700);
+            }
+          }
+        }
+
+        /**
+         * Abre el panel desde la posición actual de la burbuja hacia el lado con más espacio.
+         */
+        function openForm() {
+          currentState = 'form-open';
+          bubble.hidden = true;
+          bubble.setAttribute('aria-expanded', 'true');
+
+          if (form) form.hidden = false;
+          if (successMsg) successMsg.hidden = true;
+
+          panel.hidden = false;
+          positionPanelNearBubble();
+          panel.classList.remove('is-closing');
+          void panel.offsetHeight;
+          panel.classList.add('is-open');
+
+          // Foco accesible al botón principal JOIN THE CHAOS tras abrirse
+          setTimeout(() => {
+            if (currentState !== 'form-open') return;
+            const firstAction = panel.querySelector('#bb-btn-join');
+            if (firstAction) firstAction.focus();
+          }, 120);
+        }
+
+        /**
+         * Cierra el formulario con animación elástica de contracción (250 ms) y regenera la burbuja.
+         */
+        function closeForm() {
+          if (currentState !== 'form-open') return;
+          currentState = 'closing';
+
+          if (autoCloseTimeoutId) {
+            clearTimeout(autoCloseTimeoutId);
+            autoCloseTimeoutId = null;
+          }
+
+          panel.classList.remove('is-open');
+          panel.classList.add('is-closing');
+        }
+
+        // ====================================================================
+        // LISTENERS PERSISTENTES (REGISTRADOS UNA SOLA VEZ, CERO ACUMULACIÓN)
+        // ====================================================================
+        // 1. Pointer Events para arrastre libre (mouse y dedo) con umbral de 6px
+        bubble.addEventListener('pointerdown', (e) => {
+          if (currentState !== 'floating') return;
+          if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+          isPointerDown = true;
+          isDragging = false;
+          wasDragged = false;
+          activePointerId = e.pointerId;
+          startClientX = e.clientX;
+          startClientY = e.clientY;
+          startDragX = dragX;
+          startDragY = dragY;
+
+          try {
+            bubble.setPointerCapture(e.pointerId);
+          } catch (err) {
+            // Ignorar si falla setPointerCapture en algún navegador
+          }
+        });
+
+        bubble.addEventListener('pointermove', (e) => {
+          if (isPointerDown && e.pointerId === activePointerId) {
+            const dx = e.clientX - startClientX;
+            const dy = e.clientY - startClientY;
+
+            if (!isDragging && Math.hypot(dx, dy) >= DRAG_THRESHOLD) {
+              isDragging = true;
+              wasDragged = true;
+              hoverPassCount = 0;
+              bubble.classList.remove('is-wobbling', 'is-curious', 'is-spinning');
+              bubble.classList.add('is-dragging');
+              bubble.style.setProperty('--bb-mx', '0px');
+              bubble.style.setProperty('--bb-my', '0px');
+              bubble.style.setProperty('--bb-rot', '0deg');
+            }
+
+            if (isDragging) {
+              e.preventDefault();
+              clampAndApplyPosition(startDragX + dx, startDragY + dy);
+            }
+            return;
+          }
+
+          // Tensión superficial magnética cuando solo se mueve el mouse sin arrastrar
+          if (currentState !== 'floating' || isDragging) return;
+          const rect = bubbleWrap.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          const mx = Math.max(-1, Math.min(1, (e.clientX - cx) / (rect.width / 2)));
+          const my = Math.max(-1, Math.min(1, (e.clientY - cy) / (rect.height / 2)));
+          bubble.style.setProperty('--bb-mx', `${(mx * 8).toFixed(1)}px`);
+          bubble.style.setProperty('--bb-my', `${(my * 8).toFixed(1)}px`);
+          bubble.style.setProperty('--bb-rot', `${(mx * 8).toFixed(1)}deg`);
+        });
+
+        function finishPointerDrag(e) {
+          if (!isPointerDown || e.pointerId !== activePointerId) return;
+          isPointerDown = false;
+
+          try {
+            if (bubble.hasPointerCapture(e.pointerId)) {
+              bubble.releasePointerCapture(e.pointerId);
+            }
+          } catch (err) {
+            // Ignorar
+          }
+
+          if (isDragging) {
+            isDragging = false;
+            bubble.classList.remove('is-dragging');
+            clampAndApplyPosition(dragX, dragY);
+            savePosition();
+            triggerJellyPulse();
+            setTimeout(() => {
+              wasDragged = false;
+            }, 60);
+          }
+          activePointerId = null;
+        }
+
+        bubble.addEventListener('pointerup', finishPointerDrag);
+        bubble.addEventListener('pointercancel', finishPointerDrag);
+
+        // 1.1. Clic y teclado en la burbuja (ignora el clic si provino de soltar un arrastre >= 6px)
+        bubble.addEventListener('click', (e) => {
+          if (wasDragged) {
+            e.preventDefault();
+            e.stopPropagation();
+            wasDragged = false;
+            return;
+          }
+          if (currentState === 'floating') {
+            popBubble();
+          }
+        });
+
+        // 1.2. Movimiento por teclado con flechas (10px normal, 40px con Shift) cuando la burbuja tiene el foco
+        bubble.addEventListener('keydown', (e) => {
+          if (currentState !== 'floating') return;
+          const step = e.shiftKey ? 40 : 10;
+          let moved = false;
+
+          if (e.key === 'ArrowLeft') {
+            clampAndApplyPosition(dragX - step, dragY);
+            moved = true;
+          } else if (e.key === 'ArrowRight') {
+            clampAndApplyPosition(dragX + step, dragY);
+            moved = true;
+          } else if (e.key === 'ArrowUp') {
+            clampAndApplyPosition(dragX, dragY - step);
+            moved = true;
+          } else if (e.key === 'ArrowDown') {
+            clampAndApplyPosition(dragX, dragY + step);
+            moved = true;
+          }
+
+          if (moved) {
+            e.preventDefault();
+            savePosition();
+          }
+        });
+
+        // 1.3. Giro en vueltas al pasar el mouse > 2 veces por encima
+        bubble.addEventListener('mouseenter', () => {
+          isHovered = true;
+          if (currentState !== 'floating' || isDragging) return;
+
+          hoverPassCount += 1;
+          if (hoverResetTimeoutId) clearTimeout(hoverResetTimeoutId);
+          hoverResetTimeoutId = setTimeout(() => {
+            hoverPassCount = 0;
+          }, 6000);
+
+          if (hoverPassCount > 2) {
+            hoverPassCount = 0;
+            triggerSpinRotation();
+          }
+        });
+
+        bubble.addEventListener('mouseleave', () => {
+          isHovered = false;
+          if (isDragging) return;
+          bubble.style.setProperty('--bb-mx', '0px');
+          bubble.style.setProperty('--bb-my', '0px');
+          bubble.style.setProperty('--bb-rot', '0deg');
+          if (currentState === 'floating' && !bubble.classList.contains('is-spinning')) {
+            triggerJellyPulse();
+          }
+        });
+
+        // 1.4. Re-aplicar límites (clamp) en resize, rotación de pantalla y teclado virtual móvil
+        function handleViewportChange() {
+          clampAndApplyPosition(dragX, dragY);
+          if (currentState === 'form-open') {
+            positionPanelNearBubble();
+          }
+        }
+
+        window.addEventListener('resize', handleViewportChange);
+        window.addEventListener('orientationchange', handleViewportChange);
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', handleViewportChange);
+        }
+
+        // 1.5. Ciclo autónomo de vida (cada 9s ejecuta un gesto curioso si está flotando en reposo)
+        curiousIntervalId = setInterval(() => {
+          if (currentState === 'floating' && !isHovered && !isDragging && !document.hidden) {
+            triggerCuriousGesture();
+          }
+        }, 9000);
+
+        // 2. Control del ciclo de fin de animaciones de la burbuja y sus micro-interacciones
+        bubble.addEventListener('animationend', (event) => {
+          if (event.animationName === 'bb-spike-jelly') {
+            bubble.classList.remove('is-wobbling');
+            return;
+          }
+
+          if (event.animationName === 'bb-spike-curious') {
+            bubble.classList.remove('is-curious');
+            return;
+          }
+
+          if (event.animationName === 'bb-spike-spin') {
+            bubble.classList.remove('is-spinning');
+            return;
+          }
+
+          // Evitar que animaciones de hijos (.bb-logo, .bb-glint) alteren el estado principal de la burbuja
+          if (event.target !== bubble) return;
+
+          if (event.animationName === 'bb-rise' || event.animationName === 'bb-fade-in') {
+            if (currentState === 'rising') {
+              currentState = 'floating';
+              bubble.classList.remove('is-rising');
+              bubble.classList.add('is-floating');
+            }
+          }
+
+          if (event.animationName === 'bb-pop' || event.animationName === 'bb-fade-out') {
+            if (currentState === 'popping') {
+              bubble.hidden = true;
+              bubble.classList.remove('is-popping');
+              openForm();
+            }
+          }
+
+          if (event.animationName === 'bb-reform') {
+            if (currentState === 'reforming') {
+              currentState = 'floating';
+              bubble.classList.remove('is-reforming');
+              bubble.classList.add('is-floating');
+            }
+          }
+        });
+
+        // 3. Control de fin de animación de cierre del panel
+        panel.addEventListener('animationend', (event) => {
+          if (event.target !== panel) return;
+          if (event.animationName === 'bb-panel-close' || event.animationName === 'bb-fade-out') {
+            if (currentState === 'closing') {
+              panel.hidden = true;
+              panel.classList.remove('is-closing');
+              if (form) form.hidden = false;
+              if (successMsg) successMsg.hidden = true;
+
+              // Separación de comportamientos de regeneración (termina en su última posición arrastrada):
+              if (formSubmitted) {
+                formSubmitted = false;
+                showBubble();
+              } else {
+                reformBubble();
+              }
+
+              // Retornar el foco accesible a la burbuja una vez visible
+              bubble.focus();
+            }
+          }
+        });
+
+        // 4. Cierre mediante botón ×
+        if (panelCloseBtn) {
+          panelCloseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeForm();
+          });
+        }
+
+        // 5. Cierre mediante clic fuera del panel (backdrop / click outside)
+        document.addEventListener('click', (e) => {
+          if (currentState !== 'form-open') return;
+          if (!panel.contains(e.target) && !e.target.closest('#bb-test-panel') && !e.target.closest('.bb-bubble')) {
+            closeForm();
+          }
+        });
+
+        // 6. Cierre mediante tecla Escape
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && currentState === 'form-open') {
+            closeForm();
+          }
+        });
+
+        // 7. Acciones de redirección ("JOIN THE CHAOS" -> /account/register y "¿yA tIEnES cuEnTa?" -> /account/login)
+        function handleChaosAction(e, targetUrl, message) {
+          e.preventDefault();
+          formSubmitted = true;
+          if (form) form.hidden = true;
+          if (successText) successText.textContent = message;
+          if (successMsg) successMsg.hidden = false;
+
+          // En producción en Shopify descomentar para redirigir:
+          // window.location.href = targetUrl;
+
+          autoCloseTimeoutId = setTimeout(() => {
+            if (currentState === 'form-open') {
+              closeForm();
+            }
+          }, 1600);
+        }
+
+        if (joinBtn) {
+          joinBtn.addEventListener('click', (e) => {
+            handleChaosAction(e, '/account/register', '¡Bienvenido al Caos! Redirigiendo a registro...');
+          });
+        }
+
+        if (loginLink) {
+          loginLink.addEventListener('click', (e) => {
+            handleChaosAction(e, '/account/login', 'Redirigiendo a inicio de sesión...');
+          });
+        }
+
+        /* === FIN BLOQUE SHOPIFY === */
+
+        /* Panel de pruebas: controles para pruebas locales (eliminar al integrar en Shopify) */
+        if (toggleThemeBtn) {
+          toggleThemeBtn.addEventListener('click', () => {
+            const isDark = root.classList.toggle('is-dark-theme');
+            document.body.classList.toggle('bb-demo-dark', isDark);
+            toggleThemeBtn.textContent = isDark
+              ? 'Tema: Oscuro Invertido (Ver Claro)'
+              : 'Tema: Claro (Ver Oscuro)';
+            triggerJellyPulse();
+          });
+        }
+        if (toggleModeBtn) {
+          toggleModeBtn.addEventListener('click', () => {
+            const isSpike = bubble.classList.toggle('is-spike-mode');
+            toggleModeBtn.textContent = isSpike ? 'Modo: Silueta Spike' : 'Modo: Burbuja Esférica';
+            triggerJellyPulse();
+          });
+        }
+
+        if (jellyBtn) {
+          jellyBtn.addEventListener('click', () => {
+            if (currentState !== 'floating') {
+              panel.hidden = true;
+              panel.classList.remove('is-open', 'is-closing');
+              bubble.hidden = false;
+              bubble.classList.remove('is-rising', 'is-popping', 'is-reforming');
+              bubble.classList.add('is-floating');
+              currentState = 'floating';
+            }
+            triggerJellyPulse();
+          });
+        }
+
+        if (curiousBtn) {
+          curiousBtn.addEventListener('click', () => {
+            if (currentState !== 'floating') {
+              panel.hidden = true;
+              panel.classList.remove('is-open', 'is-closing');
+              bubble.hidden = false;
+              bubble.classList.remove('is-rising', 'is-popping', 'is-reforming');
+              bubble.classList.add('is-floating');
+              currentState = 'floating';
+            }
+            triggerCuriousGesture();
+          });
+        }
+
+        if (spinBtn) {
+          spinBtn.addEventListener('click', () => {
+            if (currentState !== 'floating') {
+              panel.hidden = true;
+              panel.classList.remove('is-open', 'is-closing');
+              bubble.hidden = false;
+              bubble.classList.remove('is-rising', 'is-popping', 'is-reforming');
+              bubble.classList.add('is-floating');
+              currentState = 'floating';
+            }
+            triggerSpinRotation();
+          });
+        }
+
+        if (resetBtn) {
+          resetBtn.addEventListener('click', () => {
+            if (riseTimeoutId) clearTimeout(riseTimeoutId);
+            if (autoCloseTimeoutId) clearTimeout(autoCloseTimeoutId);
+            panel.hidden = true;
+            panel.classList.remove('is-open', 'is-closing');
+            root.querySelectorAll('.bb-droplet, .bb-ring').forEach((el) => el.remove());
+            currentState = 'hidden';
+            bubble.hidden = false;
+            bubble.setAttribute('aria-expanded', 'false');
+            bubble.classList.remove('is-rising', 'is-floating', 'is-popping');
+            void bubble.offsetHeight;
+            riseTimeoutId = setTimeout(showBubble, 800);
+          });
+        }
+
+        if (forcePopBtn) {
+          forcePopBtn.addEventListener('click', () => {
+            if (riseTimeoutId) clearTimeout(riseTimeoutId);
+            if (autoCloseTimeoutId) clearTimeout(autoCloseTimeoutId);
+            panel.hidden = true;
+            panel.classList.remove('is-open', 'is-closing');
+            bubble.hidden = false;
+            bubble.classList.remove('is-rising');
+            bubble.classList.add('is-floating');
+            currentState = 'floating';
+            popBubble();
+          });
+        }
+
+        if (openFormBtn) {
+          openFormBtn.addEventListener('click', () => {
+            if (riseTimeoutId) clearTimeout(riseTimeoutId);
+            if (autoCloseTimeoutId) clearTimeout(autoCloseTimeoutId);
+            bubble.hidden = true;
+            bubble.classList.remove('is-rising', 'is-floating', 'is-popping');
+            openForm();
+          });
+        }
+
+        if (resetPosBtn) {
+          resetPosBtn.addEventListener('click', () => {
+            resetPosition();
+            if (currentState === 'floating') {
+              triggerJellyPulse();
+            }
+          });
+        }
+
+        // Restaurar posición guardada en localStorage (o por defecto) y aplicar clamp inicial
+        loadSavedPosition();
+
+        // Iniciar el primer ascenso 800 ms tras cargar
+        riseTimeoutId = setTimeout(showBubble, 800);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bbInit);
+      } else {
+        bbInit();
+      }
+    })();
+  </script>
+</body>
+
+</html>

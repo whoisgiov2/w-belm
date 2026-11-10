@@ -1,0 +1,148 @@
+{% comment %}
+  Elemento: Nuevo Elemento (Plantilla w-belm)
+  Integración para Shopify Online Store 2.0
+{% endcomment %}
+
+<div 
+  class="el-root-{{ section.id }}{% if section.settings.theme_variant == 'dark' %} is-dark-theme{% endif %}"
+  id="el-root-{{ section.id }}"
+>
+  <div class="el-container">
+    <button 
+      class="el-interactive-btn" 
+      id="el-interactive-btn-{{ section.id }}" 
+      type="button"
+      aria-label="{{ section.settings.button_label | escape }}"
+    >
+      <span>{{ section.settings.button_label | default: 'Click Me' }}</span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .el-root-{{ section.id }} {
+    --el-accent: {{ section.settings.accent_color | default: '#4f46e5' }};
+    --el-radius: 14px;
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  .el-root-{{ section.id }} * {
+    box-sizing: inherit;
+  }
+
+  .el-root-{{ section.id }} .el-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .el-root-{{ section.id }} .el-interactive-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    background: var(--el-accent);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--el-radius);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+  }
+
+  .el-root-{{ section.id }} .el-interactive-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px -4px rgba(79, 70, 229, 0.4);
+  }
+
+  .el-root-{{ section.id }} .el-interactive-btn:focus-visible {
+    outline: 3px solid var(--el-accent);
+    outline-offset: 3px;
+  }
+
+  .el-root-{{ section.id }}.is-dark-theme .el-interactive-btn {
+    background: #ffffff;
+    color: #09090b;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .el-root-{{ section.id }} .el-interactive-btn {
+      transition: none !important;
+      transform: none !important;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+
+    function initElement(sectionId) {
+      const root = document.getElementById('el-root-' + sectionId);
+      if (!root) return;
+      const btn = document.getElementById('el-interactive-btn-' + sectionId);
+
+      if (btn) {
+        btn.addEventListener('click', function () {
+          btn.classList.toggle('is-active');
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () {
+        initElement('{{ section.id }}');
+      });
+    } else {
+      initElement('{{ section.id }}');
+    }
+
+    document.addEventListener('shopify:section:load', function (e) {
+      if (e.detail && e.detail.sectionId) {
+        initElement(e.detail.sectionId);
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Nuevo Elemento",
+  "tag": "section",
+  "class": "el-section-container",
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texto del botón",
+      "default": "Click Me"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Color de acento",
+      "default": "#4f46e5"
+    },
+    {
+      "type": "select",
+      "id": "theme_variant",
+      "label": "Variante de color",
+      "default": "light",
+      "options": [
+        { "value": "light", "label": "Modo Claro" },
+        { "value": "dark", "label": "Modo Oscuro" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Nuevo Elemento"
+    }
+  ]
+}
+{% endschema %}

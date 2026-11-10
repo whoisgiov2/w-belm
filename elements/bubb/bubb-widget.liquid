@@ -1,0 +1,1846 @@
+{% comment %}
+  ==============================================================================
+  BUBB WIDGET - ASISTENTE FLOTANTE INTERACTIVO PARA SHOPIFY (OS 2.0)
+  ==============================================================================
+  Instrucciones:
+  1. Puedes usar este archivo como una Sección (sections/bubb-widget.liquid)
+     o como un Bloque de Aplicación (App Embed / Snippet).
+  2. Si lo agregas en sections/bubb-widget.liquid, estará disponible en el
+     Editor de Temas de Shopify ("Agregar sección" en el pie de página o global).
+  3. Toda la configuración (logo, colores, tamaño, velocidad y textos) es
+     personalizable desde el panel visual de Shopify.
+{% endcomment %}
+
+<div id="bb-root" class="bb-root-{{ section.id }}{% if section.settings.theme_variant == 'dark' %} is-dark-theme{% endif %}" aria-live="polite">
+  <!-- Filtro SVG óptico para convertir la silueta de Spike en película de jabón 3D -->
+  <svg class="bb-svg-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="bb-spike-soap-filter-{{ section.id }}" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blurCore" />
+        <feColorMatrix in="blurCore" type="matrix" values="
+          0 0 0 0 0.72
+          0 0 0 0 0.84
+          0 0 0 0 1.00
+          0 0 0 0.36 0" result="tintBase" />
+        <feOffset in="blurCore" dx="-5" dy="-5" result="shiftTL" />
+        <feColorMatrix in="shiftTL" type="matrix" values="
+          0 0 0 0 0.45
+          0 0 0 0 0.92
+          0 0 0 0 1.00
+          0 0 0 0.45 0" result="cyanGlow" />
+        <feOffset in="blurCore" dx="5" dy="5" result="shiftBR" />
+        <feColorMatrix in="shiftBR" type="matrix" values="
+          0 0 0 0 0.96
+          0 0 0 0 0.45
+          0 0 0 0 0.85
+          0 0 0 0.42 0" result="pinkGlow" />
+        <feSpecularLighting in="blurCore" surfaceScale="6" specularConstant="1.35" specularExponent="28" lighting-color="#ffffff" result="specLight">
+          <fePointLight x="-60" y="-60" z="110" />
+        </feSpecularLighting>
+        <feComposite in="specLight" in2="SourceAlpha" operator="in" result="specMasked" />
+        <feMorphology in="SourceAlpha" operator="erode" radius="1.4" result="erodedAlpha" />
+        <feComposite in="SourceAlpha" in2="erodedAlpha" operator="out" result="thinRim" />
+        <feColorMatrix in="thinRim" type="matrix" values="
+          0 0 0 0 1
+          0 0 0 0 1
+          0 0 0 0 1
+          0 0 0 0.92 0" result="whiteRim" />
+        <feDropShadow in="SourceAlpha" dx="0" dy="8" stdDeviation="6" flood-color="#4f46e5" flood-opacity="0.28" result="dropShadow" />
+        <feMerge result="soapBody">
+          <feMergeNode in="cyanGlow" />
+          <feMergeNode in="pinkGlow" />
+          <feMergeNode in="tintBase" />
+          <feMergeNode in="specMasked" />
+          <feMergeNode in="whiteRim" />
+        </feMerge>
+        <feComposite in="soapBody" in2="SourceAlpha" operator="in" result="clippedSoap" />
+        <feMerge>
+          <feMergeNode in="dropShadow" />
+          <feMergeNode in="clippedSoap" />
+        </feMerge>
+      </filter>
+
+      <!-- Filtro óptico SVG invertido para Modo Oscuro -->
+      <filter id="bb-spike-soap-filter-dark-{{ section.id }}" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+        <feColorMatrix in="SourceAlpha" type="matrix" values="
+          0 0 0 0 0.94
+          0 0 0 0 0.96
+          0 0 0 0 1.00
+          0 0 0 0.24 0" result="bb-dark-base" />
+        <feMorphology in="SourceAlpha" operator="erode" radius="4" result="bb-dark-erode" />
+        <feComposite in="SourceAlpha" in2="bb-dark-erode" operator="out" result="bb-dark-band" />
+        <feGaussianBlur in="bb-dark-band" stdDeviation="3.2" result="bb-dark-blur" />
+        <feComposite in="bb-dark-blur" in2="SourceAlpha" operator="in" result="bb-dark-masked" />
+        <feColorMatrix in="bb-dark-masked" type="matrix" values="
+          0 0 0 0 0.78
+          0 0 0 0 0.52
+          0 0 0 0 1.00
+          0 0 0 0.72 0" result="bb-dark-cushion" />
+        <feOffset in="bb-dark-blur" dx="-4" dy="-4" result="bb-dark-offset" />
+        <feComposite in="bb-dark-offset" in2="SourceAlpha" operator="in" result="bb-dark-irid-mask" />
+        <feColorMatrix in="bb-dark-irid-mask" type="matrix" values="
+          0 0 0 0 0.35
+          0 0 0 0 0.95
+          0 0 0 0 1.00
+          0 0 0 0.65 0" result="bb-dark-cyan" />
+        <feGaussianBlur in="SourceAlpha" stdDeviation="4.5" result="bb-dark-bump" />
+        <feSpecularLighting in="bb-dark-bump" surfaceScale="6.5" specularConstant="1.45" specularExponent="22" lighting-color="#ffffff" result="bb-dark-spec-raw">
+          <fePointLight x="-45" y="-55" z="95" />
+        </feSpecularLighting>
+        <feComposite in="bb-dark-spec-raw" in2="SourceAlpha" operator="in" result="bb-dark-spec" />
+        <feMorphology in="SourceAlpha" operator="erode" radius="1.5" result="bb-dark-rim-erode" />
+        <feComposite in="SourceAlpha" in2="bb-dark-rim-erode" operator="out" result="bb-dark-rim-raw" />
+        <feColorMatrix in="bb-dark-rim-raw" type="matrix" values="
+          0 0 0 0 1
+          0 0 0 0 1
+          0 0 0 0 1
+          0 0 0 0.98 0" result="bb-dark-rim" />
+        <feDropShadow in="SourceAlpha" dx="0" dy="6" stdDeviation="8" flood-color="#818cf8" flood-opacity="0.45" result="bb-dark-glow" />
+        <feMerge>
+          <feMergeNode in="bb-dark-glow" />
+          <feMergeNode in="bb-dark-base" />
+          <feMergeNode in="bb-dark-cushion" />
+          <feMergeNode in="bb-dark-cyan" />
+          <feMergeNode in="bb-dark-spec" />
+          <feMergeNode in="bb-dark-rim" />
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Contenedor externo de posición de la burbuja (transform: translate3d) -->
+  <div class="bb-bubble-wrap" id="bb-bubble-wrap-{{ section.id }}">
+    <!-- Burbuja interactiva (por defecto en modo Silueta Spike como burbuja) -->
+    <button 
+      class="bb-bubble{% if section.settings.bubble_mode != 'sphere' %} is-spike-mode{% endif %}" 
+      id="bb-bubble-{{ section.id }}" 
+      type="button" 
+      aria-label="{{ section.settings.bubble_aria_label | default: 'Abrir panel Welcome to The Chaos' }}" 
+      aria-expanded="false" 
+      aria-controls="bb-panel-{{ section.id }}"
+    >
+      <span class="bb-spike-actor">
+        {%- if section.settings.bubble_logo != blank -%}
+          {{ section.settings.bubble_logo | image_url: width: 160 | image_tag: class: 'bb-logo', loading: 'lazy', alt: shop.name }}
+          {{ section.settings.bubble_logo | image_url: width: 160 | image_tag: class: 'bb-spike-glint-img', loading: 'lazy', alt: '' }}
+        {%- else -%}
+          <img class="bb-logo" src="{{ 'spike.png' | asset_url }}" alt="{{ shop.name }}" draggable="false">
+          <img class="bb-spike-glint-img" src="{{ 'spike.png' | asset_url }}" alt="" aria-hidden="true" draggable="false">
+        {%- endif -%}
+      </span>
+      <span class="bb-glint" aria-hidden="true"></span>
+    </button>
+  </div>
+
+  <!-- Contenedor externo de posición del panel (transform: translate3d) -->
+  <div class="bb-panel-wrap" id="bb-panel-wrap-{{ section.id }}">
+    <!-- Panel "Welcome to The Chaos" -->
+    <div 
+      class="bb-panel" 
+      id="bb-panel-{{ section.id }}" 
+      role="dialog" 
+      aria-label="Welcome to The Chaos" 
+      hidden
+    >
+      <button 
+        class="bb-panel-close" 
+        id="bb-panel-close-{{ section.id }}" 
+        type="button" 
+        aria-label="Cerrar panel"
+      >&times;</button>
+
+      <div class="bb-panel-header">
+        {%- if section.settings.bubble_logo != blank -%}
+          {{ section.settings.bubble_logo | image_url: width: 76 | image_tag: class: 'bb-panel-logo', alt: shop.name }}
+        {%- else -%}
+          <img class="bb-panel-logo" src="{{ 'spike.png' | asset_url }}" alt="{{ shop.name }}" draggable="false">
+        {%- endif -%}
+        <h2 class="bb-panel-title">Welcome to<br>The Chaos</h2>
+      </div>
+
+      <div class="bb-form bb-chaos-body" id="bb-form-{{ section.id }}">
+        <p class="bb-chaos-desc">
+          {{ section.settings.chaos_description | default: 'Recibe alertas de lo más popular y obtén una sorpresa para tu cumpleaños.' }}
+        </p>
+
+        <a 
+          href="{{ section.settings.register_url | default: routes.account_register_url | default: '/account/register' }}" 
+          class="bb-btn-submit bb-btn-chaos" 
+          id="bb-btn-join-{{ section.id }}" 
+          role="button"
+        >
+          {{ section.settings.button_label | default: 'JOIN THE CHAOS' }}
+        </a>
+
+        <div class="bb-login-wrap">
+          <a 
+            href="{{ section.settings.login_url | default: routes.account_login_url | default: '/account/login' }}" 
+            class="bb-login-link" 
+            id="bb-link-login-{{ section.id }}"
+          >
+            {{ section.settings.login_label | default: '¿yA tIEnES cuEnTa?' }}
+          </a>
+        </div>
+      </div>
+
+      <div class="bb-panel-success" id="bb-panel-success-{{ section.id }}" hidden>
+        <p class="bb-success-text">{{ section.settings.success_message | default: '¡Bienvenido al Caos! Redirigiendo...' }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ==========================================================================
+     VARIABLES Y SCOPE LOCAL DE SHOPIFY
+     ========================================================================== */
+  .bb-root-{{ section.id }} {
+    --bb-size: {{ section.settings.bubble_size | default: 84 }}px;
+    --bb-accent: {{ section.settings.accent_color | default: '#4f46e5' }};
+    --bb-right: {{ section.settings.position_right | default: 24 }}px;
+    --bb-bottom: {{ section.settings.position_bottom | default: 24 }}px;
+    --bb-float-time: {{ section.settings.float_speed | default: 4 }}s;
+    --bb-squash-scale: {{ section.settings.squash_scale | default: 1.06 }};
+
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .bb-root-{{ section.id }} .bb-svg-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  /* ==========================================================================
+     BURBUJA DE JABÓN (CONTENEDOR DE POSICIÓN + BURBUJA INTERNA)
+     ========================================================================== */
+  .bb-root-{{ section.id }} .bb-bubble-wrap {
+    position: absolute;
+    right: calc(var(--bb-right) + env(safe-area-inset-right, 0px));
+    bottom: calc(var(--bb-bottom) + env(safe-area-inset-bottom, 0px));
+    width: var(--bb-size);
+    height: var(--bb-size);
+    pointer-events: none;
+    transform: translate3d(var(--bb-drag-x, 0px), var(--bb-drag-y, 0px), 0);
+    will-change: transform;
+    z-index: 999;
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble[hidden],
+  .bb-root-{{ section.id }} .bb-panel[hidden] {
+    display: none !important;
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    pointer-events: auto;
+    cursor: grab;
+    touch-action: none;
+    padding: 0;
+    margin: 0;
+    border: 1.5px solid rgba(255, 255, 255, 0.65);
+    outline: none;
+    background-clip: padding-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.7) 8%, rgba(255, 255, 255, 0) 18%),
+      radial-gradient(circle at 38% 32%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.12) 28%, rgba(255, 255, 255, 0) 52%),
+      radial-gradient(circle at 72% 75%, rgba(147, 197, 253, 0.25) 0%, rgba(192, 132, 252, 0.2) 32%, rgba(244, 114, 182, 0.14) 58%, rgba(255, 255, 255, 0) 75%),
+      radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, rgba(238, 242, 255, 0.01) 65%, rgba(199, 210, 254, 0.12) 100%);
+
+    box-shadow:
+      inset 0 0 14px 1px rgba(255, 255, 255, 0.45),
+      inset 0 0 3px 1px rgba(255, 255, 255, 0.7),
+      inset -3px -3px 12px 0px rgba(168, 85, 247, 0.18),
+      0 10px 25px -4px rgba(79, 70, 229, 0.2),
+      0 4px 12px -2px rgba(147, 197, 253, 0.25);
+
+    backdrop-filter: blur(2px) saturate(130%);
+    -webkit-backdrop-filter: blur(2px) saturate(130%);
+
+    opacity: 0;
+    transform: translateY(120px) scale(0.6);
+    pointer-events: none;
+  }
+
+  /* Logo y Actor de Silueta */
+  .bb-root-{{ section.id }} .bb-spike-actor {
+    width: 48%;
+    height: 48%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+    transform-origin: center center;
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble img,
+  .bb-root-{{ section.id }} .bb-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+  }
+
+  .bb-root-{{ section.id }} .bb-spike-glint-img {
+    display: none;
+  }
+
+  /* Modo Silueta Spike como Burbuja */
+  .bb-root-{{ section.id }} .bb-bubble.is-spike-mode {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    overflow: visible;
+    border-radius: 0;
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble.is-spike-mode::before,
+  .bb-root-{{ section.id }} .bb-bubble.is-spike-mode::after {
+    display: none;
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble.is-spike-mode .bb-spike-actor {
+    width: 100%;
+    height: 100%;
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble.is-spike-mode .bb-logo {
+    filter: url(#bb-spike-soap-filter-{{ section.id }});
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble.is-spike-mode .bb-spike-glint-img {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 3;
+    mix-blend-mode: screen;
+    filter: invert(1) brightness(2.2) drop-shadow(0 0 6px rgba(255, 255, 255, 0.95));
+    opacity: 0;
+    animation: bb-spike-glint-sweep 5s ease-in-out infinite;
+  }
+
+  @keyframes bb-spike-glint-sweep {
+    0%, 70% {
+      clip-path: polygon(-60% -20%, -30% -20%, -80% 120%, -110% 120%);
+      opacity: 0;
+    }
+    74% { opacity: 0.92; }
+    86% {
+      clip-path: polygon(130% -20%, 160% -20%, 110% 120%, 80% 120%);
+      opacity: 0.92;
+    }
+    90%, 100% {
+      clip-path: polygon(160% -20%, 190% -20%, 140% 120%, 110% 120%);
+      opacity: 0;
+    }
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble.is-spike-mode .bb-glint {
+    overflow: visible;
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble.is-spike-mode .bb-glint::before {
+    display: none;
+  }
+
+  /* Hover y tensión superficial magnética */
+  @media (hover: hover) {
+    .bb-root-{{ section.id }} .bb-bubble.is-floating {
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    }
+
+    .bb-root-{{ section.id }} .bb-bubble.is-floating:hover {
+      transform: translate3d(var(--bb-mx, 0px), var(--bb-my, 0px), 0) scale(1.12) rotate(var(--bb-rot, 0deg));
+      box-shadow:
+        inset 0 0 18px 2px rgba(255, 255, 255, 0.75),
+        inset 0 0 5px 2px rgba(255, 255, 255, 0.9),
+        inset -4px -4px 14px 0px rgba(168, 85, 247, 0.35),
+        0 14px 30px -4px rgba(79, 70, 229, 0.35),
+        0 6px 16px -2px rgba(147, 197, 253, 0.4);
+    }
+
+    .bb-root-{{ section.id }} .bb-bubble.is-spike-mode.is-floating:hover {
+      box-shadow: none;
+    }
+
+    .bb-root-{{ section.id }} .bb-bubble.is-floating:hover::before {
+      filter: blur(0.2px) brightness(1.25);
+    }
+
+    .bb-root-{{ section.id }} .bb-bubble.is-floating:hover::after {
+      filter: brightness(1.3);
+    }
+
+    .bb-root-{{ section.id }} .bb-bubble.is-floating:hover .bb-logo {
+      transform: rotate(8deg) scale(1.04);
+    }
+
+    .bb-root-{{ section.id }} .bb-bubble.is-spike-mode.is-floating:hover .bb-logo {
+      filter: url(#bb-spike-soap-filter-{{ section.id }}) drop-shadow(0 0 10px rgba(192, 132, 252, 0.55)) brightness(1.08);
+    }
+  }
+
+  /* Reflejos */
+  .bb-root-{{ section.id }} .bb-bubble::before {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: inherit;
+    border: 1.5px solid transparent;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+    border-right: 1.5px solid rgba(255, 255, 255, 0.45);
+    transform: rotate(-10deg);
+    pointer-events: none;
+    z-index: 3;
+    filter: blur(0.4px);
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble::after {
+    content: "";
+    position: absolute;
+    inset: -15%;
+    width: 130%;
+    height: 130%;
+    border-radius: inherit;
+    background: conic-gradient(
+      from 0deg,
+      rgba(147, 197, 253, 0.24),
+      rgba(192, 132, 252, 0.24),
+      rgba(244, 114, 182, 0.2),
+      rgba(253, 224, 71, 0.16),
+      rgba(134, 239, 172, 0.16),
+      rgba(147, 197, 253, 0.24)
+    );
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: 2;
+    animation: bb-sheen-rotate 8s linear infinite;
+  }
+
+  @keyframes bb-sheen-rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .bb-root-{{ section.id }} .bb-glint {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 4;
+    overflow: hidden;
+  }
+
+  .bb-root-{{ section.id }} .bb-glint::before {
+    content: "";
+    position: absolute;
+    inset: -60%;
+    width: 220%;
+    height: 220%;
+    background: linear-gradient(
+      120deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.02) 44%,
+      rgba(255, 255, 255, 0.7) 50%,
+      rgba(255, 255, 255, 0.02) 56%,
+      transparent 62%
+    );
+    transform: translate3d(-100%, -100%, 0) rotate(25deg);
+    opacity: 0;
+    animation: bb-glint-sweep 5s ease-in-out infinite;
+  }
+
+  @keyframes bb-glint-sweep {
+    0%, 70% {
+      transform: translate3d(-100%, -100%, 0) rotate(25deg);
+      opacity: 0;
+    }
+    74% {
+      opacity: 0.9;
+    }
+    86% {
+      transform: translate3d(100%, 100%, 0) rotate(25deg);
+      opacity: 0.9;
+    }
+    90%, 100% {
+      transform: translate3d(100%, 100%, 0) rotate(25deg);
+      opacity: 0;
+    }
+  }
+
+  /* ==========================================================================
+     ANIMACIONES DE LA BURBUJA (ENTRADA, FLOTACIÓN, EXPLOSIÓN)
+     ========================================================================== */
+  .bb-root-{{ section.id }} .bb-bubble.is-rising {
+    opacity: 0;
+    pointer-events: auto;
+    animation: bb-rise 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes bb-rise {
+    0% {
+      opacity: 0;
+      transform: translateY(120px) translateX(0) scale(0.6);
+    }
+    20% {
+      opacity: 0.6;
+      transform: translateY(85px) translateX(-10px) scale(0.74);
+    }
+    45% {
+      opacity: 0.9;
+      transform: translateY(45px) translateX(10px) scale(0.88);
+    }
+    70% {
+      opacity: 1;
+      transform: translateY(15px) translateX(-6px) scale(0.97);
+    }
+    88% {
+      opacity: 1;
+      transform: translateY(-2px) translateX(3px) scale(1.02);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) translateX(0) scale(1);
+    }
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble.is-floating {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+    animation:
+      bb-float var(--bb-float-time) ease-in-out infinite,
+      bb-morph 5s ease-in-out infinite,
+      bb-squash 6s ease-in-out infinite;
+  }
+
+  @keyframes bb-float {
+    0%, 100% { translate: 0px 0px; }
+    25% { translate: 4px -10px; }
+    50% { translate: 0px 4px; }
+    75% { translate: -4px 10px; }
+  }
+
+  @keyframes bb-morph {
+    0%, 100% { border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%; }
+    25% { border-radius: 46% 54% 48% 52% / 54% 47% 53% 46%; }
+    50% { border-radius: 53% 47% 54% 46% / 48% 52% 46% 54%; }
+    75% { border-radius: 48% 52% 46% 54% / 52% 48% 54% 46%; }
+  }
+
+  @keyframes bb-squash {
+    0%, 82%, 100% { scale: 1 1; }
+    88% { scale: var(--bb-squash-scale, 1.06) calc(2 - var(--bb-squash-scale, 1.06)); }
+    94% { scale: 0.98 1.02; }
+  }
+
+  /* Estado de arrastre libre (cursor grabbing + pausa de flotación y rebote) */
+  .bb-root-{{ section.id }} .bb-bubble.is-dragging {
+    cursor: grabbing !important;
+    animation-play-state: paused !important;
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble.is-dragging .bb-spike-actor,
+  .bb-root-{{ section.id }} .bb-bubble.is-dragging::after,
+  .bb-root-{{ section.id }} .bb-bubble.is-dragging .bb-glint::before,
+  .bb-root-{{ section.id }} .bb-bubble.is-dragging .bb-spike-glint-img {
+    animation-play-state: paused !important;
+  }
+
+  /* Gama de micro-interacciones de la silueta Spike */
+  .bb-root-{{ section.id }} .bb-bubble.is-spike-mode.is-floating .bb-spike-actor {
+    animation: bb-spike-silhouette-morph 5s ease-in-out infinite;
+  }
+
+  @keyframes bb-spike-silhouette-morph {
+    0%, 100% { transform: skewX(0deg) skewY(0deg) scale(1, 1) rotate(0deg); }
+    25% { transform: skewX(3.5deg) skewY(-2deg) scale(1.04, 0.96) rotate(-2.5deg); }
+    50% { transform: skewX(-3deg) skewY(2.5deg) scale(0.96, 1.04) rotate(2deg); }
+    75% { transform: skewX(2deg) skewY(1.5deg) scale(1.03, 0.97) rotate(-1.5deg); }
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble.is-wobbling .bb-spike-actor {
+    animation: bb-spike-jelly 680ms cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+  }
+
+  @keyframes bb-spike-jelly {
+    0% { transform: scale(1, 1) skewX(0deg); }
+    20% { transform: scale(1.2, 0.82) skewX(6deg) rotate(3deg); }
+    40% { transform: scale(0.85, 1.16) skewX(-5deg) rotate(-3deg); }
+    60% { transform: scale(1.09, 0.92) skewX(3deg) rotate(1.5deg); }
+    80% { transform: scale(0.96, 1.04) skewX(-1.5deg) rotate(-0.8deg); }
+    100% { transform: scale(1, 1) skewX(0deg) rotate(0deg); }
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble.is-curious .bb-spike-actor {
+    animation: bb-spike-curious 950ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+  }
+
+  @keyframes bb-spike-curious {
+    0% { transform: translateY(0) scale(1, 1) rotate(0deg); }
+    25% { transform: translateY(-9px) scale(0.93, 1.1) rotate(-14deg) skewX(-4deg); }
+    52% { transform: translateY(-6px) scale(1.08, 0.95) rotate(11deg) skewX(4deg); }
+    76% { transform: translateY(-2px) scale(1.03, 0.98) rotate(-5deg); }
+    100% { transform: translateY(0) scale(1, 1) rotate(0deg); }
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble.is-spinning .bb-spike-actor {
+    animation: bb-spike-spin 920ms cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+  }
+
+  @keyframes bb-spike-spin {
+    0% { transform: scale(1, 1) rotate(0deg); }
+    12% { transform: scale(0.92, 1.08) rotate(-22deg); }
+    48% { transform: scale(1.12, 0.9) rotate(390deg); }
+    82% { transform: scale(0.96, 1.04) rotate(740deg); }
+    92% { transform: scale(1.03, 0.98) rotate(714deg); }
+    100% { transform: scale(1, 1) rotate(720deg); }
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble.is-popping {
+    pointer-events: none !important;
+    translate: 0 0 !important;
+    scale: 1 1 !important;
+    animation: bb-pop 280ms ease-out forwards !important;
+  }
+
+  @keyframes bb-pop {
+    0% { transform: scale(1); opacity: 1; }
+    43% { transform: scale(1.35); opacity: 1; }
+    100% { transform: scale(1.8); opacity: 0; }
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble.is-popping .bb-logo {
+    animation: bb-logo-pop 280ms ease-out forwards !important;
+  }
+
+  @keyframes bb-logo-pop {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12)) brightness(1);
+    }
+    43% {
+      transform: scale(1.2);
+      opacity: 1;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.9)) brightness(2);
+    }
+    100% {
+      transform: scale(1.2);
+      opacity: 0;
+      filter: brightness(2.5);
+    }
+  }
+
+  /* Anillo y gotitas */
+  .bb-ring {
+    position: fixed;
+    width: var(--bb-size);
+    height: var(--bb-size);
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%) scale(0.2);
+    animation: bb-ring-burst 450ms cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+  }
+
+  @keyframes bb-ring-burst {
+    0% { transform: translate(-50%, -50%) scale(0.2); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+  }
+
+  .bb-droplet {
+    position: fixed;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.95) 0%, rgba(199, 210, 254, 0.65) 50%, rgba(168, 85, 247, 0.35) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.6);
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%) translate(0, 0) scale(1);
+    animation: bb-droplet-burst 600ms cubic-bezier(0.15, 0.85, 0.35, 1) forwards;
+  }
+
+  @keyframes bb-droplet-burst {
+    0% { transform: translate(-50%, -50%) translate(0, 0) scale(1); opacity: 1; }
+    65% { opacity: 0.9; }
+    100% { transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+  }
+
+  /* Regeneración inversa a la explosión (al cerrar sin enviar) */
+  .bb-root-{{ section.id }} .bb-bubble.is-reforming {
+    pointer-events: none !important;
+    translate: 0 0 !important;
+    scale: 1 1 !important;
+    animation: bb-reform 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  }
+
+  @keyframes bb-reform {
+    0% { transform: scale(1.6); opacity: 0; }
+    35% { transform: scale(1.22); opacity: 0.85; }
+    65% { transform: scale(0.94); opacity: 1; }
+    82% { transform: scale(1.04); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .bb-root-{{ section.id }} .bb-bubble.is-reforming .bb-logo {
+    animation: bb-logo-reform 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  }
+
+  @keyframes bb-logo-reform {
+    0% { transform: scale(0.5); opacity: 0; filter: brightness(2.2); }
+    60% { transform: scale(1.15); opacity: 0.9; filter: brightness(1.5); }
+    100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+  }
+
+  .bb-ring.is-imploding {
+    animation: bb-ring-implode 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  }
+
+  @keyframes bb-ring-implode {
+    0% { transform: translate(-50%, -50%) scale(1.8); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+  }
+
+  /* ==========================================================================
+     PANEL DEL FORMULARIO DE CONTACTO (CONTENEDOR DE POSICIÓN + PANEL INTERNO)
+     ========================================================================== */
+  .bb-root-{{ section.id }} .bb-panel-wrap {
+    position: absolute;
+    right: calc(var(--bb-right) + env(safe-area-inset-right, 0px));
+    bottom: calc(var(--bb-bottom) + env(safe-area-inset-bottom, 0px));
+    width: min(340px, calc(100vw - 32px));
+    pointer-events: none;
+    transform: translate3d(var(--bb-panel-x, 0px), var(--bb-panel-y, 0px), 0);
+    will-change: transform;
+    z-index: 1000;
+  }
+
+  .bb-root-{{ section.id }} .bb-panel {
+    position: relative;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.18), 0 0 1px rgba(15, 23, 42, 0.1);
+    padding: 22px 20px 20px 20px;
+    box-sizing: border-box;
+    pointer-events: auto;
+    transform-origin: bottom right;
+    z-index: 1000;
+  }
+
+  .bb-root-{{ section.id }} .bb-panel.is-open {
+    animation: bb-panel-spring 450ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  @keyframes bb-panel-spring {
+    0% { transform: scale(0.15); opacity: 0; border-radius: 50%; }
+    65% { opacity: 1; border-radius: 28px; }
+    100% { transform: scale(1); opacity: 1; border-radius: 24px; }
+  }
+
+  .bb-root-{{ section.id }} .bb-panel.is-closing {
+    animation: bb-panel-close 250ms cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+    pointer-events: none;
+  }
+
+  @keyframes bb-panel-close {
+    0% { transform: scale(1); opacity: 1; border-radius: 24px; }
+    100% { transform: scale(0.15); opacity: 0; border-radius: 50%; }
+  }
+
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-panel-header,
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-chaos-desc,
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-btn-submit,
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-login-wrap {
+    opacity: 0;
+    animation: bb-field-in 260ms ease-out forwards;
+  }
+
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-panel-header { animation-delay: 100ms; }
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-chaos-desc { animation-delay: 160ms; }
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-btn-submit { animation-delay: 220ms; }
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-login-wrap { animation-delay: 280ms; }
+
+  @keyframes bb-field-in {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .bb-root-{{ section.id }} .bb-panel-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+  }
+
+  .bb-root-{{ section.id }} .bb-panel-close:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+    transform: scale(1.08);
+  }
+
+  .bb-root-{{ section.id }} .bb-panel-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 4px 16px 0 16px;
+  }
+
+  .bb-root-{{ section.id }} .bb-panel-logo {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    transition: filter 0.3s ease;
+  }
+
+  .bb-root-{{ section.id }} .bb-panel-title {
+    margin: 0;
+    font-size: 23px;
+    line-height: 1.12;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #09090b;
+  }
+
+  .bb-root-{{ section.id }} .bb-chaos-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 14px;
+  }
+
+  .bb-root-{{ section.id }} .bb-chaos-desc {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.48;
+    color: #475569;
+    padding: 0 6px;
+  }
+
+  .bb-root-{{ section.id }} .bb-btn-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    text-decoration: none;
+    width: 100%;
+    padding: 12px 16px;
+    background: #09090b;
+    color: #ffffff;
+    border: 1.5px solid #09090b;
+    border-radius: 14px;
+    font-size: 13.5px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 8px 20px -4px rgba(9, 9, 11, 0.28);
+    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+    margin-top: 2px;
+  }
+
+  .bb-root-{{ section.id }} .bb-btn-submit:hover {
+    transform: translateY(-2px) scale(1.015);
+    background: var(--bb-accent);
+    border-color: var(--bb-accent);
+    box-shadow: 0 10px 24px -4px rgba(79, 70, 229, 0.45);
+  }
+
+  .bb-root-{{ section.id }} .bb-btn-submit:active {
+    transform: translateY(0) scale(0.99);
+  }
+
+  .bb-root-{{ section.id }} .bb-login-wrap {
+    margin-top: 2px;
+    text-align: center;
+  }
+
+  .bb-root-{{ section.id }} .bb-login-link {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #09090b;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1.5px;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .bb-root-{{ section.id }} .bb-login-link:hover {
+    color: var(--bb-accent);
+    transform: translateY(-1px);
+  }
+
+  .bb-root-{{ section.id }} .bb-panel-success {
+    padding: 20px 10px;
+    text-align: center;
+    animation: bb-field-in 300ms ease-out forwards;
+  }
+
+  .bb-root-{{ section.id }} .bb-success-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--bb-accent);
+    margin: 0;
+  }
+
+  /* ==========================================================================
+     VARIANTE CON COLORES INVERTIDOS (MODO OSCURO / .is-dark-theme)
+     ========================================================================== */
+  .bb-root-{{ section.id }}.is-dark-theme .bb-bubble.is-spike-mode .bb-logo,
+  [data-theme="dark"] .bb-root-{{ section.id }} .bb-bubble.is-spike-mode .bb-logo,
+  .dark .bb-root-{{ section.id }} .bb-bubble.is-spike-mode .bb-logo {
+    filter: url(#bb-spike-soap-filter-dark-{{ section.id }});
+  }
+
+  .bb-root-{{ section.id }}.is-dark-theme .bb-bubble:not(.is-spike-mode) .bb-logo,
+  [data-theme="dark"] .bb-root-{{ section.id }} .bb-bubble:not(.is-spike-mode) .bb-logo,
+  .dark .bb-root-{{ section.id }} .bb-bubble:not(.is-spike-mode) .bb-logo {
+    filter: invert(1) drop-shadow(0 2px 6px rgba(255, 255, 255, 0.45));
+  }
+
+  .bb-root-{{ section.id }}.is-dark-theme .bb-panel,
+  [data-theme="dark"] .bb-root-{{ section.id }} .bb-panel,
+  .dark .bb-root-{{ section.id }} .bb-panel {
+    background: #09090b;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 24px 50px -10px rgba(0, 0, 0, 0.75), 0 0 24px -4px rgba(129, 140, 248, 0.25);
+  }
+
+  .bb-root-{{ section.id }}.is-dark-theme .bb-panel-close,
+  [data-theme="dark"] .bb-root-{{ section.id }} .bb-panel-close,
+  .dark .bb-root-{{ section.id }} .bb-panel-close {
+    background: #18181b;
+    color: #a1a1aa;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .bb-root-{{ section.id }}.is-dark-theme .bb-panel-close:hover,
+  [data-theme="dark"] .bb-root-{{ section.id }} .bb-panel-close:hover,
+  .dark .bb-root-{{ section.id }} .bb-panel-close:hover {
+    background: #27272a;
+    color: #ffffff;
+  }
+
+  .bb-root-{{ section.id }}.is-dark-theme .bb-panel-logo,
+  [data-theme="dark"] .bb-root-{{ section.id }} .bb-panel-logo,
+  .dark .bb-root-{{ section.id }} .bb-panel-logo {
+    filter: invert(1) drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+  }
+
+  .bb-root-{{ section.id }}.is-dark-theme .bb-panel-title,
+  [data-theme="dark"] .bb-root-{{ section.id }} .bb-panel-title,
+  .dark .bb-root-{{ section.id }} .bb-panel-title {
+    color: #ffffff;
+  }
+
+  .bb-root-{{ section.id }}.is-dark-theme .bb-chaos-desc,
+  [data-theme="dark"] .bb-root-{{ section.id }} .bb-chaos-desc,
+  .dark .bb-root-{{ section.id }} .bb-chaos-desc {
+    color: #cbd5e1;
+  }
+
+  .bb-root-{{ section.id }}.is-dark-theme .bb-btn-submit,
+  [data-theme="dark"] .bb-root-{{ section.id }} .bb-btn-submit,
+  .dark .bb-root-{{ section.id }} .bb-btn-submit {
+    background: #ffffff;
+    color: #09090b;
+    border-color: #ffffff;
+    box-shadow: 0 8px 22px -4px rgba(255, 255, 255, 0.25);
+  }
+
+  .bb-root-{{ section.id }}.is-dark-theme .bb-btn-submit:hover,
+  [data-theme="dark"] .bb-root-{{ section.id }} .bb-btn-submit:hover,
+  .dark .bb-root-{{ section.id }} .bb-btn-submit:hover {
+    background: #e0e7ff;
+    border-color: #c7d2fe;
+    color: #09090b;
+  }
+
+  .bb-root-{{ section.id }}.is-dark-theme .bb-login-link,
+  [data-theme="dark"] .bb-root-{{ section.id }} .bb-login-link,
+  .dark .bb-root-{{ section.id }} .bb-login-link {
+    color: #f8fafc;
+  }
+
+  .bb-root-{{ section.id }}.is-dark-theme .bb-login-link:hover,
+  [data-theme="dark"] .bb-root-{{ section.id }} .bb-login-link:hover,
+  .dark .bb-root-{{ section.id }} .bb-login-link:hover {
+    color: #a5b4fc;
+  }
+
+  /* Accesibilidad y foco por teclado */
+  .bb-root-{{ section.id }} .bb-bubble:focus-visible,
+  .bb-root-{{ section.id }} .bb-panel-close:focus-visible,
+  .bb-root-{{ section.id }} .bb-btn-submit:focus-visible,
+  .bb-root-{{ section.id }} .bb-login-link:focus-visible {
+    outline: 3px solid var(--bb-accent);
+    outline-offset: 3px;
+  }
+
+  .bb-root-{{ section.id }} .bb-input:focus-visible,
+  .bb-root-{{ section.id }} .bb-textarea:focus-visible {
+    outline: none;
+    border-color: var(--bb-accent);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25);
+  }
+
+  @media (max-width: 480px) {
+    .bb-root-{{ section.id }} .bb-panel-wrap {
+      width: calc(100vw - 32px);
+      max-width: none;
+    }
+
+    .bb-root-{{ section.id }} .bb-panel {
+      width: 100%;
+      max-width: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bb-root-{{ section.id }} .bb-bubble { transition: opacity 200ms ease-in-out; }
+    .bb-root-{{ section.id }} .bb-bubble.is-rising,
+    .bb-root-{{ section.id }} .bb-bubble.is-floating {
+      animation: bb-fade-in 200ms ease-in-out forwards !important;
+      translate: 0 0 !important;
+      scale: 1 1 !important;
+      transform: none !important;
+      opacity: 1 !important;
+    }
+    .bb-root-{{ section.id }} .bb-bubble.is-popping {
+      animation: bb-fade-out 200ms ease-out forwards !important;
+      transform: none !important;
+    }
+    .bb-root-{{ section.id }} .bb-bubble.is-reforming {
+      animation: bb-fade-in 200ms ease-out forwards !important;
+      transform: none !important;
+    }
+    .bb-root-{{ section.id }} .bb-glint { display: none !important; }
+    .bb-root-{{ section.id }} .bb-panel.is-open {
+      animation: bb-fade-in 200ms ease-out forwards !important;
+      transform: none !important;
+      border-radius: 24px !important;
+    }
+    .bb-root-{{ section.id }} .bb-panel.is-closing {
+      animation: bb-fade-out 200ms ease-out forwards !important;
+      transform: none !important;
+    }
+    .bb-root-{{ section.id }} .bb-panel.is-open .bb-panel-header,
+    .bb-root-{{ section.id }} .bb-panel.is-open .bb-field-group,
+    .bb-root-{{ section.id }} .bb-panel.is-open .bb-btn-submit {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+    .bb-root-{{ section.id }} .bb-bubble::after { animation: none !important; }
+  }
+
+  @keyframes bb-fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes bb-fade-out { 0% { opacity: 1; } 100% { opacity: 0; } }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+
+    function bbInitWidget(sectionId) {
+      const root = document.querySelector('.bb-root-' + sectionId);
+      if (!root) return;
+
+      // Limpiar listeners previos de instancia anterior si Shopify recarga la sección
+      if (root._bbAbortController) {
+        root._bbAbortController.abort();
+      }
+      if (root._bbCuriousIntervalId) {
+        clearInterval(root._bbCuriousIntervalId);
+      }
+      const abortController = new AbortController();
+      root._bbAbortController = abortController;
+      const signal = abortController.signal;
+
+      const bubbleWrap = document.getElementById('bb-bubble-wrap-' + sectionId);
+      const bubble = document.getElementById('bb-bubble-' + sectionId);
+      const panelWrap = document.getElementById('bb-panel-wrap-' + sectionId);
+      const panel = document.getElementById('bb-panel-' + sectionId);
+      const form = root.querySelector('.bb-form');
+      const successMsg = document.getElementById('bb-panel-success-' + sectionId);
+      const panelCloseBtn = document.getElementById('bb-panel-close-' + sectionId);
+
+      if (!bubble || !bubbleWrap || !panel || !panelWrap) return;
+
+      const STORAGE_KEY = 'bb_bubble_pos_v1';
+      const DRAG_THRESHOLD = 6;
+      const SAFE_MARGIN = 12;
+
+      let currentState = 'hidden';
+      let riseTimeoutId = null;
+      let autoCloseTimeoutId = null;
+      let hoverResetTimeoutId = null;
+      let hoverPassCount = 0;
+      let isHovered = false;
+      let formSubmitted = false;
+
+      let dragX = 0;
+      let dragY = 0;
+      let isPointerDown = false;
+      let isDragging = false;
+      let wasDragged = false;
+      let activePointerId = null;
+      let startClientX = 0;
+      let startClientY = 0;
+      let startDragX = 0;
+      let startDragY = 0;
+
+      function getViewportBounds() {
+        const vv = window.visualViewport;
+        const vw = vv ? vv.width : window.innerWidth;
+        const vh = vv ? vv.height : window.innerHeight;
+        const offsetLeft = vv ? vv.offsetLeft : 0;
+        const offsetTop = vv ? vv.offsetTop : 0;
+        return { vw: vw, vh: vh, offsetLeft: offsetLeft, offsetTop: offsetTop };
+      }
+
+      function clampAndApplyPosition(targetX, targetY) {
+        const rect = bubbleWrap.getBoundingClientRect();
+        const baseLeft = rect.left - dragX;
+        const baseTop = rect.top - dragY;
+        const bw = rect.width || 84;
+        const bh = rect.height || 84;
+
+        const bounds = getViewportBounds();
+        const minX = bounds.offsetLeft + SAFE_MARGIN - baseLeft;
+        const maxX = bounds.offsetLeft + bounds.vw - SAFE_MARGIN - bw - baseLeft;
+        const minY = bounds.offsetTop + SAFE_MARGIN - baseTop;
+        const maxY = bounds.offsetTop + bounds.vh - SAFE_MARGIN - bh - baseTop;
+
+        dragX = Math.min(Math.max(minX, maxX), Math.max(Math.min(minX, maxX), targetX));
+        dragY = Math.min(Math.max(minY, maxY), Math.max(Math.min(minY, maxY), targetY));
+
+        bubbleWrap.style.setProperty('--bb-drag-x', dragX.toFixed(1) + 'px');
+        bubbleWrap.style.setProperty('--bb-drag-y', dragY.toFixed(1) + 'px');
+
+        if (currentState === 'form-open') {
+          positionPanelNearBubble();
+        }
+      }
+
+      function savePosition() {
+        try {
+          window.localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({ x: Math.round(dragX), y: Math.round(dragY) })
+          );
+        } catch (err) {
+          // Ignorar errores de storage
+        }
+      }
+
+      function loadSavedPosition() {
+        try {
+          const raw = window.localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed.x === 'number' && typeof parsed.y === 'number' && isFinite(parsed.x) && isFinite(parsed.y)) {
+            clampAndApplyPosition(parsed.x, parsed.y);
+          }
+        } catch (err) {
+          // Si falla la lectura o el JSON, mantener posición por defecto (0, 0)
+        }
+      }
+
+      function positionPanelNearBubble() {
+        const bRect = bubbleWrap.getBoundingClientRect();
+        const pRect = panelWrap.getBoundingClientRect();
+        const pBaseLeft = pRect.left - (parseFloat(panelWrap.style.getPropertyValue('--bb-panel-x')) || 0);
+        const pBaseTop = pRect.top - (parseFloat(panelWrap.style.getPropertyValue('--bb-panel-y')) || 0);
+
+        const bounds = getViewportBounds();
+        const margin = 16;
+        const pWidth = Math.min(340, bounds.vw - 32);
+        const pHeight = panel.offsetHeight || 245;
+
+        const bCenterX = bRect.left + bRect.width / 2;
+        const bCenterY = bRect.top + bRect.height / 2;
+
+        const spaceLeft = bCenterX - bounds.offsetLeft;
+        const spaceRight = (bounds.offsetLeft + bounds.vw) - bCenterX;
+        const spaceTop = bCenterY - bounds.offsetTop;
+        const spaceBottom = (bounds.offsetTop + bounds.vh) - bCenterY;
+
+        let desiredLeft;
+        let originX;
+        if (spaceLeft >= spaceRight) {
+          desiredLeft = bRect.right - pWidth;
+          originX = 'right';
+        } else {
+          desiredLeft = bRect.left;
+          originX = 'left';
+        }
+
+        let desiredTop;
+        let originY;
+        if (spaceTop >= spaceBottom) {
+          desiredTop = bRect.bottom - pHeight;
+          originY = 'bottom';
+        } else {
+          desiredTop = bRect.top;
+          originY = 'top';
+        }
+
+        const clampedLeft = Math.min(bounds.offsetLeft + bounds.vw - pWidth - margin, Math.max(bounds.offsetLeft + margin, desiredLeft));
+        const clampedTop = Math.min(bounds.offsetTop + bounds.vh - pHeight - margin, Math.max(bounds.offsetTop + margin, desiredTop));
+
+        const panelX = clampedLeft - pBaseLeft;
+        const panelY = clampedTop - pBaseTop;
+
+        panelWrap.style.setProperty('--bb-panel-x', panelX.toFixed(1) + 'px');
+        panelWrap.style.setProperty('--bb-panel-y', panelY.toFixed(1) + 'px');
+        panel.style.transformOrigin = originY + ' ' + originX;
+      }
+
+      function removeNodeSafely(node, fallbackMs) {
+        let removed = false;
+        const cleanup = function () {
+          if (removed) return;
+          removed = true;
+          if (node && node.parentNode) {
+            node.remove();
+          }
+        };
+        node.addEventListener('animationend', cleanup, { once: true });
+        setTimeout(cleanup, fallbackMs);
+      }
+
+      function triggerJellyPulse() {
+        if (currentState !== 'floating') return;
+        bubble.classList.remove('is-wobbling', 'is-curious', 'is-spinning');
+        void bubble.offsetHeight;
+        bubble.classList.add('is-wobbling');
+      }
+
+      function triggerCuriousGesture() {
+        if (currentState !== 'floating') return;
+        bubble.classList.remove('is-wobbling', 'is-curious', 'is-spinning');
+        void bubble.offsetHeight;
+        bubble.classList.add('is-curious');
+      }
+
+      function triggerSpinRotation() {
+        if (currentState !== 'floating') return;
+        bubble.classList.remove('is-wobbling', 'is-curious', 'is-spinning');
+        void bubble.offsetHeight;
+        bubble.classList.add('is-spinning');
+      }
+
+      function showBubble() {
+        if (riseTimeoutId) {
+          clearTimeout(riseTimeoutId);
+          riseTimeoutId = null;
+        }
+
+        currentState = 'rising';
+        panel.hidden = true;
+        panel.classList.remove('is-open', 'is-closing');
+        bubble.hidden = false;
+        bubble.setAttribute('aria-expanded', 'false');
+        bubble.classList.remove('is-floating', 'is-popping', 'is-reforming', 'is-dragging', 'is-wobbling', 'is-curious', 'is-spinning');
+        void bubble.offsetHeight;
+        bubble.classList.add('is-rising');
+      }
+
+      function reformBubble() {
+        currentState = 'reforming';
+        panel.hidden = true;
+        panel.classList.remove('is-open', 'is-closing');
+        bubble.hidden = false;
+        bubble.setAttribute('aria-expanded', 'false');
+        bubble.classList.remove('is-rising', 'is-floating', 'is-popping', 'is-dragging', 'is-wobbling', 'is-curious', 'is-spinning');
+
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (!prefersReducedMotion) {
+          const rect = bubbleWrap.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+
+          const ring = document.createElement('div');
+          ring.className = 'bb-ring is-imploding';
+          ring.style.left = centerX + 'px';
+          ring.style.top = centerY + 'px';
+          root.appendChild(ring);
+          removeNodeSafely(ring, 450);
+        }
+
+        void bubble.offsetHeight;
+        bubble.classList.add('is-reforming');
+      }
+
+      function popBubble() {
+        if (currentState !== 'floating') return;
+        currentState = 'popping';
+
+        bubble.setAttribute('aria-expanded', 'true');
+
+        const rect = bubbleWrap.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        bubble.classList.remove('is-rising', 'is-floating', 'is-dragging', 'is-wobbling', 'is-curious', 'is-spinning');
+        bubble.classList.add('is-popping');
+
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (!prefersReducedMotion) {
+          const ring = document.createElement('div');
+          ring.className = 'bb-ring';
+          ring.style.left = centerX + 'px';
+          ring.style.top = centerY + 'px';
+          root.appendChild(ring);
+          removeNodeSafely(ring, 550);
+
+          for (let i = 0; i < 12; i++) {
+            const baseAngle = i * (360 / 12);
+            const jitter = Math.random() * 16 - 8;
+            const angleRad = ((baseAngle + jitter) * Math.PI) / 180;
+            const distance = 50 + Math.random() * 60;
+            const size = Math.floor(6 + Math.random() * 5);
+
+            const dx = Math.cos(angleRad) * distance;
+            const dy = Math.sin(angleRad) * distance;
+
+            const droplet = document.createElement('div');
+            droplet.className = 'bb-droplet';
+            droplet.style.width = size + 'px';
+            droplet.style.height = size + 'px';
+            droplet.style.left = centerX + 'px';
+            droplet.style.top = centerY + 'px';
+            droplet.style.setProperty('--dx', dx.toFixed(1) + 'px');
+            droplet.style.setProperty('--dy', dy.toFixed(1) + 'px');
+
+            root.appendChild(droplet);
+            removeNodeSafely(droplet, 700);
+          }
+        }
+      }
+
+      function openForm() {
+        currentState = 'form-open';
+        bubble.hidden = true;
+        bubble.setAttribute('aria-expanded', 'true');
+
+        if (form) form.hidden = false;
+        if (successMsg) successMsg.hidden = true;
+
+        panel.hidden = false;
+        positionPanelNearBubble();
+        panel.classList.remove('is-closing');
+        void panel.offsetHeight;
+        panel.classList.add('is-open');
+
+        setTimeout(function () {
+          if (currentState !== 'form-open') return;
+          const firstAction = panel.querySelector('#bb-btn-join-' + sectionId);
+          if (firstAction) firstAction.focus();
+        }, 120);
+      }
+
+      function closeForm() {
+        if (currentState !== 'form-open') return;
+        currentState = 'closing';
+
+        if (autoCloseTimeoutId) {
+          clearTimeout(autoCloseTimeoutId);
+          autoCloseTimeoutId = null;
+        }
+
+        panel.classList.remove('is-open');
+        panel.classList.add('is-closing');
+      }
+
+      bubble.addEventListener('pointerdown', function (e) {
+        if (currentState !== 'floating') return;
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+        isPointerDown = true;
+        isDragging = false;
+        wasDragged = false;
+        activePointerId = e.pointerId;
+        startClientX = e.clientX;
+        startClientY = e.clientY;
+        startDragX = dragX;
+        startDragY = dragY;
+
+        try {
+          bubble.setPointerCapture(e.pointerId);
+        } catch (err) {
+          // Ignorar si falla setPointerCapture
+        }
+      });
+
+      bubble.addEventListener('pointermove', function (e) {
+        if (isPointerDown && e.pointerId === activePointerId) {
+          const dx = e.clientX - startClientX;
+          const dy = e.clientY - startClientY;
+
+          if (!isDragging && Math.hypot(dx, dy) >= DRAG_THRESHOLD) {
+            isDragging = true;
+            wasDragged = true;
+            hoverPassCount = 0;
+            bubble.classList.remove('is-wobbling', 'is-curious', 'is-spinning');
+            bubble.classList.add('is-dragging');
+          }
+
+          if (isDragging) {
+            e.preventDefault();
+            clampAndApplyPosition(startDragX + dx, startDragY + dy);
+          }
+          return;
+        }
+
+        if (currentState !== 'floating') return;
+        const rect = bubbleWrap.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = Math.max(-1, Math.min(1, (e.clientX - cx) / (rect.width / 2)));
+        const dy = Math.max(-1, Math.min(1, (e.clientY - cy) / (rect.height / 2)));
+        bubble.style.setProperty('--bb-mx', (dx * 8).toFixed(1) + 'px');
+        bubble.style.setProperty('--bb-my', (dy * 8).toFixed(1) + 'px');
+        bubble.style.setProperty('--bb-rot', (dx * 8).toFixed(1) + 'deg');
+      });
+
+      function endPointerDrag(e) {
+        if (!isPointerDown || e.pointerId !== activePointerId) return;
+        isPointerDown = false;
+        activePointerId = null;
+
+        try {
+          if (bubble.hasPointerCapture(e.pointerId)) {
+            bubble.releasePointerCapture(e.pointerId);
+          }
+        } catch (err) {
+          // Ignorar si ya fue liberado
+        }
+
+        if (isDragging) {
+          isDragging = false;
+          bubble.classList.remove('is-dragging');
+          clampAndApplyPosition(dragX, dragY);
+          savePosition();
+        }
+      }
+
+      bubble.addEventListener('pointerup', endPointerDrag);
+      bubble.addEventListener('pointercancel', endPointerDrag);
+
+      bubble.addEventListener('click', function (e) {
+        if (wasDragged) {
+          wasDragged = false;
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+        if (currentState === 'floating') {
+          popBubble();
+        }
+      });
+
+      bubble.addEventListener('keydown', function (e) {
+        if (currentState !== 'floating') return;
+
+        const step = e.shiftKey ? 40 : 10;
+        let moved = false;
+        let nextX = dragX;
+        let nextY = dragY;
+
+        if (e.key === 'ArrowLeft') {
+          nextX -= step;
+          moved = true;
+        } else if (e.key === 'ArrowRight') {
+          nextX += step;
+          moved = true;
+        } else if (e.key === 'ArrowUp') {
+          nextY -= step;
+          moved = true;
+        } else if (e.key === 'ArrowDown') {
+          nextY += step;
+          moved = true;
+        }
+
+        if (moved) {
+          e.preventDefault();
+          clampAndApplyPosition(nextX, nextY);
+          savePosition();
+        }
+      });
+
+      bubble.addEventListener('mouseenter', function () {
+        isHovered = true;
+        if (currentState !== 'floating' || isDragging) return;
+
+        hoverPassCount += 1;
+        if (hoverResetTimeoutId) clearTimeout(hoverResetTimeoutId);
+        hoverResetTimeoutId = setTimeout(function () {
+          hoverPassCount = 0;
+        }, 6000);
+
+        if (hoverPassCount > 2) {
+          hoverPassCount = 0;
+          triggerSpinRotation();
+        }
+      });
+
+      bubble.addEventListener('mouseleave', function () {
+        isHovered = false;
+        bubble.style.setProperty('--bb-mx', '0px');
+        bubble.style.setProperty('--bb-my', '0px');
+        bubble.style.setProperty('--bb-rot', '0deg');
+        if (currentState === 'floating' && !isDragging && !bubble.classList.contains('is-spinning')) {
+          triggerJellyPulse();
+        }
+      });
+
+      root._bbCuriousIntervalId = setInterval(function () {
+        if (currentState === 'floating' && !isHovered && !isDragging && !document.hidden) {
+          triggerCuriousGesture();
+        }
+      }, 9000);
+
+      bubble.addEventListener('animationend', function (event) {
+        if (event.animationName === 'bb-spike-jelly') {
+          bubble.classList.remove('is-wobbling');
+          return;
+        }
+
+        if (event.animationName === 'bb-spike-curious') {
+          bubble.classList.remove('is-curious');
+          return;
+        }
+
+        if (event.animationName === 'bb-spike-spin') {
+          bubble.classList.remove('is-spinning');
+          return;
+        }
+
+        if (event.target !== bubble) return;
+
+        if (event.animationName === 'bb-rise' || event.animationName === 'bb-fade-in') {
+          if (currentState === 'rising') {
+            currentState = 'floating';
+            bubble.classList.remove('is-rising');
+            bubble.classList.add('is-floating');
+          }
+        }
+
+        if (event.animationName === 'bb-pop' || event.animationName === 'bb-fade-out') {
+          if (currentState === 'popping') {
+            bubble.hidden = true;
+            bubble.classList.remove('is-popping');
+            openForm();
+          }
+        }
+
+        if (event.animationName === 'bb-reform' || event.animationName === 'bb-fade-in') {
+          if (currentState === 'reforming') {
+            currentState = 'floating';
+            bubble.classList.remove('is-reforming');
+            bubble.classList.add('is-floating');
+          }
+        }
+      });
+
+      panel.addEventListener('animationend', function (event) {
+        if (event.target !== panel) return;
+
+        if (event.animationName === 'bb-panel-close' || event.animationName === 'bb-fade-out') {
+          if (currentState === 'closing') {
+            panel.hidden = true;
+            panel.classList.remove('is-closing');
+            if (form) form.hidden = false;
+            if (successMsg) successMsg.hidden = true;
+
+            if (formSubmitted) {
+              formSubmitted = false;
+              showBubble();
+            } else {
+              reformBubble();
+            }
+
+            bubble.focus();
+          }
+        }
+      });
+
+      if (panelCloseBtn) {
+        panelCloseBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          closeForm();
+        });
+      }
+
+      document.addEventListener('click', function (e) {
+        if (currentState !== 'form-open') return;
+        if (!panel.contains(e.target) && !bubble.contains(e.target)) {
+          closeForm();
+        }
+      }, { signal: signal });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && currentState === 'form-open') {
+          closeForm();
+        }
+      }, { signal: signal });
+
+      function handleViewportChange() {
+        clampAndApplyPosition(dragX, dragY);
+      }
+
+      window.addEventListener('resize', handleViewportChange, { signal: signal });
+      window.addEventListener('orientationchange', function () {
+        setTimeout(handleViewportChange, 60);
+      }, { signal: signal });
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', handleViewportChange, { signal: signal });
+      }
+
+      if (form) {
+        form.addEventListener('submit', function () {
+          formSubmitted = true;
+          autoCloseTimeoutId = setTimeout(function () {
+            if (currentState === 'form-open') {
+              closeForm();
+            }
+          }, 2000);
+        });
+      }
+
+      loadSavedPosition();
+      riseTimeoutId = setTimeout(showBubble, 800);
+    }
+
+    // Inicializar para el ID de sección actual
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () {
+        bbInitWidget('{{ section.id }}');
+      });
+    } else {
+      bbInitWidget('{{ section.id }}');
+    }
+
+    // Soporte para recarga en tiempo real dentro del Editor de Temas de Shopify
+    document.addEventListener('shopify:section:load', function (e) {
+      if (e.detail && e.detail.sectionId) {
+        bbInitWidget(e.detail.sectionId);
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Bubb Asistente Flotante",
+  "tag": "section",
+  "class": "bb-section-container",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Apariencia de la Burbuja"
+    },
+    {
+      "type": "select",
+      "id": "theme_variant",
+      "label": "Variante de color (Claro / Oscuro Invertido)",
+      "default": "light",
+      "options": [
+        {
+          "value": "light",
+          "label": "Modo Claro (Original)"
+        },
+        {
+          "value": "dark",
+          "label": "Modo Oscuro (Colores Invertidos)"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "bubble_mode",
+      "label": "Modo visual de la burbuja",
+      "default": "spike",
+      "options": [
+        {
+          "value": "spike",
+          "label": "Silueta Spike como burbuja (con micro-interacciones)"
+        },
+        {
+          "value": "sphere",
+          "label": "Burbuja esférica con logo interior"
+        }
+      ]
+    },
+    {
+      "type": "image_picker",
+      "id": "bubble_logo",
+      "label": "Logo de la burbuja (transparente)",
+      "info": "Si no se sube una imagen, se usará 'spike.png' desde assets."
+    },
+    {
+      "type": "range",
+      "id": "bubble_size",
+      "min": 60,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Diámetro de la burbuja",
+      "default": 84
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Color de acento de marca",
+      "default": "#4f46e5"
+    },
+    {
+      "type": "range",
+      "id": "position_right",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Distancia desde la derecha",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "position_bottom",
+      "min": 10,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Distancia desde abajo",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "float_speed",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "unit": "s",
+      "label": "Velocidad de flotación (duración ciclo)",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "squash_scale",
+      "min": 1.01,
+      "max": 1.12,
+      "step": 0.01,
+      "label": "Intensidad del rebote elástico",
+      "default": 1.06
+    },
+    {
+      "type": "text",
+      "id": "bubble_aria_label",
+      "label": "Etiqueta accesible de la burbuja",
+      "default": "Abrir panel Welcome to The Chaos"
+    },
+    {
+      "type": "header",
+      "content": "Panel Welcome to The Chaos"
+    },
+    {
+      "type": "textarea",
+      "id": "chaos_description",
+      "label": "Texto descriptivo",
+      "default": "Recibe alertas de lo más popular y obtén una sorpresa para tu cumpleaños."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texto del botón principal (Registro)",
+      "default": "JOIN THE CHAOS"
+    },
+    {
+      "type": "url",
+      "id": "register_url",
+      "label": "URL de registro (por defecto /account/register)"
+    },
+    {
+      "type": "text",
+      "id": "login_label",
+      "label": "Texto del enlace de inicio de sesión",
+      "default": "¿yA tIEnES cuEnTa?"
+    },
+    {
+      "type": "url",
+      "id": "login_url",
+      "label": "URL de login (por defecto /account/login)"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Mensaje de redirección",
+      "default": "¡Bienvenido al Caos! Redirigiendo..."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bubb Asistente Flotante"
+    }
+  ]
+}
+{% endschema %}

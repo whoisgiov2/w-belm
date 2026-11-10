@@ -1,0 +1,1386 @@
+/* === INICIO BLOQUE SHOPIFY === */
+
+/* ==========================================================================
+   1. VARIABLES DE TEMA Y CONFIGURACIÓN (:root)
+   ========================================================================== */
+:root {
+  --bb-size: 84px;
+  --bb-accent: #4f46e5;
+  --bb-right: 24px;
+  --bb-bottom: 24px;
+  --bb-float-time: 4s;
+  --bb-squash-scale: 1.06;
+}
+
+/* ==========================================================================
+   2. CONTENEDOR RAÍZ (AISLAMIENTO TOTAL PARA SHOPIFY)
+   ========================================================================== */
+#bb-root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Contenedor oculto del filtro SVG óptico para la silueta de Spike */
+.bb-svg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   3. BURBUJA DE JABÓN (CONTENEDOR DE POSICIÓN + BURBUJA INTERNA)
+   ========================================================================== */
+/* Contenedor externo: controla SOLO la posición (transform: translate3d) sin mezclar con animaciones */
+.bb-bubble-wrap {
+  position: absolute;
+  right: calc(var(--bb-right) + env(safe-area-inset-right, 0px));
+  bottom: calc(var(--bb-bottom) + env(safe-area-inset-bottom, 0px));
+  width: var(--bb-size);
+  height: var(--bb-size);
+  pointer-events: none;
+  transform: translate3d(var(--bb-drag-x, 0px), var(--bb-drag-y, 0px), 0);
+  will-change: transform;
+  z-index: 999;
+}
+
+.bb-bubble[hidden],
+.bb-panel[hidden] {
+  display: none !important;
+}
+
+.bb-bubble {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  padding: 0;
+  margin: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.65);
+  outline: none;
+  background-clip: padding-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  /* Fondo multicapa con radial-gradient apilados (más translúcido para fundirse con los colores de la tienda) */
+  background:
+    /* Reflejo blanco pequeño e intenso arriba a la izquierda (~30% / 25%) */
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.7) 8%, rgba(255, 255, 255, 0) 18%),
+    /* Reflejo suave y difuso más grande junto a él (~38% / 32%) */
+    radial-gradient(circle at 38% 32%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.12) 28%, rgba(255, 255, 255, 0) 52%),
+    /* Tinte iridiscente abajo a la derecha más etéreo y cristalino */
+    radial-gradient(circle at 72% 75%, rgba(147, 197, 253, 0.25) 0%, rgba(192, 132, 252, 0.2) 32%, rgba(244, 114, 182, 0.14) 58%, rgba(255, 255, 255, 0) 75%),
+    /* Película base cristalina con mínima opacidad para dejar ver el fondo de la página */
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, rgba(238, 242, 255, 0.01) 65%, rgba(199, 210, 254, 0.12) 100%);
+
+  /* Sombras: interior blanca suave (película de jabón) y exterior difuminada */
+  box-shadow:
+    inset 0 0 14px 1px rgba(255, 255, 255, 0.45),
+    inset 0 0 3px 1px rgba(255, 255, 255, 0.7),
+    inset -3px -3px 12px 0px rgba(168, 85, 247, 0.18),
+    0 10px 25px -4px rgba(79, 70, 229, 0.2),
+    0 4px 12px -2px rgba(147, 197, 253, 0.25);
+
+  /* Refracción óptica del fondo: interactúa con los colores de la web que están detrás */
+  backdrop-filter: blur(2px) saturate(130%);
+  -webkit-backdrop-filter: blur(2px) saturate(130%);
+
+  /* Estado inicial: antes de subir (fuera de pantalla e invisible) */
+  opacity: 0;
+  transform: translateY(120px) scale(0.6);
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   4. LOGO DE LA MARCA Y CONTENEDOR ACTOR (.bb-spike-actor)
+   ========================================================================== */
+.bb-spike-actor {
+  width: 48%;
+  height: 48%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+  transform-origin: center center;
+}
+
+.bb-bubble img,
+.bb-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+}
+
+/* Capa de destello recortada a la silueta (activa en modo Silueta Spike) */
+.bb-spike-glint-img {
+  display: none;
+}
+
+/* ==========================================================================
+   4.0. MODO SILUETA SPIKE COMO BURBUJA (.bb-bubble.is-spike-mode)
+   ========================================================================== */
+/* Elimina la esfera exterior: el propio Spike se convierte en la burbuja de jabón */
+.bb-bubble.is-spike-mode {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  overflow: visible;
+  border-radius: 0;
+}
+
+.bb-bubble.is-spike-mode::before,
+.bb-bubble.is-spike-mode::after {
+  display: none;
+}
+
+.bb-bubble.is-spike-mode .bb-spike-actor {
+  width: 100%;
+  height: 100%;
+}
+
+/* El filtro SVG #bb-spike-soap-filter convierte el alfa de spike.png en película de jabón 3D */
+.bb-bubble.is-spike-mode .bb-logo {
+  filter: url(#bb-spike-soap-filter);
+}
+
+/* Haz de luz diagonal cada 5s recortado estrictamente a las púas y silueta de Spike */
+.bb-bubble.is-spike-mode .bb-spike-glint-img {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 3;
+  mix-blend-mode: screen;
+  filter: invert(1) brightness(2.2) drop-shadow(0 0 6px rgba(255, 255, 255, 0.95));
+  opacity: 0;
+  animation: bb-spike-glint-sweep 5s ease-in-out infinite;
+}
+
+@keyframes bb-spike-glint-sweep {
+
+  0%,
+  70% {
+    clip-path: polygon(-60% -20%, -30% -20%, -80% 120%, -110% 120%);
+    opacity: 0;
+  }
+
+  74% {
+    opacity: 0.92;
+  }
+
+  86% {
+    clip-path: polygon(130% -20%, 160% -20%, 110% 120%, 80% 120%);
+    opacity: 0.92;
+  }
+
+  90%,
+  100% {
+    clip-path: polygon(160% -20%, 190% -20%, 140% 120%, 110% 120%);
+    opacity: 0;
+  }
+}
+
+.bb-bubble.is-spike-mode .bb-glint {
+  overflow: visible;
+}
+
+.bb-bubble.is-spike-mode .bb-glint::before {
+  display: none;
+}
+
+/* ==========================================================================
+   4.1. HOVER Y TENSIÓN SUPERFICIAL MAGNÉTICA (DISPOSITIVOS CON HOVER REAL)
+   ========================================================================== */
+@media (hover: hover) {
+  .bb-bubble.is-floating {
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  }
+
+  .bb-bubble.is-floating:hover {
+    transform: translate3d(var(--bb-mx, 0px), var(--bb-my, 0px), 0) scale(1.12) rotate(var(--bb-rot, 0deg));
+    box-shadow:
+      inset 0 0 18px 2px rgba(255, 255, 255, 0.75),
+      inset 0 0 5px 2px rgba(255, 255, 255, 0.9),
+      inset -4px -4px 14px 0px rgba(168, 85, 247, 0.35),
+      0 14px 30px -4px rgba(79, 70, 229, 0.35),
+      0 6px 16px -2px rgba(147, 197, 253, 0.4);
+  }
+
+  .bb-bubble.is-spike-mode.is-floating:hover {
+    box-shadow: none;
+  }
+
+  .bb-bubble.is-floating:hover::before {
+    filter: blur(0.2px) brightness(1.25);
+  }
+
+  .bb-bubble.is-floating:hover::after {
+    filter: brightness(1.3);
+  }
+
+  .bb-bubble.is-floating:hover .bb-logo {
+    transform: rotate(8deg) scale(1.04);
+  }
+
+  .bb-bubble.is-spike-mode.is-floating:hover .bb-logo {
+    filter: url(#bb-spike-soap-filter) drop-shadow(0 0 10px rgba(192, 132, 252, 0.55)) brightness(1.08);
+  }
+}
+
+/* ==========================================================================
+   5. REFLEJOS Y BRILLO IRIDISCENTE (POR ENCIMA DEL LOGO)
+   ========================================================================== */
+/* ::before - Arco blanco fino de reflejo abajo a la derecha */
+.bb-bubble::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: inherit;
+  border: 1.5px solid transparent;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+  border-right: 1.5px solid rgba(255, 255, 255, 0.45);
+  transform: rotate(-10deg);
+  pointer-events: none;
+  z-index: 3;
+  filter: blur(0.4px);
+}
+
+/* ::after - Brillo iridiscente muy sutil con rotación lenta continua (8s infinito) */
+.bb-bubble::after {
+  content: "";
+  position: absolute;
+  inset: -15%;
+  width: 130%;
+  height: 130%;
+  border-radius: inherit;
+  background: conic-gradient(from 0deg,
+      rgba(147, 197, 253, 0.24),
+      /* azul claro */
+      rgba(192, 132, 252, 0.24),
+      /* violeta */
+      rgba(244, 114, 182, 0.2),
+      /* rosa */
+      rgba(253, 224, 71, 0.16),
+      /* amarillo sutil */
+      rgba(134, 239, 172, 0.16),
+      /* verde menta */
+      rgba(147, 197, 253, 0.24)
+      /* cierre ciclo */
+    );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 2;
+  animation: bb-sheen-rotate 8s linear infinite;
+}
+
+@keyframes bb-sheen-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   5.1. DESTELLO PERIÓDICO QUE RECORRE LA FIGURA (CADA 5 SEGUNDOS)
+   ========================================================================== */
+.bb-glint {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 4;
+  overflow: hidden;
+}
+
+/* Haz de luz diagonal que cruza la burbuja */
+.bb-glint::before {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  width: 220%;
+  height: 220%;
+  background: linear-gradient(120deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.02) 44%,
+      rgba(255, 255, 255, 0.7) 50%,
+      rgba(255, 255, 255, 0.02) 56%,
+      transparent 62%);
+  transform: translate3d(-100%, -100%, 0) rotate(25deg);
+  opacity: 0;
+  animation: bb-glint-sweep 5s ease-in-out infinite;
+}
+
+@keyframes bb-glint-sweep {
+
+  0%,
+  70% {
+    transform: translate3d(-100%, -100%, 0) rotate(25deg);
+    opacity: 0;
+  }
+
+  74% {
+    opacity: 0.9;
+  }
+
+  86% {
+    transform: translate3d(100%, 100%, 0) rotate(25deg);
+    opacity: 0.9;
+  }
+
+  90%,
+  100% {
+    transform: translate3d(100%, 100%, 0) rotate(25deg);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   6. ANIMACIÓN DE ENTRADA (is-rising)
+   ========================================================================== */
+/* 800 ms después de cargar, la burbuja sube con curva y zigzag lateral ±10px */
+.bb-bubble.is-rising {
+  opacity: 0;
+  pointer-events: auto;
+  animation: bb-rise 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes bb-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(120px) translateX(0) scale(0.6);
+  }
+
+  20% {
+    opacity: 0.6;
+    transform: translateY(85px) translateX(-10px) scale(0.74);
+  }
+
+  45% {
+    opacity: 0.9;
+    transform: translateY(45px) translateX(10px) scale(0.88);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateY(15px) translateX(-6px) scale(0.97);
+  }
+
+  88% {
+    opacity: 1;
+    transform: translateY(-2px) translateX(3px) scale(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(1);
+  }
+}
+
+/* ==========================================================================
+   7. ESTADO FLOTANDO (is-floating)
+   ========================================================================== */
+/* Al terminar de subir, entra en bucle infinito de flotación, deformación y rebote */
+.bb-bubble.is-floating {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  animation:
+    bb-float var(--bb-float-time) ease-in-out infinite,
+    bb-morph 5s ease-in-out infinite,
+    bb-squash 6s ease-in-out infinite;
+}
+
+/* Flotación vertical ±10px y horizontal ±4px, ciclo de var(--bb-float-time) */
+@keyframes bb-float {
+
+  0%,
+  100% {
+    translate: 0px 0px;
+  }
+
+  25% {
+    translate: 4px -10px;
+  }
+
+  50% {
+    translate: 0px 4px;
+  }
+
+  75% {
+    translate: -4px 10px;
+  }
+}
+
+/* Deformación orgánica del border-radius entre 46% y 54%, ciclo de 5s */
+@keyframes bb-morph {
+
+  0%,
+  100% {
+    border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+  }
+
+  25% {
+    border-radius: 46% 54% 48% 52% / 54% 47% 53% 46%;
+  }
+
+  50% {
+    border-radius: 53% 47% 54% 46% / 48% 52% 46% 54%;
+  }
+
+  75% {
+    border-radius: 48% 52% 46% 54% / 52% 48% 54% 46%;
+  }
+}
+
+/* Rebote suave cada ~6s (squash and stretch con variable de intensidad) */
+@keyframes bb-squash {
+
+  0%,
+  82%,
+  100% {
+    scale: 1 1;
+  }
+
+  88% {
+    scale: var(--bb-squash-scale, 1.06) calc(2 - var(--bb-squash-scale, 1.06));
+  }
+
+  94% {
+    scale: 0.98 1.02;
+  }
+}
+
+/* ==========================================================================
+   6.1. ESTADO DE ARRASTRE LIBRE (is-dragging: cursor grabbing + pausa de flotación y rebote)
+   ========================================================================== */
+.bb-bubble.is-dragging {
+  cursor: grabbing !important;
+  animation-play-state: paused !important;
+}
+
+.bb-bubble.is-dragging .bb-spike-actor,
+.bb-bubble.is-dragging::after,
+.bb-bubble.is-dragging .bb-glint::before,
+.bb-bubble.is-dragging .bb-spike-glint-img {
+  animation-play-state: paused !important;
+}
+
+/* ==========================================================================
+   7.0. GAMA DE MICRO-INTERACCIONES DE LA SILUETA SPIKE
+   ========================================================================== */
+/* A) Ondulación líquida continua de la silueta y púas de Spike mientras flota */
+.bb-bubble.is-spike-mode.is-floating .bb-spike-actor {
+  animation: bb-spike-silhouette-morph 5s ease-in-out infinite;
+}
+
+@keyframes bb-spike-silhouette-morph {
+
+  0%,
+  100% {
+    transform: skewX(0deg) skewY(0deg) scale(1, 1) rotate(0deg);
+  }
+
+  25% {
+    transform: skewX(3.5deg) skewY(-2deg) scale(1.04, 0.96) rotate(-2.5deg);
+  }
+
+  50% {
+    transform: skewX(-3deg) skewY(2.5deg) scale(0.96, 1.04) rotate(2deg);
+  }
+
+  75% {
+    transform: skewX(2deg) skewY(1.5deg) scale(1.03, 0.97) rotate(-1.5deg);
+  }
+}
+
+/* B) Pulso de gelatina (is-wobbling): vibración elástica de las púas por tensión superficial */
+.bb-bubble.is-wobbling .bb-spike-actor {
+  animation: bb-spike-jelly 680ms cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+@keyframes bb-spike-jelly {
+  0% {
+    transform: scale(1, 1) skewX(0deg);
+  }
+
+  20% {
+    transform: scale(1.2, 0.82) skewX(6deg) rotate(3deg);
+  }
+
+  40% {
+    transform: scale(0.85, 1.16) skewX(-5deg) rotate(-3deg);
+  }
+
+  60% {
+    transform: scale(1.09, 0.92) skewX(3deg) rotate(1.5deg);
+  }
+
+  80% {
+    transform: scale(0.96, 1.04) skewX(-1.5deg) rotate(-0.8deg);
+  }
+
+  100% {
+    transform: scale(1, 1) skewX(0deg) rotate(0deg);
+  }
+}
+
+/* C) Gesto curioso (is-curious): Spike se asoma, estira sus púas y saluda al cliente */
+.bb-bubble.is-curious .bb-spike-actor {
+  animation: bb-spike-curious 950ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+}
+
+@keyframes bb-spike-curious {
+  0% {
+    transform: translateY(0) scale(1, 1) rotate(0deg);
+  }
+
+  25% {
+    transform: translateY(-9px) scale(0.93, 1.1) rotate(-14deg) skewX(-4deg);
+  }
+
+  52% {
+    transform: translateY(-6px) scale(1.08, 0.95) rotate(11deg) skewX(4deg);
+  }
+
+  76% {
+    transform: translateY(-2px) scale(1.03, 0.98) rotate(-5deg);
+  }
+
+  100% {
+    transform: translateY(0) scale(1, 1) rotate(0deg);
+  }
+}
+
+/* D) Giro en vueltas por rotación (is-spinning): al pasar el mouse más de 2 veces por encima */
+.bb-bubble.is-spinning .bb-spike-actor {
+  animation: bb-spike-spin 920ms cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+}
+
+@keyframes bb-spike-spin {
+  0% {
+    transform: scale(1, 1) rotate(0deg);
+  }
+
+  12% {
+    /* Impulso previo (anticipation) en sentido contrario */
+    transform: scale(0.92, 1.08) rotate(-22deg);
+  }
+
+  48% {
+    /* Primera vuelta rápida con ligera deformación centrífuga */
+    transform: scale(1.12, 0.9) rotate(390deg);
+  }
+
+  82% {
+    /* Segunda vuelta completa con leve sobrepaso elástico (overshoot) */
+    transform: scale(0.96, 1.04) rotate(740deg);
+  }
+
+  92% {
+    transform: scale(1.03, 0.98) rotate(714deg);
+  }
+
+  100% {
+    transform: scale(1, 1) rotate(720deg);
+  }
+}
+
+/* ==========================================================================
+   7.1. ESTADO EXPLOSIÓN (is-popping) Y EFECTOS DE ESTALLIDO
+   ========================================================================== */
+/* Burbuja durante el estallido: se infla rápido (120ms) y desaparece (160ms) */
+.bb-bubble.is-popping {
+  pointer-events: none !important;
+  translate: 0 0 !important;
+  scale: 1 1 !important;
+  animation: bb-pop 280ms ease-out forwards !important;
+}
+
+@keyframes bb-pop {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  43% {
+    /* 120 ms de 280 ms (~43%): inflado rápido */
+    transform: scale(1.35);
+    opacity: 1;
+  }
+
+  100% {
+    /* 160 ms restantes: estallido final */
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* Destello del logo durante el estallido */
+.bb-bubble.is-popping .bb-logo {
+  animation: bb-logo-pop 280ms ease-out forwards !important;
+}
+
+@keyframes bb-logo-pop {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  43% {
+    transform: scale(1.22);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+/* Anillo blanco fino de choque que se expande desde el centro (450 ms) */
+.bb-ring {
+  position: fixed;
+  width: var(--bb-size);
+  height: var(--bb-size);
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%) scale(0.2);
+  animation: bb-ring-burst 450ms cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes bb-ring-burst {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* Gotitas translúcidas con borde blanco disparadas en 360° (600 ms) */
+.bb-droplet {
+  position: fixed;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.95) 0%, rgba(199, 210, 254, 0.65) 50%, rgba(168, 85, 247, 0.35) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%) translate(0, 0) scale(1);
+  animation: bb-droplet-burst 600ms cubic-bezier(0.15, 0.85, 0.35, 1) forwards;
+}
+
+@keyframes bb-droplet-burst {
+  0% {
+    transform: translate(-50%, -50%) translate(0, 0) scale(1);
+    opacity: 1;
+  }
+
+  65% {
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   7.2. ESTADO REGENERACIÓN INVERSA (is-reforming AL CERRAR SIN ENVIAR)
+   ========================================================================== */
+.bb-bubble.is-reforming {
+  pointer-events: none !important;
+  translate: 0 0 !important;
+  scale: 1 1 !important;
+  animation: bb-reform 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes bb-reform {
+  0% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+
+  35% {
+    transform: scale(1.22);
+    opacity: 0.85;
+  }
+
+  65% {
+    transform: scale(0.94);
+    opacity: 1;
+  }
+
+  82% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.bb-bubble.is-reforming .bb-logo {
+  animation: bb-logo-reform 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes bb-logo-reform {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.15);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Anillo de implosión al regenerarse */
+.bb-ring.is-imploding {
+  animation: bb-ring-implode 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes bb-ring-implode {
+  0% {
+    transform: translate(-50%, -50%) scale(1.8);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   8. ACCESIBILIDAD (prefers-reduced-motion: reduce)
+   ========================================================================== */
+/* Sin flotación, rebote, gotitas ni anillo: solo desvanecimientos suaves */
+@media (prefers-reduced-motion: reduce) {
+  .bb-bubble {
+    transition: opacity 200ms ease-in-out;
+  }
+
+  .bb-bubble.is-rising,
+  .bb-bubble.is-floating {
+    animation: bb-fade-in 200ms ease-in-out forwards !important;
+    translate: 0 0 !important;
+    scale: 1 1 !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .bb-bubble.is-popping {
+    animation: bb-fade-out 200ms ease-out forwards !important;
+    transform: none !important;
+  }
+
+  .bb-bubble.is-reforming {
+    animation: bb-fade-in 200ms ease-out forwards !important;
+    transform: none !important;
+  }
+
+
+  .bb-glint,
+  .bb-spike-glint-img {
+    display: none !important;
+  }
+
+  .bb-bubble .bb-spike-actor {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .bb-panel.is-open {
+    animation: bb-fade-in 200ms ease-out forwards !important;
+    transform: none !important;
+    border-radius: 24px !important;
+  }
+
+  .bb-panel.is-closing {
+    animation: bb-fade-out 200ms ease-out forwards !important;
+    transform: none !important;
+  }
+
+  .bb-panel.is-open .bb-panel-header,
+  .bb-panel.is-open .bb-field-group,
+  .bb-panel.is-open .bb-chaos-desc,
+  .bb-panel.is-open .bb-btn-submit,
+  .bb-panel.is-open .bb-login-wrap {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .bb-bubble::after {
+    animation: none !important;
+  }
+}
+
+@keyframes bb-fade-in {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes bb-fade-out {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   9. PANEL DEL FORMULARIO DE CONTACTO (CONTENEDOR DE POSICIÓN + PANEL INTERNO)
+   ========================================================================== */
+/* Contenedor externo del panel: controla SOLO la posición (transform: translate3d) */
+.bb-panel-wrap {
+  position: absolute;
+  right: calc(var(--bb-right) + env(safe-area-inset-right, 0px));
+  bottom: calc(var(--bb-bottom) + env(safe-area-inset-bottom, 0px));
+  width: min(340px, calc(100vw - 32px));
+  pointer-events: none;
+  transform: translate3d(var(--bb-panel-x, 0px), var(--bb-panel-y, 0px), 0);
+  will-change: transform;
+  z-index: 1000;
+}
+
+.bb-panel {
+  position: relative;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.18), 0 0 1px rgba(15, 23, 42, 0.1);
+  padding: 22px 20px 20px 20px;
+  box-sizing: border-box;
+  pointer-events: auto;
+  transform-origin: bottom right;
+  z-index: 1000;
+}
+
+/* Animación de apertura: nace desde donde estaba la burbuja con curva de resorte (450 ms) */
+.bb-panel.is-open {
+  animation: bb-panel-spring 450ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes bb-panel-spring {
+  0% {
+    opacity: 0;
+    transform: scale(0.15);
+    border-radius: 50%;
+  }
+
+  65% {
+    opacity: 1;
+    border-radius: 28px;
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    border-radius: 24px;
+  }
+}
+
+/* Animación de cierre: se contrae hacia la esquina inferior derecha y desaparece en 250 ms */
+.bb-panel.is-closing {
+  animation: bb-panel-close 250ms cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  pointer-events: none;
+}
+
+@keyframes bb-panel-close {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    border-radius: 24px;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.15);
+    border-radius: 50%;
+  }
+}
+
+/* Entrada escalonada de elementos (diferencia de 60 ms entre cada uno) */
+.bb-panel.is-open .bb-panel-header,
+.bb-panel.is-open .bb-chaos-desc,
+.bb-panel.is-open .bb-field-group:nth-of-type(1),
+.bb-panel.is-open .bb-field-group:nth-of-type(2),
+.bb-panel.is-open .bb-field-group:nth-of-type(3),
+.bb-panel.is-open .bb-btn-submit,
+.bb-panel.is-open .bb-login-wrap {
+  opacity: 0;
+  animation: bb-field-in 260ms ease-out forwards;
+}
+
+.bb-panel.is-open .bb-panel-header {
+  animation-delay: 100ms;
+}
+
+.bb-panel.is-open .bb-chaos-desc,
+.bb-panel.is-open .bb-field-group:nth-of-type(1) {
+  animation-delay: 160ms;
+}
+
+.bb-panel.is-open .bb-field-group:nth-of-type(2),
+.bb-panel.is-open .bb-btn-submit {
+  animation-delay: 220ms;
+}
+
+.bb-panel.is-open .bb-field-group:nth-of-type(3),
+.bb-panel.is-open .bb-login-wrap {
+  animation-delay: 280ms;
+}
+
+@keyframes bb-field-in {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Botón cerrar (×) circular */
+.bb-panel-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+
+.bb-panel-close:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  transform: scale(1.08);
+}
+
+/* Encabezado "Welcome to The Chaos" */
+.bb-panel-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 4px 16px 0 16px;
+}
+
+.bb-panel-logo {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.bb-panel-title {
+  margin: 0;
+  font-size: 23px;
+  line-height: 1.12;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #09090b;
+  transition: color 0.3s ease;
+}
+
+/* Cuerpo y textos de "Welcome to The Chaos" */
+.bb-chaos-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+
+.bb-chaos-desc {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.48;
+  color: #475569;
+  padding: 0 6px;
+  transition: color 0.3s ease;
+}
+
+/* Botón principal CTA ("JOIN THE CHAOS") */
+.bb-btn-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  text-decoration: none;
+  width: 100%;
+  padding: 12px 16px;
+  background: #09090b;
+  color: #ffffff;
+  border: 1.5px solid #09090b;
+  border-radius: 14px;
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 8px 20px -4px rgba(9, 9, 11, 0.28);
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+  margin-top: 2px;
+}
+
+.bb-btn-submit:hover {
+  transform: translateY(-2px) scale(1.015);
+  background: var(--bb-accent);
+  border-color: var(--bb-accent);
+  box-shadow: 0 10px 24px -4px rgba(79, 70, 229, 0.45);
+}
+
+.bb-btn-submit:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* Hipervínculo "¿yA tIEnES cuEnTa?" */
+.bb-login-wrap {
+  margin-top: 2px;
+  text-align: center;
+}
+
+.bb-login-link {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #09090b;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+
+.bb-login-link:hover {
+  color: var(--bb-accent);
+  transform: translateY(-1px);
+}
+
+/* Grupos de campos e inputs (conservados por compatibilidad) */
+.bb-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.bb-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.bb-input,
+.bb-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-family: inherit;
+  font-size: 13px;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.bb-textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.bb-input:focus,
+.bb-textarea:focus {
+  border-color: var(--bb-accent);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+/* Mensaje de éxito / redirección */
+.bb-panel-success {
+  padding: 20px 10px;
+  text-align: center;
+  animation: bb-field-in 300ms ease-out forwards;
+}
+
+.bb-success-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bb-accent);
+  margin: 0;
+}
+
+/* ==========================================================================
+     10. VARIANTE CON COLORES INVERTIDOS (MODO OSCURO / .is-dark-theme)
+     Se activa con #bb-root.is-dark-theme o cuando la página tiene tema oscuro
+     ========================================================================== */
+/* 10.1. Silueta Spike invertida con óptica de jabón luminosa sobre fondo oscuro */
+#bb-root.is-dark-theme .bb-bubble.is-spike-mode .bb-logo,
+[data-theme="dark"] #bb-root .bb-bubble.is-spike-mode .bb-logo,
+.dark #bb-root .bb-bubble.is-spike-mode .bb-logo {
+  filter: url(#bb-spike-soap-filter-dark);
+}
+
+@media (hover: hover) {
+
+  #bb-root.is-dark-theme .bb-bubble.is-spike-mode.is-floating:hover .bb-logo,
+  [data-theme="dark"] #bb-root .bb-bubble.is-spike-mode.is-floating:hover .bb-logo,
+  .dark #bb-root .bb-bubble.is-spike-mode.is-floating:hover .bb-logo {
+    filter: url(#bb-spike-soap-filter-dark) drop-shadow(0 0 12px rgba(129, 140, 248, 0.7)) brightness(1.1);
+  }
+}
+
+/* 10.2. Modo Esférico clásico con logo interior invertido a blanco en Modo Oscuro */
+#bb-root.is-dark-theme .bb-bubble:not(.is-spike-mode),
+[data-theme="dark"] #bb-root .bb-bubble:not(.is-spike-mode),
+.dark #bb-root .bb-bubble:not(.is-spike-mode) {
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow:
+    inset 0 0 16px 2px rgba(255, 255, 255, 0.55),
+    inset 0 0 4px 1px rgba(255, 255, 255, 0.85),
+    inset -4px -4px 14px 0px rgba(56, 189, 248, 0.32),
+    0 10px 28px -4px rgba(129, 140, 248, 0.4),
+    0 0 16px 0px rgba(192, 132, 252, 0.3);
+}
+
+#bb-root.is-dark-theme .bb-bubble:not(.is-spike-mode) .bb-logo,
+[data-theme="dark"] #bb-root .bb-bubble:not(.is-spike-mode) .bb-logo,
+.dark #bb-root .bb-bubble:not(.is-spike-mode) .bb-logo {
+  filter: invert(1) drop-shadow(0 2px 6px rgba(255, 255, 255, 0.45));
+}
+
+/* 10.3. Panel del formulario con colores invertidos en Modo Oscuro */
+#bb-root.is-dark-theme .bb-panel,
+[data-theme="dark"] #bb-root .bb-panel,
+.dark #bb-root .bb-panel {
+  background: #09090b;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 24px 50px -10px rgba(0, 0, 0, 0.75),
+    0 0 24px -4px rgba(129, 140, 248, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+#bb-root.is-dark-theme .bb-panel-close,
+[data-theme="dark"] #bb-root .bb-panel-close,
+.dark #bb-root .bb-panel-close {
+  background: #18181b;
+  color: #a1a1aa;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#bb-root.is-dark-theme .bb-panel-close:hover,
+[data-theme="dark"] #bb-root .bb-panel-close:hover,
+.dark #bb-root .bb-panel-close:hover {
+  background: #27272a;
+  color: #ffffff;
+}
+
+/* Logo spike.png invertido a blanco dentro del encabezado oscuro */
+#bb-root.is-dark-theme .bb-panel-logo,
+[data-theme="dark"] #bb-root .bb-panel-logo,
+.dark #bb-root .bb-panel-logo {
+  filter: invert(1) drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+}
+
+#bb-root.is-dark-theme .bb-panel-title,
+[data-theme="dark"] #bb-root .bb-panel-title,
+.dark #bb-root .bb-panel-title {
+  color: #ffffff;
+}
+
+#bb-root.is-dark-theme .bb-chaos-desc,
+[data-theme="dark"] #bb-root .bb-chaos-desc,
+.dark #bb-root .bb-chaos-desc {
+  color: #cbd5e1;
+}
+
+/* Botón "JOIN THE CHAOS" invertido (fondo blanco, texto negro) */
+#bb-root.is-dark-theme .bb-btn-submit,
+[data-theme="dark"] #bb-root .bb-btn-submit,
+.dark #bb-root .bb-btn-submit {
+  background: #ffffff;
+  color: #09090b;
+  border-color: #ffffff;
+  box-shadow: 0 8px 22px -4px rgba(255, 255, 255, 0.25);
+}
+
+#bb-root.is-dark-theme .bb-btn-submit:hover,
+[data-theme="dark"] #bb-root .bb-btn-submit:hover,
+.dark #bb-root .bb-btn-submit:hover {
+  background: #e0e7ff;
+  border-color: #c7d2fe;
+  color: #09090b;
+  box-shadow: 0 10px 26px -2px rgba(129, 140, 248, 0.5);
+}
+
+/* Hipervínculo "¿yA tIEnES cuEnTa?" invertido */
+#bb-root.is-dark-theme .bb-login-link,
+[data-theme="dark"] #bb-root .bb-login-link,
+.dark #bb-root .bb-login-link {
+  color: #f8fafc;
+}
+
+#bb-root.is-dark-theme .bb-login-link:hover,
+[data-theme="dark"] #bb-root .bb-login-link:hover,
+.dark #bb-root .bb-login-link:hover {
+  color: #a5b4fc;
+}
+
+#bb-root.is-dark-theme .bb-success-text,
+[data-theme="dark"] #bb-root .bb-success-text,
+.dark #bb-root .bb-success-text {
+  color: #a5b4fc;
+}
+
+/* Dispositivos móviles (≤ 480px) */
+@media (max-width: 480px) {
+  .bb-panel-wrap {
+    width: calc(100vw - 32px);
+    max-width: none;
+  }
+
+  .bb-panel {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+/* Accesibilidad: indicador visual de foco para navegación con teclado (:focus-visible) */
+.bb-bubble:focus-visible,
+.bb-panel-close:focus-visible,
+.bb-btn-submit:focus-visible,
+.bb-login-link:focus-visible {
+  outline: 3px solid var(--bb-accent);
+  outline-offset: 3px;
+}
+
+.bb-input:focus-visible,
+.bb-textarea:focus-visible {
+  outline: none;
+  border-color: var(--bb-accent);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25);
+}
+
+/* === FIN BLOQUE SHOPIFY === */
+
+/* ==========================================================================
+   PANEL DE PRUEBAS: BORRAR AL INTEGRAR EN SHOPIFY
+   ========================================================================== */
+.bb-test-panel {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 10000;
+  pointer-events: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bb-test-btn {
+  background: #0f172a;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: background 0.2s, transform 0.1s;
+}
+
+.bb-test-btn-accent {
+  background: var(--bb-accent);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.bb-test-btn-accent:hover {
+  background: #4338ca !important;
+}
+
+.bb-test-btn:hover {
+  background: #1e293b;
+  transform: translateY(-1px);
+}
+
+.bb-test-btn:active {
+  transform: translateY(0);
+}
+
+/* FIN PANEL DE PRUEBAS */

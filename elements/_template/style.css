@@ -1,0 +1,110 @@
+/* === INICIO BLOQUE SHOPIFY === */
+
+/* ==========================================================================
+   VARIABLES Y AISLAMIENTO (PREFIJO el-)
+   ========================================================================== */
+:root {
+  --el-accent: #4f46e5;
+  --el-radius: 14px;
+  --el-transition-time: 0.3s;
+}
+
+#el-root {
+  position: relative;
+  box-sizing: border-box;
+}
+
+#el-root *,
+#el-root *::before,
+#el-root *::after {
+  box-sizing: inherit;
+}
+
+.el-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.el-interactive-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background: var(--el-accent);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--el-radius);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+  user-select: none;
+}
+
+.el-interactive-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px -4px rgba(79, 70, 229, 0.4);
+}
+
+.el-interactive-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.el-interactive-btn.is-active {
+  background: #09090b;
+  box-shadow: 0 4px 12px rgba(9, 9, 11, 0.25);
+}
+
+/* Accesibilidad y foco */
+.el-interactive-btn:focus-visible {
+  outline: 3px solid var(--el-accent);
+  outline-offset: 3px;
+}
+
+/* Modo oscuro */
+#el-root.is-dark-theme .el-interactive-btn,
+[data-theme="dark"] #el-root .el-interactive-btn {
+  background: #ffffff;
+  color: #09090b;
+}
+
+/* Accesibilidad: reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .el-interactive-btn {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* === FIN BLOQUE SHOPIFY === */
+
+/* ==========================================================================
+   PANEL DE PRUEBAS: BORRAR AL INTEGRAR EN SHOPIFY
+   ========================================================================== */
+.el-test-panel {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 10000;
+  display: flex;
+  gap: 8px;
+}
+
+.el-test-btn {
+  background: #0f172a;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.el-test-btn:hover {
+  background: #1e293b;
+}
