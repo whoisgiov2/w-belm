@@ -2,427 +2,267 @@
 @import url('https://fonts.googleapis.com/css2?family=Carter+One&family=Luckiest+Guy&display=swap');
 
 /* ==========================================================================
-   w-belm — Gift Card / Tarjeta de Descuento de Bienvenida al Caos
-   Prefijo de clases: gc-
-   Paleta: Caos Carmesí (#780606) & Dark Carbon (#09090b)
+   w-belm — Gift Card / Tarjeta de Descuento de Bienvenida al Caos (Minimalista)
+   Compatible con formato de correos HTML y navegador web
+   Fondo completo: fondoini.jpg
    ========================================================================== */
 
 :root {
   --gc-crimson: #780606;
   --gc-crimson-hover: #900808;
-  --gc-crimson-light: #fff5f5;
-  --gc-crimson-border: rgba(120, 6, 6, 0.35);
-  --gc-crimson-glow: rgba(120, 6, 6, 0.38);
-  --gc-font-title: 'Luckiest Guy', cursive, sans-serif;
-  --gc-font-display: 'Carter One', cursive, sans-serif;
+  --gc-crimson-border: rgba(120, 6, 6, 0.55);
+  --gc-crimson-glow: rgba(120, 6, 6, 0.35);
+  --gc-font-title: 'Luckiest Guy', Impact, 'Arial Black', sans-serif;
+  --gc-font-display: 'Carter One', 'Trebuchet MS', 'Arial Black', sans-serif;
   --gc-font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --gc-bg: #09090b;
-  --gc-card-bg: #ffffff;
-  --gc-text-dark: #09090b;
-  --gc-text-muted: #475569;
-  --gc-radius-card: 22px;
-  --gc-radius-inner: 16px;
 }
 
-/* Reset y caja */
-.gc-standalone * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-/* Contenedor envolvente */
-.gc-wrapper {
+/* Tarjeta principal con fondoini.jpg completo */
+.gc-card-container {
   width: 100%;
-  max-width: 540px;
+  max-width: 580px;
   margin: 0 auto;
-  perspective: 1000px;
-}
-
-/* Tarjeta principal estilo Voucher / Ticket */
-.gc-card {
-  background: var(--gc-card-bg);
-  border-radius: var(--gc-radius-card);
+  background-color: #120202;
+  background-image: url('fondoini.jpg');
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-radius: 18px;
   border: 1.5px solid var(--gc-crimson-border);
   box-shadow:
-    0 25px 60px -15px rgba(0, 0, 0, 0.7),
-    0 0 35px var(--gc-crimson-glow);
+    0 20px 45px rgba(0, 0, 0, 0.75),
+    0 0 25px var(--gc-crimson-glow);
   overflow: hidden;
-  position: relative;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-.gc-card:hover {
+.gc-card-container:hover {
+  transform: translateY(-2px);
+  border-color: rgba(120, 6, 6, 0.8);
   box-shadow:
-    0 30px 70px -15px rgba(0, 0, 0, 0.8),
-    0 0 45px rgba(120, 6, 6, 0.5);
+    0 24px 55px rgba(0, 0, 0, 0.85),
+    0 0 35px rgba(120, 6, 6, 0.5);
 }
 
-/* Banner superior con fondoini.jpg */
-.gc-banner {
-  position: relative;
-  width: 100%;
-  height: 180px;
-  overflow: hidden;
-  background: #180303;
-}
-
-.gc-banner-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.gc-card:hover .gc-banner-img {
-  transform: scale(1.04);
-}
-
-.gc-banner-overlay {
-  position: absolute;
-  inset: 0;
+/* Overlay sutil para legibilidad */
+.gc-card-overlay {
   background: linear-gradient(
     180deg,
-    rgba(0, 0, 0, 0.3) 0%,
-    rgba(120, 6, 6, 0.35) 50%,
-    rgba(9, 9, 11, 0.75) 100%
+    rgba(10, 2, 2, 0.85) 0%,
+    rgba(18, 3, 3, 0.88) 50%,
+    rgba(10, 2, 2, 0.92) 100%
   );
-  pointer-events: none;
+  padding: 42px 34px 38px 34px;
+  text-align: center;
+  box-sizing: border-box;
 }
 
-/* Insignia circular Spike centrada sobre el banner */
-.gc-logo-wrap {
-  width: 66px;
-  height: 66px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 3px solid #ffffff;
-  box-shadow:
-    0 8px 24px rgba(120, 6, 6, 0.25),
-    0 2px 6px rgba(0, 0, 0, 0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: -33px auto 14px auto;
-  position: relative;
-  z-index: 5;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.gc-card:hover .gc-logo-wrap {
-  transform: scale(1.08) rotate(2deg);
-}
-
-.gc-logo-img {
-  width: 44px;
-  height: 44px;
+/* Logo Spike minimalista y discreto */
+.gc-logo-minimal {
+  width: 36px;
+  height: 36px;
   object-fit: contain;
   display: block;
-  pointer-events: none;
-  user-select: none;
+  margin: 0 auto 22px auto;
+  filter: drop-shadow(0 2px 8px rgba(120, 6, 6, 0.6));
+  transition: transform 0.25s ease;
 }
 
-/* Cuerpo de la tarjeta */
-.gc-body {
-  padding: 0 28px 32px 28px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.gc-logo-minimal:hover {
+  transform: scale(1.1);
 }
 
-/* 1. Título principal: "Te damos la bienvenida al caos." */
-.gc-title {
-  font-family: var(--gc-font-title);
-  font-size: 28px;
-  line-height: 1.15;
-  letter-spacing: 0.03em;
-  color: var(--gc-text-dark);
-  margin-bottom: 8px;
-  text-transform: none;
-}
-
-/* 2. Subtítulo: "¡Qué bueno tenerte aquí! Disfruta este descuento..." */
-.gc-subtitle {
-  font-size: 14.5px;
-  color: var(--gc-text-muted);
-  line-height: 1.5;
-  max-width: 440px;
-  margin-bottom: 20px;
-}
-
-/* 3. Insignia: "Oferta especial" */
-.gc-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--gc-font-display);
-  font-size: 13.5px;
-  color: var(--gc-crimson);
-  background: var(--gc-crimson-light);
-  border: 1.5px solid var(--gc-crimson-border);
-  padding: 5px 16px;
-  border-radius: 9999px;
-  margin-bottom: 12px;
-  letter-spacing: 0.02em;
-  box-shadow: 0 2px 8px rgba(120, 6, 6, 0.08);
-}
-
-.gc-badge-icon {
+/* Insignia: Oferta especial */
+.gc-badge-minimal {
   display: inline-block;
-  font-size: 12px;
-}
-
-/* 4. Destacado: "10% de descuento en Página de inicio" */
-.gc-offer-box {
-  background: linear-gradient(135deg, #180303 0%, #2b0606 50%, #180303 100%);
-  border: 1px solid rgba(120, 6, 6, 0.4);
-  border-radius: var(--gc-radius-inner);
-  padding: 16px 20px;
-  width: 100%;
-  color: #ffffff;
-  margin-bottom: 20px;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 6px 18px rgba(120, 6, 6, 0.2);
-  position: relative;
-  overflow: hidden;
-}
-
-.gc-offer-box::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -60%;
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
-  transform: skewX(-25deg);
-  animation: gcShimmer 4s infinite ease-in-out;
-}
-
-@keyframes gcShimmer {
-  0% { left: -60%; }
-  35%, 100% { left: 140%; }
-}
-
-.gc-offer-highlight {
-  font-family: var(--gc-font-title);
-  font-size: 26px;
-  line-height: 1.2;
-  letter-spacing: 0.04em;
-  color: #ffffff;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-}
-
-.gc-offer-sub {
-  font-size: 14px;
-  color: #fca5a5;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  margin-top: 2px;
-}
-
-/* 5. Explicación y código */
-.gc-instructions {
-  font-size: 13.5px;
-  color: #334155;
-  line-height: 1.55;
+  background-color: rgba(120, 6, 6, 0.25);
+  border: 1px solid #780606;
+  border-radius: 20px;
+  padding: 4px 14px;
   margin-bottom: 16px;
-  max-width: 440px;
 }
 
-.gc-instructions strong {
-  color: var(--gc-crimson);
+.gc-badge-text {
   font-family: var(--gc-font-display);
-  font-size: 14.5px;
-}
-
-/* 6. Caja del cupón interactiva */
-.gc-coupon-card {
-  width: 100%;
-  background: var(--gc-crimson-light);
-  border: 2px dashed var(--gc-crimson);
-  border-radius: var(--gc-radius-inner);
-  padding: 14px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 22px;
-  transition: background 0.2s, border-color 0.2s;
-}
-
-.gc-coupon-card:hover {
-  background: #ffebeb;
-}
-
-.gc-code-meta {
-  text-align: left;
-}
-
-.gc-code-label {
-  font-size: 11px;
-  text-transform: uppercase;
+  font-size: 12px;
+  color: #fca5a5;
   letter-spacing: 0.08em;
-  color: #64748b;
+  text-transform: uppercase;
   font-weight: 700;
   display: block;
-  margin-bottom: 2px;
+  line-height: 1.2;
 }
 
-.gc-code-value {
+/* Título: "Te damos la bienvenida al caos." */
+.gc-title-text {
+  font-family: var(--gc-font-title);
+  font-size: 32px;
+  line-height: 1.15;
+  letter-spacing: 0.03em;
+  color: #ffffff;
+  margin: 0 0 10px 0;
+  text-align: center;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+}
+
+/* Subtítulo: "¡Qué bueno tenerte aquí! Disfruta este descuento..." */
+.gc-subtitle-text {
+  font-family: var(--gc-font-body);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #cbd5e1;
+  margin: 0 auto 24px auto;
+  max-width: 440px;
+  text-align: center;
+}
+
+/* Divisor sutil */
+.gc-divider {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(120, 6, 6, 0.4);
+  margin-bottom: 24px;
+  border: none;
+}
+
+/* Destacado: "10% de descuento en Página de inicio" */
+.gc-offer-val {
+  font-family: var(--gc-font-title);
+  font-size: 34px;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  color: #ff3b3b;
+  text-shadow: 0 0 18px rgba(255, 59, 59, 0.45);
+  margin-bottom: 4px;
+}
+
+.gc-offer-label {
   font-family: var(--gc-font-display);
-  font-size: 23px;
-  letter-spacing: 0.1em;
-  color: var(--gc-crimson);
+  font-size: 13.5px;
+  color: #fca5a5;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+/* Instrucciones */
+.gc-instructions-text {
+  font-family: var(--gc-font-body);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #94a3b8;
+  margin: 0 auto 18px auto;
+  max-width: 450px;
+  text-align: center;
+}
+
+.gc-instructions-text strong {
+  font-family: var(--gc-font-display);
+  font-size: 15px;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+}
+
+/* Caja de cupón / Ticket pill */
+.gc-coupon-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  background-color: rgba(0, 0, 0, 0.65);
+  border: 1.5px dashed #780606;
+  border-radius: 12px;
+  padding: 12px 24px;
+  margin-bottom: 26px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gc-coupon-pill:hover {
+  background-color: rgba(120, 6, 6, 0.35);
+  border-color: #ff3333;
+}
+
+.gc-code-display {
+  font-family: var(--gc-font-display);
+  font-size: 22px;
+  color: #ffffff;
+  letter-spacing: 0.12em;
   font-weight: 700;
   user-select: all;
 }
 
-/* Botón copiar */
-.gc-copy-btn {
-  background: #ffffff;
-  border: 1.5px solid var(--gc-crimson-border);
-  color: var(--gc-crimson);
+.gc-copy-label {
   font-family: var(--gc-font-body);
-  font-size: 12.5px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 8px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(120, 6, 6, 0.08);
-  white-space: nowrap;
-}
-
-.gc-copy-btn:hover {
-  background: var(--gc-crimson);
-  color: #ffffff;
-  border-color: var(--gc-crimson);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(120, 6, 6, 0.25);
-}
-
-.gc-copy-btn:active {
-  transform: translateY(0);
-}
-
-/* 7. Botón Principal CTA: [Aplicar descuento] */
-.gc-btn-apply {
-  width: 100%;
-  background: var(--gc-crimson);
-  color: #ffffff;
-  border: 2px solid var(--gc-crimson);
-  border-radius: 14px;
-  padding: 15px 24px;
-  font-family: var(--gc-font-title);
-  font-size: 18px;
-  letter-spacing: 0.05em;
+  color: #fca5a5;
   text-transform: uppercase;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  cursor: pointer;
-  box-shadow: 0 8px 24px -4px rgba(120, 6, 6, 0.5);
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s, box-shadow 0.25s;
+  letter-spacing: 0.04em;
+  padding-left: 12px;
+  border-left: 1px solid rgba(120, 6, 6, 0.4);
 }
 
-.gc-btn-apply:hover {
-  background: var(--gc-crimson-hover);
-  border-color: var(--gc-crimson-hover);
-  transform: translateY(-2px) scale(1.015);
-  box-shadow: 0 12px 28px -4px rgba(120, 6, 6, 0.65);
+/* Botón Principal CTA: [Aplicar descuento] */
+.gc-btn-cta {
+  background-color: #780606;
+  border: 1.5px solid #780606;
+  border-radius: 12px;
+  color: #ffffff;
+  display: inline-block;
+  font-family: var(--gc-font-title);
+  font-size: 17px;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  padding: 16px 36px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  box-shadow: 0 8px 22px rgba(120, 6, 6, 0.45);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.gc-btn-cta:hover {
+  background-color: #900808;
+  border-color: #900808;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(120, 6, 6, 0.6);
   color: #ffffff;
 }
 
-.gc-btn-apply:active {
-  transform: translateY(0) scale(0.99);
-}
-
-/* 8. Acciones secundarias */
-.gc-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  margin-top: 18px;
-  width: 100%;
-}
-
-.gc-sub-link {
-  font-size: 13px;
-  color: #64748b;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-  background: none;
-  border: none;
+/* Pie minimalista */
+.gc-footer-meta {
   font-family: var(--gc-font-body);
-  font-weight: 600;
-  transition: color 0.2s ease;
+  font-size: 11.5px;
+  color: #64748b;
+  line-height: 1.5;
+  margin-top: 28px;
 }
 
-.gc-sub-link:hover {
-  color: var(--gc-crimson);
+.gc-footer-link {
+  color: #94a3b8;
   text-decoration: underline;
+  margin-top: 4px;
+  display: inline-block;
 }
 
-/* ==========================================================================
-   RESPONSIVE
-   ========================================================================== */
-@media (max-width: 480px) {
-  .gc-banner {
-    height: 145px;
-  }
-  .gc-body {
-    padding: 0 18px 24px 18px;
-  }
-  .gc-title {
-    font-size: 24px;
-  }
-  .gc-offer-highlight {
-    font-size: 22px;
-  }
-  .gc-coupon-card {
-    flex-direction: column;
-    text-align: center;
-    gap: 10px;
-  }
-  .gc-code-meta {
-    text-align: center;
-  }
-  .gc-copy-btn {
-    width: 100%;
-    justify-content: center;
-  }
+.gc-footer-link:hover {
+  color: #fca5a5;
 }
 
-@media print {
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
-    padding: 0 !important;
+/* Responsive */
+@media (max-width: 600px) {
+  .gc-card-overlay {
+    padding: 30px 18px !important;
   }
-  .gc-card {
-    box-shadow: none !important;
-    border: 2px solid #000000 !important;
+  .gc-title-text {
+    font-size: 26px !important;
   }
-  .gc-btn-apply,
-  .gc-actions,
-  .gc-copy-btn {
-    display: none !important;
+  .gc-offer-val {
+    font-size: 28px !important;
   }
-  .gc-banner {
-    filter: grayscale(1);
+  .gc-btn-cta {
+    padding: 15px 22px !important;
+    font-size: 16px !important;
   }
 }

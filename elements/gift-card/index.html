@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prototipo Gift Card | w-belm</title>
+  <title>Prototipo Gift Card Minimalista (Correo & Tienda) | w-belm</title>
   <link rel="icon" type="image/png" href="spike.png">
 
   <!-- Google Fonts: Carter One & Luckiest Guy -->
@@ -16,14 +16,14 @@
 
   <style>
     /* ==========================================================================
-       ESTILOS DEL TESTBENCH / PROTOTIPO LOCAL
+       BARRA DE PRUEBAS Y AMBIENTE DE SIMULACIÓN
        ========================================================================== */
     body {
-      background-color: #08080a;
+      background-color: #070709;
       background-image:
-        radial-gradient(circle at 50% 0%, rgba(120, 6, 6, 0.35) 0%, transparent 60%),
-        radial-gradient(circle at 10% 80%, rgba(120, 6, 6, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 90% 60%, rgba(30, 30, 36, 0.6) 0%, transparent 45%);
+        radial-gradient(circle at 50% 0%, rgba(120, 6, 6, 0.28) 0%, transparent 60%),
+        radial-gradient(circle at 85% 90%, rgba(120, 6, 6, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 15% 70%, rgba(20, 20, 24, 0.7) 0%, transparent 45%);
       color: #f1f5f9;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       min-height: 100vh;
@@ -31,13 +31,14 @@
       flex-direction: column;
       margin: 0;
       padding: 0;
+      -webkit-font-smoothing: antialiased;
     }
 
     /* Barra superior de herramientas */
     .tb-header {
-      background: rgba(18, 18, 22, 0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(14, 14, 18, 0.94);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       padding: 12px 24px;
       display: flex;
@@ -128,7 +129,7 @@
       box-shadow: 0 0 12px rgba(120, 6, 6, 0.4);
     }
 
-    /* Área de previsualización */
+    /* Área central de previsualización */
     .tb-stage {
       flex: 1;
       display: flex;
@@ -140,10 +141,10 @@
     }
 
     /* Modo móvil */
-    .tb-stage.mode-mobile .gc-wrapper {
+    .tb-stage.mode-mobile .gc-card-container {
       max-width: 375px;
-      box-shadow: 0 0 0 12px #18181b, 0 0 0 14px rgba(255, 255, 255, 0.1);
-      border-radius: 28px;
+      box-shadow: 0 0 0 10px #18181b, 0 0 0 12px rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
     }
 
     /* Modo simulador de correo electrónico */
@@ -151,9 +152,10 @@
       display: none;
       width: 100%;
       max-width: 640px;
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+      background: #111116;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
       overflow: hidden;
       margin-bottom: 24px;
     }
@@ -162,20 +164,14 @@
       display: block;
     }
 
-    .tb-stage.mode-email .gc-wrapper {
-      padding: 24px;
-      background: #f8fafc;
-    }
-
     .tb-email-header {
-      background: #f1f5f9;
-      border-bottom: 1px solid #e2e8f0;
-      padding: 12px 18px;
+      background: #16161d;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 14px 20px;
       display: flex;
       flex-direction: column;
       gap: 6px;
       font-size: 13px;
-      color: #334155;
     }
 
     .tb-email-row {
@@ -190,59 +186,57 @@
     }
 
     .tb-email-val {
-      color: #0f172a;
+      color: #e2e8f0;
       font-weight: 600;
     }
 
-    /* Sección informativa al pie */
+    /* Sección explicativa */
     .tb-docs {
       max-width: 760px;
       width: 100%;
-      margin: 40px auto 20px auto;
+      margin: 30px auto 20px auto;
       padding: 0 16px;
     }
 
     .tb-docs-card {
-      background: rgba(24, 24, 27, 0.7);
+      background: rgba(20, 20, 24, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 16px;
       padding: 24px;
-      margin-bottom: 20px;
     }
 
     .tb-docs-card h2 {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
       color: #ffffff;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
     .tb-docs-card p {
-      font-size: 14px;
+      font-size: 13.5px;
       color: #94a3b8;
       line-height: 1.6;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .tb-docs-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
-      margin-top: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
     }
 
     .tb-doc-box {
-      background: rgba(0, 0, 0, 0.35);
+      background: rgba(0, 0, 0, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 10px;
-      padding: 16px;
+      padding: 14px;
     }
 
     .tb-doc-box h3 {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 700;
       color: #fca5a5;
       margin-bottom: 6px;
@@ -270,7 +264,7 @@
 
 <body>
 
-  <!-- Barra de pruebas -->
+  <!-- Barra superior de pruebas -->
   <header class="tb-header">
     <div class="tb-left">
       <a href="../../index.html" class="tb-back-btn">
@@ -281,7 +275,7 @@
         <span>Volver al Catálogo</span>
       </a>
       <div class="tb-title">
-        <span>Gift Card — Welcome Chaos</span>
+        <span>Gift Card Minimalista (Correo & Tienda)</span>
         <span class="tb-badge">gift_card.liquid</span>
       </div>
     </div>
@@ -326,12 +320,12 @@
   <!-- Escenario de previsualización -->
   <main class="tb-stage" id="tbStage">
 
-    <!-- Envoltura de simulación de correo -->
+    <!-- Simulador de ventana de correo cliente -->
     <div class="tb-email-window">
       <div class="tb-email-header">
         <div class="tb-email-row">
           <span class="tb-email-label">De:</span>
-          <span class="tb-email-val">w-belm Tienda Oficial &lt;contacto@w-belm.com&gt;</span>
+          <span class="tb-email-val">Tienda Oficial &lt;notificaciones@w-belm.com&gt;</span>
         </div>
         <div class="tb-email-row">
           <span class="tb-email-label">Para:</span>
@@ -344,162 +338,123 @@
       </div>
     </div>
 
-    <!-- TARJETA DE REGALO / GIFT CARD COMPONENTE -->
-    <div class="gc-wrapper">
-      <article class="gc-card" aria-label="Tarjeta de descuento y bienvenida">
+    <!-- TARJETA DE REGALO MINIMALISTA (Fondo Completo con fondoini.jpg) -->
+    <article class="gc-card-container" aria-label="Tarjeta de descuento y bienvenida">
+      <div class="gc-card-overlay">
 
-        <!-- Banner visual con fondoini.jpg -->
-        <header class="gc-banner">
-          <img
-            class="gc-banner-img"
-            src="fondoini.jpg"
-            alt="The Chaos Banner"
-            loading="eager"
-          >
-          <div class="gc-banner-overlay"></div>
-        </header>
+        <!-- 1. Encabezado minimalista: Logo Spike discreto -->
+        <img
+          class="gc-logo-minimal"
+          src="spike.png"
+          alt="Spike Logo"
+        >
 
-        <!-- Insignia del logo Spike centrada sobre el banner -->
-        <div class="gc-logo-wrap">
-          <img
-            class="gc-logo-img"
-            src="spike.png"
-            alt="Spike Logo"
-          >
+        <!-- 2. Insignia minimalista: Oferta especial -->
+        <div class="gc-badge-minimal">
+          <span class="gc-badge-text">Oferta especial</span>
         </div>
 
-        <!-- Contenido de la tarjeta -->
-        <section class="gc-body">
+        <!-- 3. Título principal: "Te damos la bienvenida al caos." -->
+        <h1 class="gc-title-text">Te damos la bienvenida al caos.</h1>
 
-          <!-- 1. Título principal -->
-          <h1 class="gc-title">Te damos la bienvenida al caos.</h1>
+        <!-- 4. Subtítulo: "¡Qué bueno tenerte aquí! Disfruta este descuento..." -->
+        <p class="gc-subtitle-text">
+          ¡Qué bueno tenerte aquí! Disfruta este descuento en tu primera compra.
+        </p>
 
-          <!-- 2. Subtítulo de bienvenida -->
-          <p class="gc-subtitle">
-            ¡Qué bueno tenerte aquí! Disfruta este descuento en tu primera compra.
-          </p>
+        <!-- Divisor sutil -->
+        <hr class="gc-divider">
 
-          <!-- 3. Insignia de oferta -->
-          <div class="gc-badge">
-            <span class="gc-badge-icon">★</span>
-            <span>Oferta especial</span>
-          </div>
+        <!-- 5. Destacado central minimalista: "10% de descuento en Página de inicio" -->
+        <div class="gc-offer-val">10% de descuento</div>
+        <div class="gc-offer-label">en Página de inicio</div>
 
-          <!-- 4. Cuadro de oferta: 10% de descuento en Página de inicio -->
-          <div class="gc-offer-box">
-            <div class="gc-offer-highlight">10% de descuento</div>
-            <div class="gc-offer-sub">en Página de inicio</div>
-          </div>
+        <!-- 6. Instrucciones del código -->
+        <p class="gc-instructions-text">
+          Usa el código: <strong>WELCOME10</strong> al pagar, o haz clic en el enlace de abajo para aplicar el descuento automáticamente a tu pedido.
+        </p>
 
-          <!-- 5. Instrucciones y código -->
-          <p class="gc-instructions">
-            Usa el código: <strong>WELCOME10</strong> al pagar, o haz clic en el enlace de abajo para aplicar el descuento automáticamente a tu pedido.
-          </p>
-
-          <!-- 6. Caja del cupón interactiva -->
-          <div class="gc-coupon-card">
-            <div class="gc-code-meta">
-              <span class="gc-code-label">Código de descuento</span>
-              <div class="gc-code-value" id="gcDiscountCode">WELCOME10</div>
+        <!-- 7. Caja minimalista del código (Ticket pill con copiado en un clic) -->
+        <div>
+          <div class="gc-coupon-pill" id="gcCouponPill" onclick="copyGiftCardCode()" title="Haz clic para copiar">
+            <div>
+              <span style="font-size: 10px; font-family: -apple-system, sans-serif; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; display: block; margin-bottom: 2px;">CÓDIGO</span>
+              <span class="gc-code-display" id="gcCodeDisplay">WELCOME10</span>
             </div>
-            <button
-              type="button"
-              class="gc-copy-btn"
-              id="gcCopyBtn"
-              onclick="copyCouponCode()"
-              aria-label="Copiar código WELCOME10"
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
-              <span id="gcCopyText">Copiar código</span>
-            </button>
+            <span class="gc-copy-label" id="gcCopyLabel">Copiar</span>
           </div>
+        </div>
 
-          <!-- 7. Botón Principal: [Aplicar descuento] -->
+        <!-- 8. Botón Principal CTA: [Aplicar descuento] -->
+        <div>
           <a
             href="https://tu-tienda.myshopify.com/discount/WELCOME10?redirect=/"
-            class="gc-btn-apply"
-            id="gcApplyLink"
+            class="gc-btn-cta"
             target="_blank"
             rel="noopener"
           >
-            <span>Aplicar descuento</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
+            Aplicar descuento
           </a>
+        </div>
 
-          <!-- 8. Acciones secundarias -->
-          <nav class="gc-actions" aria-label="Acciones de la tarjeta de regalo">
-            <button type="button" class="gc-sub-link" onclick="window.print()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                <rect x="6" y="14" width="12" height="8"></rect>
-              </svg>
-              <span>Imprimir tarjeta</span>
-            </button>
-            <a href="https://tu-tienda.myshopify.com" target="_blank" rel="noopener" class="gc-sub-link">
-              <span>Visitar la tienda &rarr;</span>
-            </a>
-          </nav>
+        <!-- 9. Pie minimalista -->
+        <div class="gc-footer-meta">
+          w-belm • El descuento se aplica automáticamente al hacer clic.<br>
+          <a href="https://tu-tienda.myshopify.com" target="_blank" rel="noopener" class="gc-footer-link">
+            Visitar la tienda
+          </a>
+        </div>
 
-        </section>
-      </article>
-    </div>
+      </div>
+    </article>
 
   </main>
 
-  <!-- Documentación de Integración -->
+  <!-- Documentación -->
   <section class="tb-docs">
     <div class="tb-docs-card">
       <h2>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="12" y1="16" x2="12" y2="12"></line>
           <line x1="12" y1="8" x2="12.01" y2="8"></line>
         </svg>
-        <span>Integración en Shopify (Online Store 2.0 & Notificaciones)</span>
+        <span>Diferencias clave respecto al desplegable de Spike</span>
       </h2>
       <p>
-        Este elemento fue construido tanto como plantilla de tema para <code>templates/gift_card.liquid</code> como para plantillas de correo de notificación automática para nuevos clientes.
+        A diferencia del modal de Spike (que tiene banner recortado, fondo blanco tipo popup y avatar circular sobre el corte), esta tarjeta de regalo está concebida como un <strong>voucher digital / email template minimalista</strong>:
       </p>
 
       <div class="tb-docs-grid">
         <div class="tb-doc-box">
-          <h3>1. Plantilla de Tienda (gift_card.liquid)</h3>
+          <h3>Fondo Integral con fondoini.jpg</h3>
           <p>
-            Ve a <strong>Tienda online &gt; Editar código &gt; templates/</strong> y sube o reemplaza <code>gift_card.liquid</code> con el archivo listo en <code>shopify/templates/gift_card.liquid</code>.
+            Toda la tarjeta está envuelta en la textura artística de <code>fondoini.jpg</code> con oscurecimiento carmesí de alto contraste.
           </p>
         </div>
 
         <div class="tb-doc-box">
-          <h3>2. Correo de Notificación (Email)</h3>
+          <h3>100% Compatible con Clientes de Correo</h3>
           <p>
-            Ve a <strong>Configuración &gt; Notificaciones &gt; Tarjeta de regalo creada</strong> (o Bienvenida a clientes) y pega el código HTML/Liquid para que el cliente reciba la tarjeta en su buzón.
+            Construida con tablas HTML híbridas, estilos inlined y etiquetas VML para Outlook, garantizando que llegue perfecta a Gmail, Outlook y Apple Mail.
           </p>
         </div>
 
         <div class="tb-doc-box">
-          <h3>3. Descuento Automático</h3>
+          <h3>Composición Minimalista</h3>
           <p>
-            El botón <strong>[Aplicar descuento]</strong> enlaza automáticamente a <code>/discount/WELCOME10?redirect=/</code>, aplicando el cupón en la sesión de Shopify sin que el cliente tenga que escribirlo.
+            Logotipo Spike discreto en cabecera, ticket pill para el cupón y botón sólido carmesí <code>[Aplicar descuento]</code> con auto-aplicación en Shopify.
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Pie de página -->
   <footer class="tb-footer">
-    <p>w-belm • Elemento Gift Card (Caos) • <a href="https://github.com/whoisgiov2/w-belm" style="color: #a5b4fc; text-decoration: none;" target="_blank" rel="noopener">github.com/whoisgiov2/w-belm</a></p>
+    <p>w-belm • Elemento Gift Card Minimalista • <a href="https://github.com/whoisgiov2/w-belm" style="color: #a5b4fc; text-decoration: none;" target="_blank" rel="noopener">github.com/whoisgiov2/w-belm</a></p>
   </footer>
 
   <script>
-    // Conmutador de vistas de prueba
     function setMode(mode) {
       var stage = document.getElementById('tbStage');
       var btnDesktop = document.getElementById('btnModeDesktop');
@@ -522,52 +477,42 @@
       }
     }
 
-    // Copiar código con feedback
-    function copyCouponCode() {
-      var codeElem = document.getElementById('gcDiscountCode');
-      var btnText = document.getElementById('gcCopyText');
+    function copyGiftCardCode() {
+      var codeElem = document.getElementById('gcCodeDisplay');
+      var labelElem = document.getElementById('gcCopyLabel');
       var code = (codeElem ? codeElem.innerText : 'WELCOME10').trim();
 
       if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(code).then(handleSuccess, handleFallback);
+        navigator.clipboard.writeText(code).then(showSuccess, fallbackCopy);
       } else {
-        handleFallback();
+        fallbackCopy();
       }
 
-      function handleFallback() {
-        var textArea = document.createElement('textarea');
-        textArea.value = code;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-9999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
+      function fallbackCopy() {
+        var textarea = document.createElement('textarea');
+        textarea.value = code;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
         try {
           document.execCommand('copy');
-          handleSuccess();
-        } catch (err) {
-          console.error('Error al copiar: ', err);
+          showSuccess();
+        } catch (e) {
+          console.error(e);
         }
-        document.body.removeChild(textArea);
+        document.body.removeChild(textarea);
       }
 
-      function handleSuccess() {
-        if (!btnText) return;
-        var originalText = btnText.innerText;
-        btnText.innerText = '¡Copiado!';
-        var btn = document.getElementById('gcCopyBtn');
-        if (btn) {
-          btn.style.background = '#780606';
-          btn.style.color = '#ffffff';
-          btn.style.borderColor = '#780606';
-        }
-        setTimeout(function () {
-          btnText.innerText = originalText;
-          if (btn) {
-            btn.style.background = '';
-            btn.style.color = '';
-            btn.style.borderColor = '';
-          }
+      function showSuccess() {
+        if (!labelElem) return;
+        var prev = labelElem.innerText;
+        labelElem.innerText = '¡Copiado!';
+        labelElem.style.color = '#ffffff';
+        setTimeout(function() {
+          labelElem.innerText = prev;
+          labelElem.style.color = '#fca5a5';
         }, 2200);
       }
     }
