@@ -189,55 +189,81 @@
       aria-label="Welcome to The Chaos" 
       hidden
     >
-      <button 
-        class="bb-panel-close" 
-        id="bb-panel-close-{{ section.id }}" 
-        type="button" 
-        aria-label="Cerrar panel"
-      >&times;</button>
-
-      <div class="bb-panel-header">
-        {%- if section.settings.bubble_logo != blank -%}
-          {{ section.settings.bubble_logo | image_url: width: 76 | image_tag: class: 'bb-panel-logo', alt: shop.name }}
+      <!-- Banner superior con fondoini.jpg -->
+      <div class="bb-panel-banner">
+        {%- if section.settings.banner_image != blank -%}
+          {{ section.settings.banner_image | image_url: width: 680 | image_tag: class: 'bb-panel-banner-img', loading: 'lazy', alt: '' }}
         {%- else -%}
-          <img class="bb-panel-logo" src="{{ 'spike.png' | asset_url }}" alt="{{ shop.name }}" draggable="false">
+          <img class="bb-panel-banner-img" src="{{ 'fondoini.jpg' | asset_url }}" alt="" loading="lazy" draggable="false">
         {%- endif -%}
-        <h2 class="bb-panel-title">Welcome to<br>The Chaos</h2>
+        <div class="bb-panel-banner-overlay" aria-hidden="true"></div>
+        <button 
+          class="bb-panel-close" 
+          id="bb-panel-close-{{ section.id }}" 
+          type="button" 
+          aria-label="Cerrar panel"
+        >&times;</button>
       </div>
 
-      <div class="bb-form bb-chaos-body" id="bb-form-{{ section.id }}">
-        <p class="bb-chaos-desc">
-          {{ section.settings.chaos_description | default: 'Recibe alertas de lo más popular y obtén una sorpresa para tu cumpleaños.' }}
-        </p>
-
-        <a 
-          href="{{ section.settings.register_url | default: routes.account_register_url | default: '/account/register' }}" 
-          class="bb-btn-submit bb-btn-chaos" 
-          id="bb-btn-join-{{ section.id }}" 
-          role="button"
-        >
-          {{ section.settings.button_label | default: 'JOIN THE CHAOS' }}
-        </a>
-
-        <div class="bb-login-wrap">
-          <a 
-            href="{{ section.settings.login_url | default: routes.account_login_url | default: '/account/login' }}" 
-            class="bb-login-link" 
-            id="bb-link-login-{{ section.id }}"
-          >
-            {{ section.settings.login_label | default: '¿yA tIEnES cuEnTa?' }}
-          </a>
+      <div class="bb-panel-body">
+        <div class="bb-panel-logo-wrap">
+          {%- if section.settings.bubble_logo != blank -%}
+            {{ section.settings.bubble_logo | image_url: width: 80 | image_tag: class: 'bb-panel-logo', alt: shop.name }}
+          {%- else -%}
+            <img class="bb-panel-logo" src="{{ 'spike.png' | asset_url }}" alt="{{ shop.name }}" draggable="false">
+          {%- endif -%}
         </div>
-      </div>
 
-      <div class="bb-panel-success" id="bb-panel-success-{{ section.id }}" hidden>
-        <p class="bb-success-text">{{ section.settings.success_message | default: '¡Bienvenido al Caos! Redirigiendo...' }}</p>
+        <div class="bb-panel-header">
+          <h2 class="bb-panel-title">Welcome to<br>The Chaos</h2>
+        </div>
+
+        <div class="bb-form bb-chaos-body" id="bb-form-{{ section.id }}">
+          <p class="bb-chaos-desc">
+            {{ section.settings.chaos_description | default: 'Recibe alertas de lo más popular y obtén una sorpresa para tu cumpleaños.' }}
+          </p>
+
+          {%- liquid
+            assign default_register = routes.account_register_url
+            if default_register == blank
+              assign default_register = '/account/register'
+            endif
+            assign default_login = routes.account_login_url
+            if default_login == blank
+              assign default_login = '/account/login'
+            endif
+          -%}
+          <a 
+            href="{{ section.settings.register_url | default: default_register }}" 
+            class="bb-btn-submit bb-btn-chaos" 
+            id="bb-btn-join-{{ section.id }}" 
+            role="button"
+          >
+            {{ section.settings.button_label | default: 'JOIN THE CHAOS' }}
+          </a>
+
+          <div class="bb-login-wrap">
+            <a 
+              href="{{ section.settings.login_url | default: default_login }}" 
+              class="bb-login-link" 
+              id="bb-link-login-{{ section.id }}"
+            >
+              {{ section.settings.login_label | default: '¿yA tIEnES cuEnTa?' }}
+            </a>
+          </div>
+        </div>
+
+        <div class="bb-panel-success" id="bb-panel-success-{{ section.id }}" hidden>
+          <p class="bb-success-text">{{ section.settings.success_message | default: '¡Bienvenido al Caos! Redirigiendo...' }}</p>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700;800&family=Oxanium:wght@700;800;900&family=Syne:wght@800&display=swap');
+
   /* ==========================================================================
      VARIABLES Y SCOPE LOCAL DE SHOPIFY
      ========================================================================== */
@@ -260,6 +286,8 @@
     --bb-bottom: {{ section.settings.position_bottom | default: 24 }}px;
     --bb-float-time: {{ section.settings.float_speed | default: 4 }}s;
     --bb-squash-scale: {{ bb_squash_factor }};
+    --bb-font-display: 'Oxanium', 'Chakra Petch', 'Syne', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --bb-font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
     position: fixed;
     inset: 0;
@@ -799,7 +827,7 @@
     position: absolute;
     right: calc(var(--bb-right) + env(safe-area-inset-right, 0px));
     bottom: calc(var(--bb-bottom) + env(safe-area-inset-bottom, 0px));
-    width: min(340px, calc(100vw - 32px));
+    width: min(356px, calc(100vw - 28px));
     pointer-events: none;
     transform: translate3d(var(--bb-panel-x, 0px), var(--bb-panel-y, 0px), 0);
     will-change: transform;
@@ -811,8 +839,10 @@
     width: 100%;
     background: #ffffff;
     border-radius: 24px;
-    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.18), 0 0 1px rgba(15, 23, 42, 0.1);
-    padding: 22px 20px 20px 20px;
+    border: 1px solid rgba(120, 6, 6, 0.12);
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.2), 0 0 1px rgba(15, 23, 42, 0.1);
+    padding: 0;
+    overflow: hidden;
     box-sizing: border-box;
     pointer-events: auto;
     transform-origin: bottom right;
@@ -839,6 +869,8 @@
     100% { transform: scale(0.15); opacity: 0; border-radius: 50%; }
   }
 
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-panel-banner,
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-panel-logo-wrap,
   .bb-root-{{ section.id }} .bb-panel.is-open .bb-panel-header,
   .bb-root-{{ section.id }} .bb-panel.is-open .bb-chaos-desc,
   .bb-root-{{ section.id }} .bb-panel.is-open .bb-btn-submit,
@@ -847,50 +879,103 @@
     animation: bb-field-in 260ms ease-out forwards;
   }
 
-  .bb-root-{{ section.id }} .bb-panel.is-open .bb-panel-header { animation-delay: 100ms; }
-  .bb-root-{{ section.id }} .bb-panel.is-open .bb-chaos-desc { animation-delay: 160ms; }
-  .bb-root-{{ section.id }} .bb-panel.is-open .bb-btn-submit { animation-delay: 220ms; }
-  .bb-root-{{ section.id }} .bb-panel.is-open .bb-login-wrap { animation-delay: 280ms; }
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-panel-banner { animation-delay: 40ms; }
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-panel-logo-wrap { animation-delay: 90ms; }
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-panel-header { animation-delay: 140ms; }
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-chaos-desc { animation-delay: 190ms; }
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-btn-submit { animation-delay: 240ms; }
+  .bb-root-{{ section.id }} .bb-panel.is-open .bb-login-wrap { animation-delay: 290ms; }
 
   @keyframes bb-field-in {
     0% { opacity: 0; transform: translateY(8px); }
     100% { opacity: 1; transform: translateY(0); }
   }
 
+  .bb-root-{{ section.id }} .bb-panel-banner {
+    position: relative;
+    width: 100%;
+    height: 132px;
+    overflow: hidden;
+    background: #18181b;
+  }
+
+  .bb-root-{{ section.id }} .bb-panel-banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+    transition: transform 0.4s ease;
+  }
+
+  .bb-root-{{ section.id }} .bb-panel:hover .bb-panel-banner-img {
+    transform: scale(1.03);
+  }
+
+  .bb-root-{{ section.id }} .bb-panel-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 45%, rgba(255, 255, 255, 0.25) 100%);
+    pointer-events: none;
+  }
+
   .bb-root-{{ section.id }} .bb-panel-close {
     position: absolute;
-    top: 14px;
-    right: 14px;
-    width: 28px;
-    height: 28px;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    border: none;
-    background: #f1f5f9;
-    color: #64748b;
-    font-size: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #18181b;
+    font-size: 19px;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     padding: 0;
-    transition: background 0.2s, color 0.2s, transform 0.15s;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
   }
 
   .bb-root-{{ section.id }} .bb-panel-close:hover {
-    background: #e2e8f0;
-    color: #0f172a;
+    background: #ffffff;
+    color: #780606;
+    border-color: rgba(120, 6, 6, 0.35);
     transform: scale(1.08);
   }
 
-  .bb-root-{{ section.id }} .bb-panel-header {
+  .bb-root-{{ section.id }} .bb-panel-body {
+    position: relative;
+    padding: 0 24px 28px 24px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 10px;
-    margin-bottom: 12px;
-    padding: 4px 16px 0 16px;
+    box-sizing: border-box;
+  }
+
+  .bb-root-{{ section.id }} .bb-panel-logo-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2.5px solid #ffffff;
+    box-shadow: 0 4px 14px rgba(120, 6, 6, 0.16), 0 1px 3px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -28px;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 3;
   }
 
   .bb-root-{{ section.id }} .bb-panel-logo {
@@ -899,16 +984,28 @@
     object-fit: contain;
     pointer-events: none;
     user-select: none;
-    transition: filter 0.3s ease;
+    display: block;
+  }
+
+  .bb-root-{{ section.id }} .bb-panel-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: 0 6px;
   }
 
   .bb-root-{{ section.id }} .bb-panel-title {
+    font-family: var(--bb-font-display);
     margin: 0;
-    font-size: 23px;
-    line-height: 1.12;
+    font-size: 25px;
+    line-height: 1.15;
     font-weight: 800;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
     color: #09090b;
+    transition: color 0.3s ease;
   }
 
   .bb-root-{{ section.id }} .bb-chaos-body {
@@ -917,14 +1014,15 @@
     align-items: center;
     text-align: center;
     gap: 14px;
+    width: 100%;
   }
 
   .bb-root-{{ section.id }} .bb-chaos-desc {
     margin: 0;
     font-size: 13.5px;
-    line-height: 1.48;
+    line-height: 1.5;
     color: #475569;
-    padding: 0 6px;
+    padding: 0 4px;
   }
 
   .bb-root-{{ section.id }} .bb-btn-submit {
@@ -934,27 +1032,28 @@
     box-sizing: border-box;
     text-decoration: none;
     width: 100%;
-    padding: 12px 16px;
-    background: #09090b;
+    padding: 13px 20px;
+    background: #780606;
     color: #ffffff;
-    border: 1.5px solid #09090b;
+    border: 1.5px solid #780606;
     border-radius: 14px;
-    font-size: 13.5px;
+    font-family: var(--bb-font-display);
+    font-size: 14.5px;
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    font-family: inherit;
     cursor: pointer;
-    box-shadow: 0 8px 20px -4px rgba(9, 9, 11, 0.28);
-    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
-    margin-top: 2px;
+    box-shadow: 0 8px 22px -4px rgba(120, 6, 6, 0.45);
+    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    margin-top: 4px;
   }
 
   .bb-root-{{ section.id }} .bb-btn-submit:hover {
     transform: translateY(-2px) scale(1.015);
-    background: var(--bb-accent);
-    border-color: var(--bb-accent);
-    box-shadow: 0 10px 24px -4px rgba(79, 70, 229, 0.45);
+    background: #900808;
+    border-color: #900808;
+    color: #ffffff;
+    box-shadow: 0 12px 26px -4px rgba(120, 6, 6, 0.6);
   }
 
   .bb-root-{{ section.id }} .bb-btn-submit:active {
@@ -962,26 +1061,28 @@
   }
 
   .bb-root-{{ section.id }} .bb-login-wrap {
-    margin-top: 2px;
+    margin-top: 4px;
     text-align: center;
   }
 
   .bb-root-{{ section.id }} .bb-login-link {
     display: inline-block;
-    font-size: 13px;
-    font-weight: 600;
-    color: #09090b;
+    font-family: var(--bb-font-display);
+    font-size: 14px;
+    font-weight: 700;
+    color: #780606;
     text-decoration: underline;
     text-underline-offset: 4px;
     text-decoration-thickness: 1.5px;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
     cursor: pointer;
     transition: color 0.2s ease, transform 0.2s ease;
   }
 
   .bb-root-{{ section.id }} .bb-login-link:hover {
-    color: var(--bb-accent);
+    color: #900808;
     transform: translateY(-1px);
+    text-decoration-thickness: 2px;
   }
 
   .bb-root-{{ section.id }} .bb-panel-success {
@@ -1125,69 +1226,79 @@
 
   .bb-root-{{ section.id }}.is-crimson-theme .bb-panel,
   [data-theme="crimson"] .bb-root-{{ section.id }} .bb-panel {
-    background: #0d0606;
-    border: 1px solid rgba(120, 6, 6, 0.38);
-    box-shadow: 0 24px 50px -10px rgba(0, 0, 0, 0.8), 0 0 28px -4px rgba(120, 6, 6, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    background: #ffffff;
+    border: 1px solid rgba(120, 6, 6, 0.16);
+    box-shadow:
+      0 24px 50px -12px rgba(15, 23, 42, 0.22),
+      0 0 24px -4px rgba(120, 6, 6, 0.18),
+      0 0 0 1px rgba(120, 6, 6, 0.08);
   }
 
   .bb-root-{{ section.id }}.is-crimson-theme .bb-panel-close,
   [data-theme="crimson"] .bb-root-{{ section.id }} .bb-panel-close {
-    background: #1c0a0a;
-    color: #fca5a5;
-    border: 1px solid rgba(120, 6, 6, 0.25);
+    background: rgba(255, 255, 255, 0.9);
+    color: #18181b;
+    border: 1px solid rgba(120, 6, 6, 0.18);
   }
 
   .bb-root-{{ section.id }}.is-crimson-theme .bb-panel-close:hover,
   [data-theme="crimson"] .bb-root-{{ section.id }} .bb-panel-close:hover {
-    background: #2d0e0e;
-    color: #ffffff;
-    border-color: rgba(220, 38, 38, 0.5);
+    background: #ffffff;
+    color: #780606;
+    border-color: #780606;
+  }
+
+  .bb-root-{{ section.id }}.is-crimson-theme .bb-panel-logo-wrap,
+  [data-theme="crimson"] .bb-root-{{ section.id }} .bb-panel-logo-wrap {
+    background: #ffffff;
+    border: 2.5px solid #ffffff;
+    box-shadow: 0 4px 14px rgba(120, 6, 6, 0.18);
   }
 
   .bb-root-{{ section.id }}.is-crimson-theme .bb-panel-logo,
   [data-theme="crimson"] .bb-root-{{ section.id }} .bb-panel-logo {
-    filter: drop-shadow(0 0 8px rgba(185, 28, 28, 0.65));
+    filter: none;
   }
 
   .bb-root-{{ section.id }}.is-crimson-theme .bb-panel-title,
   [data-theme="crimson"] .bb-root-{{ section.id }} .bb-panel-title {
-    color: #ffffff;
+    color: #09090b;
   }
 
   .bb-root-{{ section.id }}.is-crimson-theme .bb-chaos-desc,
   [data-theme="crimson"] .bb-root-{{ section.id }} .bb-chaos-desc {
-    color: #fecaca;
+    color: #475569;
   }
 
   .bb-root-{{ section.id }}.is-crimson-theme .bb-btn-submit,
   [data-theme="crimson"] .bb-root-{{ section.id }} .bb-btn-submit {
     background: #780606;
     color: #ffffff;
-    border-color: #991b1b;
-    box-shadow: 0 8px 22px -4px rgba(120, 6, 6, 0.6);
+    border-color: #780606;
+    box-shadow: 0 8px 22px -4px rgba(120, 6, 6, 0.5);
   }
 
   .bb-root-{{ section.id }}.is-crimson-theme .bb-btn-submit:hover,
   [data-theme="crimson"] .bb-root-{{ section.id }} .bb-btn-submit:hover {
-    background: #991b1b;
-    border-color: #b91c1c;
+    background: #900808;
+    border-color: #900808;
     color: #ffffff;
-    box-shadow: 0 10px 26px -2px rgba(185, 28, 28, 0.7);
+    box-shadow: 0 12px 26px -2px rgba(120, 6, 6, 0.65);
   }
 
   .bb-root-{{ section.id }}.is-crimson-theme .bb-login-link,
   [data-theme="crimson"] .bb-root-{{ section.id }} .bb-login-link {
-    color: #fca5a5;
+    color: #780606;
   }
 
   .bb-root-{{ section.id }}.is-crimson-theme .bb-login-link:hover,
   [data-theme="crimson"] .bb-root-{{ section.id }} .bb-login-link:hover {
-    color: #ef4444;
+    color: #900808;
   }
 
   .bb-root-{{ section.id }}.is-crimson-theme .bb-success-text,
   [data-theme="crimson"] .bb-root-{{ section.id }} .bb-success-text {
-    color: #f87171;
+    color: #780606;
   }
 
   .bb-root-{{ section.id }}.is-crimson-theme .bb-bubble:focus-visible,
@@ -1215,7 +1326,7 @@
 
   @media (max-width: 480px) {
     .bb-root-{{ section.id }} .bb-panel-wrap {
-      width: calc(100vw - 32px);
+      width: calc(100vw - 28px);
       max-width: none;
     }
 
@@ -1253,9 +1364,13 @@
       animation: bb-fade-out 200ms ease-out forwards !important;
       transform: none !important;
     }
+    .bb-root-{{ section.id }} .bb-panel.is-open .bb-panel-banner,
+    .bb-root-{{ section.id }} .bb-panel.is-open .bb-panel-logo-wrap,
     .bb-root-{{ section.id }} .bb-panel.is-open .bb-panel-header,
     .bb-root-{{ section.id }} .bb-panel.is-open .bb-field-group,
-    .bb-root-{{ section.id }} .bb-panel.is-open .bb-btn-submit {
+    .bb-root-{{ section.id }} .bb-panel.is-open .bb-chaos-desc,
+    .bb-root-{{ section.id }} .bb-panel.is-open .bb-btn-submit,
+    .bb-root-{{ section.id }} .bb-panel.is-open .bb-login-wrap {
       animation: none !important;
       opacity: 1 !important;
       transform: none !important;
@@ -1384,8 +1499,8 @@
 
         const bounds = getViewportBounds();
         const margin = 16;
-        const pWidth = Math.min(340, bounds.vw - 32);
-        const pHeight = panel.offsetHeight || 245;
+        const pWidth = Math.min(356, bounds.vw - 28);
+        const pHeight = panel.offsetHeight || 420;
 
         const bCenterX = bRect.left + bRect.width / 2;
         const bCenterY = bRect.top + bRect.height / 2;
@@ -1980,6 +2095,12 @@
     {
       "type": "header",
       "content": "Panel Welcome to The Chaos"
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner superior del panel",
+      "info": "Si no se sube, se usará 'fondoini.jpg' de assets."
     },
     {
       "type": "textarea",
