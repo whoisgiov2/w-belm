@@ -1,0 +1,672 @@
+{% layout none %}
+<!doctype html>
+<html lang="{{ request.locale.iso_code | default: 'es' }}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Te damos la bienvenida al caos | {{ shop.name | default: 'w-belm' }}</title>
+  <meta name="description" content="Disfruta este descuento especial de bienvenida en tu primera compra en {{ shop.name | default: 'nuestra tienda' }}.">
+
+  <!-- Google Fonts: Carter One & Luckiest Guy -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Carter+One&family=Luckiest+Guy&display=swap" rel="stylesheet">
+
+  {%- comment -%}
+    --------------------------------------------------------------------------
+    w-belm — Gift Card / Tarjeta de Descuento de Bienvenida al Caos
+    Compatible con:
+    1. Shopify Theme Template: templates/gift_card.liquid
+    2. Plantilla de Correo / Notificación: Configuración > Notificaciones
+    --------------------------------------------------------------------------
+  {%- endcomment -%}
+
+  {%- assign discount_code = 'WELCOME10' -%}
+  {%- if gift_card and gift_card.code -%}
+    {%- assign discount_code = gift_card.code -%}
+  {%- endif -%}
+
+  {%- assign store_url = shop.url | default: '/' -%}
+  {%- assign discount_url = store_url | append: '/discount/' | append: discount_code | append: '?redirect=/' -%}
+
+  {%- assign banner_asset = 'fondoini.jpg' | asset_img_url: '1200x' -%}
+  {%- assign logo_asset = 'spike.png' | asset_img_url: '300x' -%}
+
+  <style>
+    /* ==========================================================================
+       VARIABLES Y RESET
+       ========================================================================== */
+    :root {
+      --gc-crimson: #780606;
+      --gc-crimson-hover: #900808;
+      --gc-crimson-light: #fff5f5;
+      --gc-crimson-border: rgba(120, 6, 6, 0.35);
+      --gc-crimson-glow: rgba(120, 6, 6, 0.38);
+      --gc-font-title: 'Luckiest Guy', cursive, sans-serif;
+      --gc-font-display: 'Carter One', cursive, sans-serif;
+      --gc-font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --gc-bg: #09090b;
+      --gc-card-bg: #ffffff;
+      --gc-text-dark: #09090b;
+      --gc-text-muted: #475569;
+      --gc-radius-card: 22px;
+      --gc-radius-inner: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--gc-bg);
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(120, 6, 6, 0.32) 0%, transparent 65%),
+        radial-gradient(circle at 10% 85%, rgba(120, 6, 6, 0.15) 0%, transparent 45%),
+        radial-gradient(circle at 90% 70%, rgba(24, 24, 27, 0.8) 0%, transparent 50%);
+      color: var(--gc-text-dark);
+      font-family: var(--gc-font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ==========================================================================
+       CONTENEDOR DE LA TARJETA
+       ========================================================================== */
+    .gc-wrapper {
+      width: 100%;
+      max-width: 540px;
+      margin: 0 auto;
+      perspective: 1000px;
+    }
+
+    .gc-card {
+      background: var(--gc-card-bg);
+      border-radius: var(--gc-radius-card);
+      border: 1.5px solid var(--gc-crimson-border);
+      box-shadow:
+        0 25px 60px -15px rgba(0, 0, 0, 0.7),
+        0 0 35px var(--gc-crimson-glow);
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .gc-card:hover {
+      box-shadow:
+        0 30px 70px -15px rgba(0, 0, 0, 0.8),
+        0 0 45px rgba(120, 6, 6, 0.5);
+    }
+
+    /* ==========================================================================
+       BANNER SUPERIOR (fondoini.jpg)
+       ========================================================================== */
+    .gc-banner {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+      background: #180303;
+    }
+
+    .gc-banner-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .gc-card:hover .gc-banner-img {
+      transform: scale(1.04);
+    }
+
+    .gc-banner-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(120, 6, 6, 0.35) 50%,
+        rgba(9, 9, 11, 0.75) 100%
+      );
+      pointer-events: none;
+    }
+
+    /* ==========================================================================
+       INSIGNIA CENTRAL SPIKE (spike.png)
+       ========================================================================== */
+    .gc-logo-wrap {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid #ffffff;
+      box-shadow:
+        0 8px 24px rgba(120, 6, 6, 0.25),
+        0 2px 6px rgba(0, 0, 0, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: -33px auto 14px auto;
+      position: relative;
+      z-index: 5;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .gc-card:hover .gc-logo-wrap {
+      transform: scale(1.08) rotate(2deg);
+    }
+
+    .gc-logo-img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ==========================================================================
+       CUERPO DE LA TARJETA Y TEXTOS
+       ========================================================================== */
+    .gc-body {
+      padding: 0 28px 32px 28px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Título principal: "Te damos la bienvenida al caos." */
+    .gc-title {
+      font-family: var(--gc-font-title);
+      font-size: 28px;
+      line-height: 1.15;
+      letter-spacing: 0.03em;
+      color: var(--gc-text-dark);
+      margin-bottom: 8px;
+      text-transform: none;
+    }
+
+    /* Subtítulo: "¡Qué bueno tenerte aquí! Disfruta este descuento..." */
+    .gc-subtitle {
+      font-size: 14.5px;
+      color: var(--gc-text-muted);
+      line-height: 1.5;
+      max-width: 440px;
+      margin-bottom: 20px;
+    }
+
+    /* Insignia: "Oferta especial" */
+    .gc-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--gc-font-display);
+      font-size: 13.5px;
+      color: var(--gc-crimson);
+      background: var(--gc-crimson-light);
+      border: 1.5px solid var(--gc-crimson-border);
+      padding: 5px 16px;
+      border-radius: 9999px;
+      margin-bottom: 12px;
+      letter-spacing: 0.02em;
+      box-shadow: 0 2px 8px rgba(120, 6, 6, 0.08);
+    }
+
+    .gc-badge-icon {
+      display: inline-block;
+      font-size: 12px;
+    }
+
+    /* Destacado: "10% de descuento en Página de inicio" */
+    .gc-offer-box {
+      background: linear-gradient(135deg, #180303 0%, #2b0606 50%, #180303 100%);
+      border: 1px solid rgba(120, 6, 6, 0.4);
+      border-radius: var(--gc-radius-inner);
+      padding: 16px 20px;
+      width: 100%;
+      color: #ffffff;
+      margin-bottom: 20px;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 6px 18px rgba(120, 6, 6, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gc-offer-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -60%;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+      transform: skewX(-25deg);
+      animation: gcShimmer 4s infinite ease-in-out;
+    }
+
+    @keyframes gcShimmer {
+      0% { left: -60%; }
+      35%, 100% { left: 140%; }
+    }
+
+    .gc-offer-highlight {
+      font-family: var(--gc-font-title);
+      font-size: 26px;
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .gc-offer-sub {
+      font-size: 14px;
+      color: #fca5a5;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      margin-top: 2px;
+    }
+
+    /* Explicación y caja del código */
+    .gc-instructions {
+      font-size: 13.5px;
+      color: #334155;
+      line-height: 1.55;
+      margin-bottom: 16px;
+      max-width: 440px;
+    }
+
+    .gc-instructions strong {
+      color: var(--gc-crimson);
+      font-family: var(--gc-font-display);
+      font-size: 14.5px;
+    }
+
+    /* Caja del cupón / Voucher con borde punteado */
+    .gc-coupon-card {
+      width: 100%;
+      background: var(--gc-crimson-light);
+      border: 2px dashed var(--gc-crimson);
+      border-radius: var(--gc-radius-inner);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 22px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .gc-coupon-card:hover {
+      background: #ffebeb;
+    }
+
+    .gc-code-meta {
+      text-align: left;
+    }
+
+    .gc-code-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748b;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .gc-code-value {
+      font-family: var(--gc-font-display);
+      font-size: 23px;
+      letter-spacing: 0.1em;
+      color: var(--gc-crimson);
+      font-weight: 700;
+      user-select: all;
+    }
+
+    /* Botón copiar */
+    .gc-copy-btn {
+      background: #ffffff;
+      border: 1.5px solid var(--gc-crimson-border);
+      color: var(--gc-crimson);
+      font-family: var(--gc-font-body);
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(120, 6, 6, 0.08);
+      white-space: nowrap;
+    }
+
+    .gc-copy-btn:hover {
+      background: var(--gc-crimson);
+      color: #ffffff;
+      border-color: var(--gc-crimson);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(120, 6, 6, 0.25);
+    }
+
+    .gc-copy-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Botón Principal CTA: [Aplicar descuento] */
+    .gc-btn-apply {
+      width: 100%;
+      background: var(--gc-crimson);
+      color: #ffffff;
+      border: 2px solid var(--gc-crimson);
+      border-radius: 14px;
+      padding: 15px 24px;
+      font-family: var(--gc-font-title);
+      font-size: 18px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px -4px rgba(120, 6, 6, 0.5);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s, box-shadow 0.25s;
+    }
+
+    .gc-btn-apply:hover {
+      background: var(--gc-crimson-hover);
+      border-color: var(--gc-crimson-hover);
+      transform: translateY(-2px) scale(1.015);
+      box-shadow: 0 12px 28px -4px rgba(120, 6, 6, 0.65);
+      color: #ffffff;
+    }
+
+    .gc-btn-apply:active {
+      transform: translateY(0) scale(0.99);
+    }
+
+    /* Acciones secundarias: Imprimir / Visitar tienda */
+    .gc-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 18px;
+      width: 100%;
+    }
+
+    .gc-sub-link {
+      font-size: 13px;
+      color: #64748b;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: var(--gc-font-body);
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .gc-sub-link:hover {
+      color: var(--gc-crimson);
+      text-decoration: underline;
+    }
+
+    /* Saldo o vigencia si existe en Shopify */
+    {% if gift_card and gift_card.balance %}
+      .gc-balance-pill {
+        display: inline-block;
+        background: #f1f5f9;
+        color: #0f172a;
+        font-weight: 700;
+        font-size: 13px;
+        padding: 4px 12px;
+        border-radius: 8px;
+        margin-top: 12px;
+      }
+    {% endif %}
+
+    /* ==========================================================================
+       RESPONSIVE & IMPRESIÓN
+       ========================================================================== */
+    @media (max-width: 480px) {
+      body {
+        padding: 16px 12px;
+      }
+      .gc-banner {
+        height: 145px;
+      }
+      .gc-body {
+        padding: 0 18px 24px 18px;
+      }
+      .gc-title {
+        font-size: 24px;
+      }
+      .gc-offer-highlight {
+        font-size: 22px;
+      }
+      .gc-coupon-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+      }
+      .gc-code-meta {
+        text-align: center;
+      }
+      .gc-copy-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+      }
+      .gc-card {
+        box-shadow: none !important;
+        border: 2px solid #000000 !important;
+      }
+      .gc-btn-apply,
+      .gc-actions,
+      .gc-copy-btn {
+        display: none !important;
+      }
+      .gc-banner {
+        filter: grayscale(1);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="gc-wrapper" role="main">
+    <article class="gc-card" aria-label="Tarjeta de descuento y bienvenida">
+
+      <!-- Banner visual con fondoini.jpg -->
+      <header class="gc-banner">
+        <img
+          class="gc-banner-img"
+          src="{{ banner_asset }}"
+          onerror="this.onerror=null;this.src='fondoini.jpg';"
+          alt="The Chaos Banner"
+          loading="eager"
+        >
+        <div class="gc-banner-overlay"></div>
+      </header>
+
+      <!-- Insignia del logo Spike centrada sobre el banner -->
+      <div class="gc-logo-wrap">
+        <img
+          class="gc-logo-img"
+          src="{{ logo_asset }}"
+          onerror="this.onerror=null;this.src='spike.png';"
+          alt="Logo {{ shop.name | default: 'Spike' }}"
+        >
+      </div>
+
+      <!-- Contenido de la tarjeta -->
+      <section class="gc-body">
+
+        <!-- 1. Título principal -->
+        <h1 class="gc-title">Te damos la bienvenida al caos.</h1>
+
+        <!-- 2. Subtítulo de bienvenida -->
+        <p class="gc-subtitle">
+          ¡Qué bueno tenerte aquí! Disfruta este descuento en tu primera compra.
+        </p>
+
+        <!-- 3. Insignia de oferta -->
+        <div class="gc-badge">
+          <span class="gc-badge-icon">★</span>
+          <span>Oferta especial</span>
+        </div>
+
+        <!-- 4. Cuadro de oferta: 10% de descuento en Página de inicio -->
+        <div class="gc-offer-box">
+          <div class="gc-offer-highlight">10% de descuento</div>
+          <div class="gc-offer-sub">en Página de inicio</div>
+        </div>
+
+        <!-- 5. Instrucciones y código -->
+        <p class="gc-instructions">
+          Usa el código: <strong>{{ discount_code }}</strong> al pagar, o haz clic en el enlace de abajo para aplicar el descuento automáticamente a tu pedido.
+        </p>
+
+        <!-- 6. Caja del cupón interactiva -->
+        <div class="gc-coupon-card">
+          <div class="gc-code-meta">
+            <span class="gc-code-label">Código de descuento</span>
+            <div class="gc-code-value" id="gcDiscountCode">{{ discount_code }}</div>
+          </div>
+          <button
+            type="button"
+            class="gc-copy-btn"
+            id="gcCopyBtn"
+            onclick="copyCouponCode()"
+            aria-label="Copiar código {{ discount_code }}"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="gcCopyText">Copiar código</span>
+          </button>
+        </div>
+
+        <!-- 7. Botón Principal: [Aplicar descuento] -->
+        <a
+          href="{{ discount_url }}"
+          class="gc-btn-apply"
+          id="gcApplyLink"
+          target="_blank"
+          rel="noopener"
+        >
+          <span>Aplicar descuento</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+
+        {% if gift_card and gift_card.balance %}
+          <div class="gc-balance-pill">
+            Saldo disponible: {{ gift_card.balance | money_with_currency }}
+          </div>
+        {% endif %}
+
+        <!-- 8. Acciones secundarias -->
+        <nav class="gc-actions" aria-label="Acciones de la tarjeta de regalo">
+          <button type="button" class="gc-sub-link" onclick="window.print()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            <span>Imprimir tarjeta</span>
+          </button>
+          <a href="{{ store_url }}" class="gc-sub-link">
+            <span>Visitar la tienda &rarr;</span>
+          </a>
+        </nav>
+
+      </section>
+    </article>
+  </main>
+
+  <!-- Script para interactividad: copia en un clic -->
+  <script>
+    function copyCouponCode() {
+      var codeElem = document.getElementById('gcDiscountCode');
+      var btnText = document.getElementById('gcCopyText');
+      var code = (codeElem ? codeElem.innerText : '{{ discount_code }}').trim();
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(handleSuccess, handleFallback);
+      } else {
+        handleFallback();
+      }
+
+      function handleFallback() {
+        var textArea = document.createElement('textarea');
+        textArea.value = code;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          handleSuccess();
+        } catch (err) {
+          console.error('Error al copiar código: ', err);
+        }
+        document.body.removeChild(textArea);
+      }
+
+      function handleSuccess() {
+        if (!btnText) return;
+        var originalText = btnText.innerText;
+        btnText.innerText = '¡Copiado!';
+        var btn = document.getElementById('gcCopyBtn');
+        if (btn) {
+          btn.style.background = '#780606';
+          btn.style.color = '#ffffff';
+          btn.style.borderColor = '#780606';
+        }
+        setTimeout(function() {
+          btnText.innerText = originalText;
+          if (btn) {
+            btn.style.background = '';
+            btn.style.color = '';
+            btn.style.borderColor = '';
+          }
+        }, 2200);
+      }
+    }
+  </script>
+
+</body>
+</html>

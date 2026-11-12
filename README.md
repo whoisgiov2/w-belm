@@ -15,18 +15,30 @@ w-belm/
 ├── index.html                     # Visualizador local de los elementos disponibles
 │
 ├── elements/                      # Componentes interactivos
-│   └── bubb/                      # Asistente flotante (Burbuja & Chaos Panel)
-│       ├── index.html             # Prototipo local (doble clic para probar)
-│       ├── style.css              # Estilos y micro-interacciones (prefijo bb-)
-│       ├── bubb-widget.liquid     # Sección para Shopify OS 2.0
-│       ├── spike.png              # Asset gráfico del logo / silueta
-│       └── README.md              # Guía específica de integración para Bubb
+│   ├── bubb/                      # Asistente flotante (Burbuja & Chaos Panel)
+│   │   ├── index.html             # Prototipo local (doble clic para probar)
+│   │   ├── style.css              # Estilos y micro-interacciones (prefijo bb-)
+│   │   ├── bubb-widget.liquid     # Sección para Shopify OS 2.0
+│   │   ├── spike.png              # Asset gráfico del logo / silueta
+│   │   ├── fondoini.jpg           # Asset gráfico del banner superior
+│   │   └── README.md              # Guía específica de integración para Bubb
+│   │
+│   └── gift-card/                 # Tarjeta de regalo & cupón de bienvenida (Caos)
+│       ├── index.html             # Prototipo local interactivo con simulador de correo
+│       ├── style.css              # Estilos del voucher y tarjetas (prefijo gc-)
+│       ├── gift_card.liquid       # Archivo Liquid para Shopify
+│       ├── spike.png              # Asset gráfico del logo Spike
+│       ├── fondoini.jpg           # Asset gráfico del fondo Caos
+│       └── README.md              # Guía de integración para templates y emails
 │
 └── shopify/                       # Archivos listos para copiar a tu tema de Shopify
     ├── sections/
     │   └── bubb-widget.liquid     # Secciones listas para /sections/
+    ├── templates/
+    │   └── gift_card.liquid       # Plantilla de tarjeta de regalo para /templates/
     ├── assets/
-    │   └── spike.png              # Imágenes listas para /assets/
+    │   ├── spike.png              # Imágenes listas para /assets/
+    │   └── fondoini.jpg           # Banner listo para /assets/
     └── README.md                  # Instrucciones rápidas de instalación en el tema
 ```
 
@@ -108,4 +120,5 @@ Cada elemento está construido para sincronizarse fácilmente con los colores, f
 No necesitas instalar Node.js, librerías ni configurar ningún servidor.
 
 1. Abre el archivo **[index.html](file:///c:/Users/crm/Downloads/Bubb/index.html)** en la raíz con doble clic para ver el catálogo de elementos disponibles.
-2. O abre directamente **[elements/bubb/index.html](file:///c:/Users/crm/Downloads/Bubb/elements/bubb/index.html)** con doble clic para interactuar con la burbuja, moverla por la pantalla, probar la explosión y usar su barra de pruebas superior.
+2. Abre directamente **[elements/bubb/index.html](file:///c:/Users/crm/Downloads/Bubb/elements/bubb/index.html)** para probar la burbuja interactiva y su panel.
+3. Abre directamente **[elements/gift-card/index.html](file:///c:/Users/crm/Downloads/Bubb/elements/gift-card/index.html)** para interactuar con la tarjeta de regalo, probar el copiado de cupón, simulación de correo y vista móvil.

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prototipo Gift Card | w-belm</title>
+  <link rel="icon" type="image/png" href="spike.png">
+
+  <!-- Google Fonts: Carter One & Luckiest Guy -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Carter+One&family=Luckiest+Guy&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* ==========================================================================
+       ESTILOS DEL TESTBENCH / PROTOTIPO LOCAL
+       ========================================================================== */
+    body {
+      background-color: #08080a;
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(120, 6, 6, 0.35) 0%, transparent 60%),
+        radial-gradient(circle at 10% 80%, rgba(120, 6, 6, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 60%, rgba(30, 30, 36, 0.6) 0%, transparent 45%);
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Barra superior de herramientas */
+    .tb-header {
+      background: rgba(18, 18, 22, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .tb-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .tb-back-btn {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s;
+    }
+
+    .tb-back-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+
+    .tb-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tb-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      background: rgba(120, 6, 6, 0.25);
+      border: 1px solid rgba(120, 6, 6, 0.5);
+      color: #fca5a5;
+      border-radius: 9999px;
+      font-weight: 700;
+    }
+
+    .tb-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tb-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 6px 13px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .tb-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+
+    .tb-btn.active {
+      background: #780606;
+      border-color: #780606;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(120, 6, 6, 0.4);
+    }
+
+    /* Área de previsualización */
+    .tb-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+      transition: all 0.3s ease;
+    }
+
+    /* Modo móvil */
+    .tb-stage.mode-mobile .gc-wrapper {
+      max-width: 375px;
+      box-shadow: 0 0 0 12px #18181b, 0 0 0 14px rgba(255, 255, 255, 0.1);
+      border-radius: 28px;
+    }
+
+    /* Modo simulador de correo electrónico */
+    .tb-email-window {
+      display: none;
+      width: 100%;
+      max-width: 640px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .tb-stage.mode-email .tb-email-window {
+      display: block;
+    }
+
+    .tb-stage.mode-email .gc-wrapper {
+      padding: 24px;
+      background: #f8fafc;
+    }
+
+    .tb-email-header {
+      background: #f1f5f9;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 12px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+      color: #334155;
+    }
+
+    .tb-email-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tb-email-label {
+      color: #64748b;
+      font-weight: 600;
+      min-width: 65px;
+    }
+
+    .tb-email-val {
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    /* Sección informativa al pie */
+    .tb-docs {
+      max-width: 760px;
+      width: 100%;
+      margin: 40px auto 20px auto;
+      padding: 0 16px;
+    }
+
+    .tb-docs-card {
+      background: rgba(24, 24, 27, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .tb-docs-card h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tb-docs-card p {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .tb-docs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .tb-doc-box {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .tb-doc-box h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fca5a5;
+      margin-bottom: 6px;
+    }
+
+    .tb-doc-box code {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fef08a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: monospace;
+    }
+
+    .tb-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 20px 0;
+      text-align: center;
+      font-size: 12.5px;
+      color: #64748b;
+      margin-top: auto;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Barra de pruebas -->
+  <header class="tb-header">
+    <div class="tb-left">
+      <a href="../../index.html" class="tb-back-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Volver al Catálogo</span>
+      </a>
+      <div class="tb-title">
+        <span>Gift Card — Welcome Chaos</span>
+        <span class="tb-badge">gift_card.liquid</span>
+      </div>
+    </div>
+
+    <div class="tb-controls">
+      <button type="button" class="tb-btn active" id="btnModeDesktop" onclick="setMode('desktop')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+        <span>Desktop</span>
+      </button>
+
+      <button type="button" class="tb-btn" id="btnModeMobile" onclick="setMode('mobile')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+        </svg>
+        <span>Móvil</span>
+      </button>
+
+      <button type="button" class="tb-btn" id="btnModeEmail" onclick="setMode('email')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+          <polyline points="22,6 12,13 2,6"></polyline>
+        </svg>
+        <span>Simulador Correo</span>
+      </button>
+
+      <button type="button" class="tb-btn" onclick="window.print()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        <span>Imprimir</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Escenario de previsualización -->
+  <main class="tb-stage" id="tbStage">
+
+    <!-- Envoltura de simulación de correo -->
+    <div class="tb-email-window">
+      <div class="tb-email-header">
+        <div class="tb-email-row">
+          <span class="tb-email-label">De:</span>
+          <span class="tb-email-val">w-belm Tienda Oficial &lt;contacto@w-belm.com&gt;</span>
+        </div>
+        <div class="tb-email-row">
+          <span class="tb-email-label">Para:</span>
+          <span class="tb-email-val">cliente@ejemplo.com</span>
+        </div>
+        <div class="tb-email-row">
+          <span class="tb-email-label">Asunto:</span>
+          <span class="tb-email-val">Te damos la bienvenida al caos — Disfruta tu 10% de descuento</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TARJETA DE REGALO / GIFT CARD COMPONENTE -->
+    <div class="gc-wrapper">
+      <article class="gc-card" aria-label="Tarjeta de descuento y bienvenida">
+
+        <!-- Banner visual con fondoini.jpg -->
+        <header class="gc-banner">
+          <img
+            class="gc-banner-img"
+            src="fondoini.jpg"
+            alt="The Chaos Banner"
+            loading="eager"
+          >
+          <div class="gc-banner-overlay"></div>
+        </header>
+
+        <!-- Insignia del logo Spike centrada sobre el banner -->
+        <div class="gc-logo-wrap">
+          <img
+            class="gc-logo-img"
+            src="spike.png"
+            alt="Spike Logo"
+          >
+        </div>
+
+        <!-- Contenido de la tarjeta -->
+        <section class="gc-body">
+
+          <!-- 1. Título principal -->
+          <h1 class="gc-title">Te damos la bienvenida al caos.</h1>
+
+          <!-- 2. Subtítulo de bienvenida -->
+          <p class="gc-subtitle">
+            ¡Qué bueno tenerte aquí! Disfruta este descuento en tu primera compra.
+          </p>
+
+          <!-- 3. Insignia de oferta -->
+          <div class="gc-badge">
+            <span class="gc-badge-icon">★</span>
+            <span>Oferta especial</span>
+          </div>
+
+          <!-- 4. Cuadro de oferta: 10% de descuento en Página de inicio -->
+          <div class="gc-offer-box">
+            <div class="gc-offer-highlight">10% de descuento</div>
+            <div class="gc-offer-sub">en Página de inicio</div>
+          </div>
+
+          <!-- 5. Instrucciones y código -->
+          <p class="gc-instructions">
+            Usa el código: <strong>WELCOME10</strong> al pagar, o haz clic en el enlace de abajo para aplicar el descuento automáticamente a tu pedido.
+          </p>
+
+          <!-- 6. Caja del cupón interactiva -->
+          <div class="gc-coupon-card">
+            <div class="gc-code-meta">
+              <span class="gc-code-label">Código de descuento</span>
+              <div class="gc-code-value" id="gcDiscountCode">WELCOME10</div>
+            </div>
+            <button
+              type="button"
+              class="gc-copy-btn"
+              id="gcCopyBtn"
+              onclick="copyCouponCode()"
+              aria-label="Copiar código WELCOME10"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span id="gcCopyText">Copiar código</span>
+            </button>
+          </div>
+
+          <!-- 7. Botón Principal: [Aplicar descuento] -->
+          <a
+            href="https://tu-tienda.myshopify.com/discount/WELCOME10?redirect=/"
+            class="gc-btn-apply"
+            id="gcApplyLink"
+            target="_blank"
+            rel="noopener"
+          >
+            <span>Aplicar descuento</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+
+          <!-- 8. Acciones secundarias -->
+          <nav class="gc-actions" aria-label="Acciones de la tarjeta de regalo">
+            <button type="button" class="gc-sub-link" onclick="window.print()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+              </svg>
+              <span>Imprimir tarjeta</span>
+            </button>
+            <a href="https://tu-tienda.myshopify.com" target="_blank" rel="noopener" class="gc-sub-link">
+              <span>Visitar la tienda &rarr;</span>
+            </a>
+          </nav>
+
+        </section>
+      </article>
+    </div>
+
+  </main>
+
+  <!-- Documentación de Integración -->
+  <section class="tb-docs">
+    <div class="tb-docs-card">
+      <h2>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span>Integración en Shopify (Online Store 2.0 & Notificaciones)</span>
+      </h2>
+      <p>
+        Este elemento fue construido tanto como plantilla de tema para <code>templates/gift_card.liquid</code> como para plantillas de correo de notificación automática para nuevos clientes.
+      </p>
+
+      <div class="tb-docs-grid">
+        <div class="tb-doc-box">
+          <h3>1. Plantilla de Tienda (gift_card.liquid)</h3>
+          <p>
+            Ve a <strong>Tienda online &gt; Editar código &gt; templates/</strong> y sube o reemplaza <code>gift_card.liquid</code> con el archivo listo en <code>shopify/templates/gift_card.liquid</code>.
+          </p>
+        </div>
+
+        <div class="tb-doc-box">
+          <h3>2. Correo de Notificación (Email)</h3>
+          <p>
+            Ve a <strong>Configuración &gt; Notificaciones &gt; Tarjeta de regalo creada</strong> (o Bienvenida a clientes) y pega el código HTML/Liquid para que el cliente reciba la tarjeta en su buzón.
+          </p>
+        </div>
+
+        <div class="tb-doc-box">
+          <h3>3. Descuento Automático</h3>
+          <p>
+            El botón <strong>[Aplicar descuento]</strong> enlaza automáticamente a <code>/discount/WELCOME10?redirect=/</code>, aplicando el cupón en la sesión de Shopify sin que el cliente tenga que escribirlo.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pie de página -->
+  <footer class="tb-footer">
+    <p>w-belm • Elemento Gift Card (Caos) • <a href="https://github.com/whoisgiov2/w-belm" style="color: #a5b4fc; text-decoration: none;" target="_blank" rel="noopener">github.com/whoisgiov2/w-belm</a></p>
+  </footer>
+
+  <script>
+    // Conmutador de vistas de prueba
+    function setMode(mode) {
+      var stage = document.getElementById('tbStage');
+      var btnDesktop = document.getElementById('btnModeDesktop');
+      var btnMobile = document.getElementById('btnModeMobile');
+      var btnEmail = document.getElementById('btnModeEmail');
+
+      stage.classList.remove('mode-mobile', 'mode-email');
+      btnDesktop.classList.remove('active');
+      btnMobile.classList.remove('active');
+      btnEmail.classList.remove('active');
+
+      if (mode === 'mobile') {
+        stage.classList.add('mode-mobile');
+        btnMobile.classList.add('active');
+      } else if (mode === 'email') {
+        stage.classList.add('mode-email');
+        btnEmail.classList.add('active');
+      } else {
+        btnDesktop.classList.add('active');
+      }
+    }
+
+    // Copiar código con feedback
+    function copyCouponCode() {
+      var codeElem = document.getElementById('gcDiscountCode');
+      var btnText = document.getElementById('gcCopyText');
+      var code = (codeElem ? codeElem.innerText : 'WELCOME10').trim();
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(handleSuccess, handleFallback);
+      } else {
+        handleFallback();
+      }
+
+      function handleFallback() {
+        var textArea = document.createElement('textarea');
+        textArea.value = code;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          handleSuccess();
+        } catch (err) {
+          console.error('Error al copiar: ', err);
+        }
+        document.body.removeChild(textArea);
+      }
+
+      function handleSuccess() {
+        if (!btnText) return;
+        var originalText = btnText.innerText;
+        btnText.innerText = '¡Copiado!';
+        var btn = document.getElementById('gcCopyBtn');
+        if (btn) {
+          btn.style.background = '#780606';
+          btn.style.color = '#ffffff';
+          btn.style.borderColor = '#780606';
+        }
+        setTimeout(function () {
+          btnText.innerText = originalText;
+          if (btn) {
+            btn.style.background = '';
+            btn.style.color = '';
+            btn.style.borderColor = '';
+          }
+        }, 2200);
+      }
+    }
+  </script>
+
+</body>
+
+</html>
