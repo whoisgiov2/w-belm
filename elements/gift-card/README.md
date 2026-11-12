@@ -4,21 +4,18 @@
 
 ---
 
-## 🎨 Características de Diseño (Diferenciación con el Popup de Spike)
+## 🎨 Diseño "Chaos Ticket" (póster editorial / zine)
 
-A diferencia del desplegable de Spike (que utiliza un modal con fondo blanco y avatar circular sobresaliente tipo chat), esta tarjeta está concebida como un **voucher digital minimalista y compatible con clientes de correo**:
+Lenguaje visual propio, distinto al desplegable de Spike (sin esquinas redondeadas, sin pastillas, sin cajas punteadas ni avatar circular):
 
-- **Fondo Integral con `fondoini.jpg`**:
-  Toda la tarjeta está envuelta en la textura artística de la marca con una capa de gradiente oscuro carmesí que garantiza contraste y legibilidad perfecta.
-- **Estructura Híbrida para Correo (Email-First)**:
-  Maquetada con tablas HTML, estilos inlined y marcado condicional VML para Microsoft Outlook. Compatible con Gmail, Apple Mail, Outlook, Yahoo Mail y clientes móviles.
-- **Tipografía de Alto Impacto**:
-  - `Luckiest Guy`: Título principal (*"Te damos la bienvenida al caos."*), destacado (*"10% de descuento"*) y botón de acción (*"APLICAR DESCUENTO"*).
-  - `Carter One`: Insignia (*"Oferta especial"*), ubicación (*"en Página de inicio"*) y código (*"WELCOME10"*).
-- **Enlace de Descuento Automático de Shopify**:
-  El botón `[Aplicar descuento]` redirige directamente a `/discount/WELCOME10?redirect=/`, aplicando automáticamente el descuento en la sesión del cliente al ingresar a la tienda.
-- **Caja de Cupón Minimalista**:
-  Ticket pill con código de descuento claro, seleccionable en correos y con copiado en un clic en navegador web.
+- **Fondo integral `fondoini.jpg`** con velo oscuro carmesí.
+- **Cinta superior** roja con Spike, "WELCOME TO THE CHAOS" y nº de ticket.
+- **"10%" gigante** (Luckiest Guy) con sombra dura desplazada en `#780606`, junto a "DE DESCUENTO / en Página de inicio".
+- **Título tipo nota de rescate**: cada palabra de "Te damos la bienvenida al caos." en un bloque de color distinto.
+- **Código en fichas**: cada carácter de `WELCOME10` en su propio bloque alternando blanco/rojo (se genera con un bucle Liquid sobre el código).
+- **CTA en barra completa** de borde a borde: "APLICAR DESCUENTO" + bloque negro con flecha. Enlaza a `/discount/WELCOME10?redirect=/`.
+- **Pie con código de barras decorativo** hecho con celdas de tabla (seguro para correo).
+- **Email-first**: tablas, estilos inline, VML para Outlook, preheader oculto y fuentes de respaldo (`Impact`, `Trebuchet MS`).
 
 ---
 

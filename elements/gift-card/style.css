@@ -2,267 +2,100 @@
 @import url('https://fonts.googleapis.com/css2?family=Carter+One&family=Luckiest+Guy&display=swap');
 
 /* ==========================================================================
-   w-belm — Gift Card / Tarjeta de Descuento de Bienvenida al Caos (Minimalista)
-   Compatible con formato de correos HTML y navegador web
-   Fondo completo: fondoini.jpg
+   w-belm — Gift Card "Chaos Ticket" (prototipo local)
+   Prefijo: ct-  |  Paleta: #780606 / #000000 / #ffffff
+   El correo real usa estilos inline (gift_card.liquid); este archivo replica
+   las reglas de <head> y añade el banco de pruebas (tb-).
    ========================================================================== */
 
-:root {
-  --gc-crimson: #780606;
-  --gc-crimson-hover: #900808;
-  --gc-crimson-border: rgba(120, 6, 6, 0.55);
-  --gc-crimson-glow: rgba(120, 6, 6, 0.35);
-  --gc-font-title: 'Luckiest Guy', Impact, 'Arial Black', sans-serif;
-  --gc-font-display: 'Carter One', 'Trebuchet MS', 'Arial Black', sans-serif;
-  --gc-font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+/* ---------- Reglas compartidas con gift_card.liquid ---------- */
+.ct-title { font-family: 'Luckiest Guy', Impact, 'Arial Black', sans-serif !important; }
+.ct-display { font-family: 'Carter One', 'Trebuchet MS', 'Arial Black', sans-serif !important; }
+.ct-wrap table, .ct-wrap td { border-collapse: collapse; }
+.ct-wrap img { display: block; border: 0; }
+
+.ct-cta-main { transition: background-color 0.2s ease; }
+.ct-cta-main:hover { background-color: #900808 !important; }
+.ct-cta-arrow { transition: background-color 0.2s ease, color 0.2s ease; }
+.ct-cta-arrow:hover { background-color: #ffffff !important; color: #780606 !important; }
+.ct-tile { cursor: pointer; transition: transform 0.15s ease; }
+.ct-tile:hover { transform: translateY(-3px); }
+
+@media only screen and (max-width: 620px) {
+  .ct-wrap { width: 100% !important; }
+  .ct-col { display: block !important; width: 100% !important; box-sizing: border-box; }
+  .ct-pad { padding-left: 20px !important; padding-right: 20px !important; }
+  .ct-giant { font-size: 104px !important; line-height: 96px !important; }
+  .ct-ransom { font-size: 24px !important; line-height: 44px !important; }
+  .ct-tile { width: 28px !important; height: 38px !important; line-height: 40px !important; font-size: 20px !important; }
+  .ct-cta-main { font-size: 17px !important; padding-left: 16px !important; }
+  .ct-hide-sm { display: none !important; }
 }
 
-/* Tarjeta principal con fondoini.jpg completo */
-.gc-card-container {
-  width: 100%;
-  max-width: 580px;
-  margin: 0 auto;
-  background-color: #120202;
-  background-image: url('fondoini.jpg');
-  background-position: center center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  border-radius: 18px;
-  border: 1.5px solid var(--gc-crimson-border);
-  box-shadow:
-    0 20px 45px rgba(0, 0, 0, 0.75),
-    0 0 25px var(--gc-crimson-glow);
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+/* ---------- Banco de pruebas ---------- */
+body {
+  margin: 0;
+  background: #000000;
+  color: #e5e5e5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.gc-card-container:hover {
-  transform: translateY(-2px);
-  border-color: rgba(120, 6, 6, 0.8);
-  box-shadow:
-    0 24px 55px rgba(0, 0, 0, 0.85),
-    0 0 35px rgba(120, 6, 6, 0.5);
-}
-
-/* Overlay sutil para legibilidad */
-.gc-card-overlay {
-  background: linear-gradient(
-    180deg,
-    rgba(10, 2, 2, 0.85) 0%,
-    rgba(18, 3, 3, 0.88) 50%,
-    rgba(10, 2, 2, 0.92) 100%
-  );
-  padding: 42px 34px 38px 34px;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-/* Logo Spike minimalista y discreto */
-.gc-logo-minimal {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto 22px auto;
-  filter: drop-shadow(0 2px 8px rgba(120, 6, 6, 0.6));
-  transition: transform 0.25s ease;
-}
-
-.gc-logo-minimal:hover {
-  transform: scale(1.1);
-}
-
-/* Insignia: Oferta especial */
-.gc-badge-minimal {
-  display: inline-block;
-  background-color: rgba(120, 6, 6, 0.25);
-  border: 1px solid #780606;
-  border-radius: 20px;
-  padding: 4px 14px;
-  margin-bottom: 16px;
-}
-
-.gc-badge-text {
-  font-family: var(--gc-font-display);
-  font-size: 12px;
-  color: #fca5a5;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 700;
-  display: block;
-  line-height: 1.2;
-}
-
-/* Título: "Te damos la bienvenida al caos." */
-.gc-title-text {
-  font-family: var(--gc-font-title);
-  font-size: 32px;
-  line-height: 1.15;
-  letter-spacing: 0.03em;
-  color: #ffffff;
-  margin: 0 0 10px 0;
-  text-align: center;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
-}
-
-/* Subtítulo: "¡Qué bueno tenerte aquí! Disfruta este descuento..." */
-.gc-subtitle-text {
-  font-family: var(--gc-font-body);
-  font-size: 14.5px;
-  line-height: 1.55;
-  color: #cbd5e1;
-  margin: 0 auto 24px auto;
-  max-width: 440px;
-  text-align: center;
-}
-
-/* Divisor sutil */
-.gc-divider {
-  width: 100%;
-  height: 1px;
-  background-color: rgba(120, 6, 6, 0.4);
-  margin-bottom: 24px;
-  border: none;
-}
-
-/* Destacado: "10% de descuento en Página de inicio" */
-.gc-offer-val {
-  font-family: var(--gc-font-title);
-  font-size: 34px;
-  line-height: 1.1;
-  letter-spacing: 0.04em;
-  color: #ff3b3b;
-  text-shadow: 0 0 18px rgba(255, 59, 59, 0.45);
-  margin-bottom: 4px;
-}
-
-.gc-offer-label {
-  font-family: var(--gc-font-display);
-  font-size: 13.5px;
-  color: #fca5a5;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-}
-
-/* Instrucciones */
-.gc-instructions-text {
-  font-family: var(--gc-font-body);
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: #94a3b8;
-  margin: 0 auto 18px auto;
-  max-width: 450px;
-  text-align: center;
-}
-
-.gc-instructions-text strong {
-  font-family: var(--gc-font-display);
-  font-size: 15px;
-  color: #ffffff;
-  letter-spacing: 0.05em;
-}
-
-/* Caja de cupón / Ticket pill */
-.gc-coupon-pill {
-  display: inline-flex;
+.tb-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   align-items: center;
-  gap: 16px;
-  background-color: rgba(0, 0, 0, 0.65);
-  border: 1.5px dashed #780606;
-  border-radius: 12px;
-  padding: 12px 24px;
-  margin-bottom: 26px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: #0a0a0a;
+  border-bottom: 2px solid #780606;
 }
 
-.gc-coupon-pill:hover {
-  background-color: rgba(120, 6, 6, 0.35);
-  border-color: #ff3333;
-}
+.tb-left { display: flex; align-items: center; gap: 14px; }
+.tb-link { color: #a3a3a3; text-decoration: none; font-size: 13px; font-weight: 600; }
+.tb-link:hover { color: #ffffff; }
+.tb-name { font-family: 'Luckiest Guy', Impact, sans-serif; letter-spacing: 2px; color: #ffffff; font-size: 15px; }
 
-.gc-code-display {
-  font-family: var(--gc-font-display);
-  font-size: 22px;
-  color: #ffffff;
-  letter-spacing: 0.12em;
+.tb-modes { display: flex; gap: 0; }
+.tb-btn {
+  background: #000000;
+  color: #d4d4d4;
+  border: 1px solid #262626;
+  padding: 7px 14px;
+  font-size: 12px;
   font-weight: 700;
-  user-select: all;
-}
-
-.gc-copy-label {
-  font-family: var(--gc-font-body);
-  font-size: 11px;
-  font-weight: 700;
-  color: #fca5a5;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding-left: 12px;
-  border-left: 1px solid rgba(120, 6, 6, 0.4);
-}
-
-/* Botón Principal CTA: [Aplicar descuento] */
-.gc-btn-cta {
-  background-color: #780606;
-  border: 1.5px solid #780606;
-  border-radius: 12px;
-  color: #ffffff;
-  display: inline-block;
-  font-family: var(--gc-font-title);
-  font-size: 17px;
-  letter-spacing: 0.06em;
-  line-height: 1;
-  padding: 16px 36px;
-  text-align: center;
-  text-decoration: none;
-  text-transform: uppercase;
-  box-shadow: 0 8px 22px rgba(120, 6, 6, 0.45);
-  transition: all 0.2s ease;
   cursor: pointer;
 }
+.tb-btn + .tb-btn { border-left: none; }
+.tb-btn:hover { color: #ffffff; }
+.tb-btn.is-active { background: #780606; border-color: #780606; color: #ffffff; }
 
-.gc-btn-cta:hover {
-  background-color: #900808;
-  border-color: #900808;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(120, 6, 6, 0.6);
-  color: #ffffff;
+.tb-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 36px 12px;
 }
 
-/* Pie minimalista */
-.gc-footer-meta {
-  font-family: var(--gc-font-body);
-  font-size: 11.5px;
-  color: #64748b;
-  line-height: 1.5;
-  margin-top: 28px;
-}
+.tb-frame { width: 100%; max-width: 600px; transition: max-width 0.3s ease; }
+.tb-stage.is-mobile .tb-frame { max-width: 375px; outline: 10px solid #171717; }
 
-.gc-footer-link {
-  color: #94a3b8;
-  text-decoration: underline;
-  margin-top: 4px;
-  display: inline-block;
-}
+/* Simulador de bandeja de correo */
+.tb-mail { display: none; width: 100%; max-width: 600px; margin-bottom: 0; background: #111111; border: 1px solid #262626; border-bottom: none; font-size: 13px; }
+.tb-stage.is-email .tb-mail { display: block; }
+.tb-stage.is-email.is-mobile .tb-mail { max-width: 375px; }
+.tb-mail-row { display: flex; gap: 10px; padding: 8px 16px; border-bottom: 1px solid #1f1f1f; }
+.tb-mail-row b { color: #737373; min-width: 60px; font-weight: 600; }
+.tb-mail-row span { color: #e5e5e5; }
 
-.gc-footer-link:hover {
-  color: #fca5a5;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  .gc-card-overlay {
-    padding: 30px 18px !important;
-  }
-  .gc-title-text {
-    font-size: 26px !important;
-  }
-  .gc-offer-val {
-    font-size: 28px !important;
-  }
-  .gc-btn-cta {
-    padding: 15px 22px !important;
-    font-size: 16px !important;
-  }
-}
+.tb-foot { text-align: center; font-size: 12px; color: #525252; padding: 18px; border-top: 1px solid #171717; }
+.tb-foot a { color: #ff4d4d; text-decoration: none; }

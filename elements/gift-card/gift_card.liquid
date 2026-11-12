@@ -1,6 +1,6 @@
 {% layout none %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ request.locale.iso_code | default: 'es' }}">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="{{ request.locale.iso_code | default: 'es' }}">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,279 +9,245 @@
   <meta name="supported-color-schemes" content="dark only">
   <title>Te damos la bienvenida al caos | {{ shop.name | default: 'w-belm' }}</title>
 
-  <!-- Google Fonts: Carter One & Luckiest Guy -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Carter+One&family=Luckiest+Guy&display=swap" rel="stylesheet">
 
   {%- comment -%}
-    --------------------------------------------------------------------------
-    w-belm — Gift Card / Tarjeta de Descuento de Bienvenida al Caos
-    100% Compatible con Clientes de Correo (Gmail, Apple Mail, Outlook)
-    y Plantilla de Tienda Shopify: templates/gift_card.liquid
-    --------------------------------------------------------------------------
+    ==========================================================================
+    w-belm — Gift Card "Chaos Ticket" (diseño editorial tipo póster / zine)
+    - Correo: Gmail, Apple Mail, Outlook (VML), Yahoo, clientes móviles
+    - Tienda: templates/gift_card.liquid
+    Sin esquinas redondeadas, sin pastillas ni cajas punteadas: bloques sólidos,
+    número gigante con sombra dura, título tipo "nota de rescate", código en
+    fichas individuales y código de barras decorativo.
+    ==========================================================================
   {%- endcomment -%}
 
   {%- assign discount_code = 'WELCOME10' -%}
   {%- if gift_card and gift_card.code -%}
     {%- assign discount_code = gift_card.code -%}
   {%- endif -%}
+  {%- assign code_chars = discount_code | split: '' -%}
 
   {%- assign store_url = shop.url | default: '/' -%}
   {%- assign discount_url = store_url | append: '/discount/' | append: discount_code | append: '?redirect=/' -%}
 
-  {%- assign banner_asset = 'fondoini.jpg' | asset_img_url: '1200x' -%}
-  {%- assign logo_asset = 'spike.png' | asset_img_url: '200x' -%}
+  {%- assign bg_asset = 'fondoini.jpg' | asset_img_url: '1200x' -%}
+  {%- assign logo_asset = 'spike.png' | asset_img_url: '120x' -%}
+
+  {%- assign barcode = '3,1,1,2,4,1,2,1,1,3,2,1,1,1,4,2,1,2,3,1,1,2,2,1,3,1,1,4,1,2' | split: ',' -%}
 
   <style type="text/css">
-    /* ==========================================================================
-       ESTILOS EMBEBIDOS Y MEDIA QUERIES (Compatibilidad Correo & Web)
-       ========================================================================== */
-    :root {
-      color-scheme: dark only;
-    }
-    body, table, td, a {
-      -webkit-text-size-adjust: 100%;
-      -ms-text-size-adjust: 100%;
-    }
-    table, td {
-      mso-table-lspace: 0pt;
-      mso-table-rspace: 0pt;
-    }
-    img {
-      -ms-interpolation-mode: bicubic;
-      border: 0;
-      height: auto;
-      line-height: 100%;
-      outline: none;
-      text-decoration: none;
-    }
-    body {
-      margin: 0 !important;
-      padding: 0 !important;
-      width: 100% !important;
-      background-color: #08080a;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse; }
+    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; display: block; }
+    body { margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #000000; }
+
+    .ct-title { font-family: 'Luckiest Guy', Impact, 'Arial Black', sans-serif !important; }
+    .ct-display { font-family: 'Carter One', 'Trebuchet MS', 'Arial Black', sans-serif !important; }
+
+    .ct-cta-main:hover { background-color: #900808 !important; }
+    .ct-cta-arrow:hover { background-color: #ffffff !important; color: #780606 !important; }
+    .ct-tile { cursor: pointer; }
+
+    @media only screen and (max-width: 620px) {
+      .ct-wrap { width: 100% !important; }
+      .ct-col { display: block !important; width: 100% !important; box-sizing: border-box; }
+      .ct-pad { padding-left: 20px !important; padding-right: 20px !important; }
+      .ct-giant { font-size: 104px !important; line-height: 96px !important; }
+      .ct-ransom { font-size: 24px !important; line-height: 44px !important; }
+      .ct-tile { width: 28px !important; height: 38px !important; font-size: 20px !important; }
+      .ct-cta-main { font-size: 17px !important; padding-left: 16px !important; }
+      .ct-hide-sm { display: none !important; }
     }
 
-    /* Fuentes personalizadas con fallback seguro para correo */
-    .gc-font-title {
-      font-family: 'Luckiest Guy', Impact, 'Arial Black', sans-serif !important;
-    }
-    .gc-font-display {
-      font-family: 'Carter One', 'Trebuchet MS', 'Arial Black', sans-serif !important;
-    }
-
-    /* Efectos hover para clientes que soportan CSS */
-    .gc-btn-hover:hover {
-      background-color: #900808 !important;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(120, 6, 6, 0.6) !important;
-    }
-    .gc-card-container:hover {
-      border-color: rgba(120, 6, 6, 0.8) !important;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(120, 6, 6, 0.45) !important;
-    }
-
-    /* Copiado rápido en navegador */
-    .gc-copy-action {
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .gc-copy-action:hover {
-      background-color: rgba(120, 6, 6, 0.35) !important;
-      border-color: #ff3333 !important;
-    }
-
-    /* Responsive */
-    @media only screen and (max-width: 600px) {
-      .gc-main-table {
-        width: 100% !important;
-      }
-      .gc-card-padding {
-        padding: 30px 18px !important;
-      }
-      .gc-title-text {
-        font-size: 26px !important;
-        line-height: 1.15 !important;
-      }
-      .gc-offer-val {
-        font-size: 28px !important;
-      }
-      .gc-btn-cta {
-        padding: 15px 22px !important;
-        font-size: 16px !important;
-      }
+    @media print {
+      .ct-cta-row { display: none !important; }
     }
   </style>
 
   <!--[if mso]>
   <style type="text/css">
-    body, table, td, span, a, p { font-family: Arial, Helvetica, sans-serif !important; }
-    .gc-font-title { font-family: Impact, 'Arial Black', sans-serif !important; }
-    .gc-font-display { font-family: 'Trebuchet MS', Arial, sans-serif !important; }
+    .ct-title { font-family: Impact, 'Arial Black', sans-serif !important; }
+    .ct-display, body, td, p, a, span { font-family: 'Trebuchet MS', Arial, sans-serif !important; }
   </style>
   <![endif]-->
 </head>
 
-<body style="margin: 0; padding: 0; background-color: #08080a; color: #f3f4f6; -webkit-font-smoothing: antialiased;">
+<body style="margin:0; padding:0; background-color:#000000;">
 
-  <!-- Contenedor general del correo -->
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="width: 100%; margin: 0; padding: 36px 12px; background-color: #08080a;">
+  <!-- Preheader oculto (vista previa en la bandeja de entrada) -->
+  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#000000;">
+    10% de descuento en tu primera compra con el código {{ discount_code }}. Bienvenido al caos.
+  </div>
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="background-color:#000000;">
     <tr>
-      <td align="center" valign="top">
+      <td align="center" style="padding:28px 10px;">
 
-        <!-- ================================================================
-             TARJETA DE REGALO MINIMALISTA (Fondo Completo con fondoini.jpg)
-             ================================================================ -->
         <!--[if gte mso 9]>
-        <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:580px;">
-        <v:fill type="frame" src="{{ banner_asset }}" color="#140202" />
+        <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:600px;">
+        <v:fill type="frame" src="{{ bg_asset }}" color="#0d0101" />
         <v:textbox inset="0,0,0,0">
         <![endif]-->
 
-        <table class="gc-main-table gc-card-container" width="580" cellpadding="0" cellspacing="0" border="0" role="presentation" style="width: 100%; max-width: 580px; margin: 0 auto; background-color: #120202; background-image: url('{{ banner_asset }}'); background-position: center center; background-size: cover; background-repeat: no-repeat; border-radius: 18px; border: 1.5px solid rgba(120, 6, 6, 0.55); box-shadow: 0 20px 45px rgba(0, 0, 0, 0.75), 0 0 25px rgba(120, 6, 6, 0.35); overflow: hidden; transition: all 0.3s ease;">
+        <!-- ===================== TICKET ===================== -->
+        <table class="ct-wrap" width="600" cellpadding="0" cellspacing="0" border="0" role="presentation"
+               style="width:600px; max-width:600px; background-color:#0d0101; background-image:url('{{ bg_asset }}'); background-size:cover; background-position:center; background-repeat:no-repeat;">
+
+          <!-- 1. Franja superior: cinta de marca -->
           <tr>
-            <td align="center" valign="top">
+            <td style="background-color:#780606; padding:0;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+                <tr>
+                  <td width="44" valign="middle" style="padding:10px 0 10px 18px;">
+                    <img src="{{ logo_asset }}" onerror="this.onerror=null;this.src='spike.png';" width="26" height="26" alt="{{ shop.name | default: 'Spike' }}" style="width:26px; height:26px;">
+                  </td>
+                  <td valign="middle" class="ct-title" style="padding:10px 8px; font-family:'Luckiest Guy', Impact, sans-serif; font-size:15px; letter-spacing:3px; color:#ffffff; text-transform:uppercase;">
+                    Welcome to the chaos
+                  </td>
+                  <td align="right" valign="middle" class="ct-display ct-hide-sm" style="padding:10px 18px 10px 8px; font-family:'Carter One', 'Trebuchet MS', sans-serif; font-size:12px; letter-spacing:2px; color:#000000; text-transform:uppercase;">
+                    Ticket Nº 001
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-              <!-- Capa de oscurecimiento / gradiente semitransparente para máxima legibilidad -->
-              <div style="background: linear-gradient(180deg, rgba(10, 2, 2, 0.85) 0%, rgba(18, 3, 3, 0.88) 50%, rgba(10, 2, 2, 0.92) 100%);">
-                <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
-                  <tr>
-                    <td class="gc-card-padding" align="center" style="padding: 42px 34px 38px 34px;">
+          <!-- Contenido sobre fondoini.jpg con velo oscuro -->
+          <tr>
+            <td style="background-color:rgba(8,0,0,0.80); padding:0;">
 
-                      <!-- 1. Encabezado minimalista: Logo discreto Spike -->
-                      <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin-bottom: 24px;">
-                        <tr>
-                          <td align="center">
-                            <a href="{{ store_url }}" target="_blank" style="text-decoration: none; display: inline-block;">
-                              <img
-                                src="{{ logo_asset }}"
-                                onerror="this.onerror=null;this.src='spike.png';"
-                                alt="{{ shop.name | default: 'Spike' }}"
-                                width="36"
-                                height="36"
-                                style="width: 36px; height: 36px; object-fit: contain; display: block; margin: 0 auto; filter: drop-shadow(0 2px 8px rgba(120, 6, 6, 0.6));"
-                              >
-                            </a>
+              <!-- 2. Héroe: número gigante + oferta -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+                <tr>
+                  <td class="ct-col ct-pad" width="330" valign="bottom" style="padding:40px 0 10px 34px;">
+                    <table cellpadding="0" cellspacing="0" border="0" role="presentation">
+                      <tr>
+                        <td class="ct-display" style="border-left:5px solid #780606; padding:2px 0 2px 10px; font-family:'Carter One', 'Trebuchet MS', sans-serif; font-size:13px; letter-spacing:3px; color:#ffffff; text-transform:uppercase;">
+                          Oferta especial
+                        </td>
+                      </tr>
+                    </table>
+                    <div class="ct-title ct-giant" style="font-family:'Luckiest Guy', Impact, sans-serif; font-size:138px; line-height:128px; color:#ffffff; letter-spacing:-2px; text-shadow:7px 7px 0 #780606; margin-top:14px;">
+                      10%
+                    </div>
+                  </td>
+                  <td class="ct-col ct-pad" valign="bottom" style="padding:40px 34px 18px 10px;">
+                    <div class="ct-title" style="font-family:'Luckiest Guy', Impact, sans-serif; font-size:34px; line-height:34px; color:#ffffff; text-transform:uppercase;">
+                      de<br>descuento
+                    </div>
+                    <div class="ct-display" style="font-family:'Carter One', 'Trebuchet MS', sans-serif; font-size:15px; color:#ff4d4d; margin-top:8px; letter-spacing:1px;">
+                      en Página de inicio
+                    </div>
+                    <div style="width:56px; height:6px; background-color:#780606; margin-top:14px; font-size:1px; line-height:1px;">&nbsp;</div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- 3. Título estilo nota de rescate -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+                <tr>
+                  <td class="ct-pad ct-title ct-ransom" style="padding:26px 34px 6px 34px; font-family:'Luckiest Guy', Impact, sans-serif; font-size:28px; line-height:50px; text-transform:uppercase;">
+                    <span style="background-color:#ffffff; color:#000000; padding:4px 10px;">Te</span>
+                    <span style="background-color:#000000; color:#ffffff; padding:4px 10px; border:2px solid #ffffff;">damos</span>
+                    <span style="background-color:#780606; color:#ffffff; padding:4px 10px;">la</span>
+                    <span style="background-color:#ffffff; color:#780606; padding:4px 10px;">bienvenida</span>
+                    <span style="background-color:#000000; color:#ffffff; padding:4px 10px; border:2px solid #780606;">al</span>
+                    <span style="background-color:#780606; color:#000000; padding:4px 12px;">caos.</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="ct-pad" style="padding:14px 34px 0 34px; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size:15px; line-height:24px; color:#e5e5e5;">
+                    ¡Qué bueno tenerte aquí! Disfruta este descuento en tu primera compra.
+                  </td>
+                </tr>
+              </table>
+
+              <!-- 4. Código en fichas individuales -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+                <tr>
+                  <td class="ct-pad ct-display" style="padding:30px 34px 10px 34px; font-family:'Carter One', 'Trebuchet MS', sans-serif; font-size:12px; letter-spacing:3px; color:#ff4d4d; text-transform:uppercase;">
+                    Usa el código
+                  </td>
+                </tr>
+                <tr>
+                  <td class="ct-pad" style="padding:0 34px;">
+                    <table cellpadding="0" cellspacing="0" border="0" role="presentation" id="ctTiles" onclick="ctCopyCode()" title="Copiar código">
+                      <tr>
+                        {%- for ch in code_chars -%}
+                          {%- assign odd = forloop.index | modulo: 2 -%}
+                          <td style="padding:0 4px 0 0;">
+                            <div class="ct-tile ct-title" style="width:38px; height:50px; line-height:52px; text-align:center; font-family:'Luckiest Guy', Impact, sans-serif; font-size:26px; {% if odd == 1 %}background-color:#ffffff; color:#000000;{% else %}background-color:#780606; color:#ffffff;{% endif %}">{{ ch }}</div>
                           </td>
-                        </tr>
-                      </table>
+                        {%- endfor -%}
+                      </tr>
+                    </table>
+                    <span id="ctCode" style="display:none;">{{ discount_code }}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="ct-pad" style="padding:14px 34px 0 34px; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size:13.5px; line-height:22px; color:#a3a3a3;">
+                    Usa el código: <strong style="color:#ffffff;">{{ discount_code }}</strong> al pagar, o haz clic en el enlace de abajo para aplicar el descuento automáticamente a tu pedido.
+                    <span id="ctCopyMsg" style="color:#ff4d4d; font-weight:700;"></span>
+                  </td>
+                </tr>
+              </table>
 
-                      <!-- 2. Insignia minimalista: Oferta especial -->
-                      <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin-bottom: 16px;">
-                        <tr>
-                          <td align="center" style="background-color: rgba(120, 6, 6, 0.25); border: 1px solid #780606; border-radius: 20px; padding: 4px 14px;">
-                            <span class="gc-font-display" style="font-family: 'Carter One', 'Trebuchet MS', sans-serif; font-size: 12px; color: #fca5a5; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; display: block; line-height: 1.2;">
-                              Oferta especial
-                            </span>
-                          </td>
-                        </tr>
-                      </table>
+              <!-- 5. CTA en barra completa -->
+              <table class="ct-cta-row" width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+                <tr>
+                  <td style="padding:30px 0 0 0;">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+                      <tr>
+                        <td style="background-color:#780606;">
+                          <a href="{{ discount_url }}" target="_blank" class="ct-title ct-cta-main"
+                             style="display:block; background-color:#780606; color:#ffffff; text-decoration:none; font-family:'Luckiest Guy', Impact, sans-serif; font-size:21px; letter-spacing:3px; text-transform:uppercase; padding:22px 0 20px 34px;">
+                            Aplicar descuento
+                          </a>
+                        </td>
+                        <td width="76" style="background-color:#000000;">
+                          <a href="{{ discount_url }}" target="_blank" class="ct-cta-arrow"
+                             style="display:block; background-color:#000000; color:#ffffff; text-decoration:none; text-align:center; font-family:Arial, sans-serif; font-size:30px; font-weight:700; padding:16px 0 18px 0;">
+                            &rarr;
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
 
-                      <!-- 3. Título principal: "Te damos la bienvenida al caos." -->
-                      <h1 class="gc-font-title gc-title-text" style="font-family: 'Luckiest Guy', Impact, sans-serif; font-size: 32px; line-height: 1.15; letter-spacing: 0.03em; color: #ffffff; margin: 0 0 10px 0; text-align: center; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);">
-                        Te damos la bienvenida al caos.
-                      </h1>
-
-                      <!-- 4. Subtítulo: "¡Qué bueno tenerte aquí! Disfruta este descuento..." -->
-                      <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14.5px; line-height: 1.55; color: #cbd5e1; margin: 0 auto 24px auto; max-width: 440px; text-align: center;">
-                        ¡Qué bueno tenerte aquí! Disfruta este descuento en tu primera compra.
-                      </p>
-
-                      <!-- Línea divisoria sutil -->
-                      <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin-bottom: 24px;">
-                        <tr>
-                          <td style="border-bottom: 1px solid rgba(120, 6, 6, 0.4); height: 1px; font-size: 1px; line-height: 1px;">&nbsp;</td>
-                        </tr>
-                      </table>
-
-                      <!-- 5. Destacado central minimalista: "10% de descuento en Página de inicio" -->
-                      <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin-bottom: 22px;">
-                        <tr>
-                          <td align="center">
-                            <div class="gc-font-title gc-offer-val" style="font-family: 'Luckiest Guy', Impact, sans-serif; font-size: 34px; line-height: 1.1; letter-spacing: 0.04em; color: #ff3b3b; text-shadow: 0 0 18px rgba(255, 59, 59, 0.45); margin-bottom: 4px;">
-                              10% de descuento
-                            </div>
-                            <div class="gc-font-display" style="font-family: 'Carter One', 'Trebuchet MS', sans-serif; font-size: 13.5px; color: #fca5a5; letter-spacing: 0.04em; text-transform: uppercase;">
-                              en Página de inicio
-                            </div>
-                          </td>
-                        </tr>
-                      </table>
-
-                      <!-- 6. Instrucciones del código -->
-                      <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 13.5px; line-height: 1.6; color: #94a3b8; margin: 0 auto 18px auto; max-width: 450px; text-align: center;">
-                        Usa el código: <strong class="gc-font-display" style="font-family: 'Carter One', monospace; font-size: 15px; color: #ffffff; letter-spacing: 0.05em;">{{ discount_code }}</strong> al pagar, o haz clic en el enlace de abajo para aplicar el descuento automáticamente a tu pedido.
-                      </p>
-
-                      <!-- 7. Caja minimalista del código (Ticket pill para correo y web) -->
-                      <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin: 0 auto 26px auto;">
-                        <tr>
-                          <td class="gc-copy-action" onclick="copyGiftCardCode()" style="background-color: rgba(0, 0, 0, 0.65); border: 1.5px dashed #780606; border-radius: 12px; padding: 12px 24px; text-align: center;">
-                            <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin: 0 auto;">
-                              <tr>
-                                <td align="center" style="padding-right: 10px;">
-                                  <span style="font-size: 10px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; display: block; margin-bottom: 2px;">CÓDIGO</span>
-                                  <span id="gcCodeDisplay" class="gc-font-display" style="font-family: 'Carter One', monospace; font-size: 22px; color: #ffffff; letter-spacing: 0.12em; font-weight: 700; user-select: all; display: block;">{{ discount_code }}</span>
-                                </td>
-                                <td align="center" style="border-left: 1px solid rgba(120, 6, 6, 0.4); padding-left: 12px;">
-                                  <span id="gcCopyLabel" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 11px; font-weight: 700; color: #fca5a5; text-transform: uppercase; letter-spacing: 0.04em;">Copiar</span>
-                                </td>
-                              </tr>
-                            </table>
-                          </td>
-                        </tr>
-                      </table>
-
-                      <!-- 8. Botón Principal CTA: [Aplicar descuento] (Bulletproof Button para correo) -->
-                      <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
-                        <tr>
-                          <td align="center">
-                            <div>
-                              <!--[if mso]>
-                              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ discount_url }}" style="height:52px;v-text-anchor:middle;width:320px;" arcsize="20%" strokecolor="#780606" fillcolor="#780606">
-                              <w:anchorlock/>
-                              <center style="color:#ffffff;font-family:Impact, Arial Black, sans-serif;font-size:17px;font-weight:bold;letter-spacing:1px;">APLICAR DESCUENTO</center>
-                              </v:roundrect>
-                              <![endif]-->
-                              <a
-                                href="{{ discount_url }}"
-                                target="_blank"
-                                class="gc-font-title gc-btn-cta gc-btn-hover"
-                                style="background-color: #780606; border: 1.5px solid #780606; border-radius: 12px; color: #ffffff; display: inline-block; font-family: 'Luckiest Guy', Impact, sans-serif; font-size: 17px; letter-spacing: 0.06em; line-height: 1; padding: 16px 36px; text-align: center; text-decoration: none; text-transform: uppercase; -webkit-text-size-adjust: none; mso-hide: all; box-shadow: 0 8px 22px rgba(120, 6, 6, 0.45); transition: all 0.2s ease;"
-                              >
-                                Aplicar descuento
-                              </a>
-                            </div>
-                          </td>
-                        </tr>
-                      </table>
-
-                      {% if gift_card and gift_card.balance %}
-                        <p style="font-size: 12px; color: #94a3b8; margin: 16px 0 0 0; text-align: center;">
-                          Saldo: {{ gift_card.balance | money_with_currency }}
-                        </p>
-                      {% endif %}
-
-                      <!-- 9. Pie minimalista -->
-                      <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin-top: 28px;">
-                        <tr>
-                          <td align="center" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 11.5px; color: #64748b; line-height: 1.5;">
-                            {{ shop.name | default: 'w-belm' }} • El descuento se aplica automáticamente al hacer clic.<br>
-                            <a href="{{ store_url }}" target="_blank" style="color: #94a3b8; text-decoration: underline; margin-top: 4px; display: inline-block;">
-                              Visitar la tienda
-                            </a>
-                          </td>
-                        </tr>
-                      </table>
-
-                    </td>
-                  </tr>
-                </table>
-              </div>
+              <!-- 6. Pie: código de barras decorativo + datos de tienda -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+                <tr>
+                  <td class="ct-col ct-pad" valign="middle" style="padding:24px 0 26px 34px;">
+                    <table cellpadding="0" cellspacing="0" border="0" role="presentation">
+                      <tr>
+                        {%- for w in barcode -%}
+                          {%- assign px = w | times: 2 -%}
+                          {%- assign even = forloop.index | modulo: 2 -%}
+                          <td width="{{ px }}" height="34" style="width:{{ px }}px; height:34px; font-size:1px; line-height:1px; background-color:{% if even == 1 %}#ffffff{% else %}transparent{% endif %};">&nbsp;</td>
+                        {%- endfor -%}
+                      </tr>
+                    </table>
+                    <div class="ct-display" style="font-family:'Carter One', 'Trebuchet MS', sans-serif; font-size:10px; letter-spacing:5px; color:#737373; margin-top:4px;">{{ discount_code }}</div>
+                  </td>
+                  <td class="ct-col ct-pad" align="right" valign="middle" style="padding:24px 34px 26px 10px; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size:12px; line-height:19px; color:#737373; text-align:right;">
+                    <span class="ct-display" style="font-family:'Carter One', 'Trebuchet MS', sans-serif; color:#ffffff; font-size:14px;">{{ shop.name | default: 'w-belm' }}</span><br>
+                    {% if gift_card and gift_card.balance %}Saldo: {{ gift_card.balance | money_with_currency }}<br>{% endif %}
+                    <a href="{{ store_url }}" target="_blank" style="color:#ff4d4d; text-decoration:none;">Visitar la tienda &rsaquo;</a>
+                  </td>
+                </tr>
+              </table>
 
             </td>
+          </tr>
+
+          <!-- 7. Franja inferior delgada -->
+          <tr>
+            <td style="background-color:#780606; height:8px; font-size:1px; line-height:1px;">&nbsp;</td>
           </tr>
         </table>
 
@@ -294,45 +260,31 @@
     </tr>
   </table>
 
-  <!-- Script interactivo de copiado rápido (se activa cuando se visualiza en navegador web) -->
+  <!-- Copiado del código (solo en navegador; los clientes de correo ignoran scripts) -->
   <script type="text/javascript">
-    function copyGiftCardCode() {
-      var codeElem = document.getElementById('gcCodeDisplay');
-      var labelElem = document.getElementById('gcCopyLabel');
-      var code = (codeElem ? codeElem.innerText : '{{ discount_code }}').trim();
-
+    function ctCopyCode() {
+      var code = (document.getElementById('ctCode') || {}).textContent || '{{ discount_code }}';
+      code = code.trim();
+      var msg = document.getElementById('ctCopyMsg');
+      function done() {
+        if (!msg) return;
+        msg.textContent = ' ¡Código copiado!';
+        setTimeout(function () { msg.textContent = ''; }, 2200);
+      }
       if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(code).then(showSuccess, fallbackCopy);
+        navigator.clipboard.writeText(code).then(done, fallback);
       } else {
-        fallbackCopy();
+        fallback();
       }
-
-      function fallbackCopy() {
-        var textarea = document.createElement('textarea');
-        textarea.value = code;
-        textarea.style.position = 'fixed';
-        textarea.style.left = '-9999px';
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        try {
-          document.execCommand('copy');
-          showSuccess();
-        } catch (e) {
-          console.error(e);
-        }
-        document.body.removeChild(textarea);
-      }
-
-      function showSuccess() {
-        if (!labelElem) return;
-        var prev = labelElem.innerText;
-        labelElem.innerText = '¡Copiado!';
-        labelElem.style.color = '#ffffff';
-        setTimeout(function() {
-          labelElem.innerText = prev;
-          labelElem.style.color = '#fca5a5';
-        }, 2200);
+      function fallback() {
+        var t = document.createElement('textarea');
+        t.value = code;
+        t.style.position = 'fixed';
+        t.style.left = '-9999px';
+        document.body.appendChild(t);
+        t.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(t);
       }
     }
   </script>

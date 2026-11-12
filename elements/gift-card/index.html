@@ -1,523 +1,252 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prototipo Gift Card Minimalista (Correo & Tienda) | w-belm</title>
+  <title>Gift Card · Chaos Ticket | w-belm</title>
   <link rel="icon" type="image/png" href="spike.png">
-
-  <!-- Google Fonts: Carter One & Luckiest Guy -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Carter+One&family=Luckiest+Guy&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="style.css">
-
-  <style>
-    /* ==========================================================================
-       BARRA DE PRUEBAS Y AMBIENTE DE SIMULACIÓN
-       ========================================================================== */
-    body {
-      background-color: #070709;
-      background-image:
-        radial-gradient(circle at 50% 0%, rgba(120, 6, 6, 0.28) 0%, transparent 60%),
-        radial-gradient(circle at 85% 90%, rgba(120, 6, 6, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 15% 70%, rgba(20, 20, 24, 0.7) 0%, transparent 45%);
-      color: #f1f5f9;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      margin: 0;
-      padding: 0;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* Barra superior de herramientas */
-    .tb-header {
-      background: rgba(14, 14, 18, 0.94);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .tb-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .tb-back-btn {
-      color: #94a3b8;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      transition: all 0.2s;
-    }
-
-    .tb-back-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: #ffffff;
-    }
-
-    .tb-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .tb-badge {
-      font-size: 11px;
-      padding: 2px 8px;
-      background: rgba(120, 6, 6, 0.25);
-      border: 1px solid rgba(120, 6, 6, 0.5);
-      color: #fca5a5;
-      border-radius: 9999px;
-      font-weight: 700;
-    }
-
-    .tb-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .tb-btn {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #e2e8f0;
-      font-size: 12.5px;
-      font-weight: 600;
-      padding: 6px 13px;
-      border-radius: 8px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
-    }
-
-    .tb-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-      color: #ffffff;
-    }
-
-    .tb-btn.active {
-      background: #780606;
-      border-color: #780606;
-      color: #ffffff;
-      box-shadow: 0 0 12px rgba(120, 6, 6, 0.4);
-    }
-
-    /* Área central de previsualización */
-    .tb-stage {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 16px;
-      transition: all 0.3s ease;
-    }
-
-    /* Modo móvil */
-    .tb-stage.mode-mobile .gc-card-container {
-      max-width: 375px;
-      box-shadow: 0 0 0 10px #18181b, 0 0 0 12px rgba(255, 255, 255, 0.1);
-      border-radius: 24px;
-    }
-
-    /* Modo simulador de correo electrónico */
-    .tb-email-window {
-      display: none;
-      width: 100%;
-      max-width: 640px;
-      background: #111116;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
-      overflow: hidden;
-      margin-bottom: 24px;
-    }
-
-    .tb-stage.mode-email .tb-email-window {
-      display: block;
-    }
-
-    .tb-email-header {
-      background: #16161d;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 14px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      font-size: 13px;
-    }
-
-    .tb-email-row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .tb-email-label {
-      color: #64748b;
-      font-weight: 600;
-      min-width: 65px;
-    }
-
-    .tb-email-val {
-      color: #e2e8f0;
-      font-weight: 600;
-    }
-
-    /* Sección explicativa */
-    .tb-docs {
-      max-width: 760px;
-      width: 100%;
-      margin: 30px auto 20px auto;
-      padding: 0 16px;
-    }
-
-    .tb-docs-card {
-      background: rgba(20, 20, 24, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 24px;
-    }
-
-    .tb-docs-card h2 {
-      font-size: 17px;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .tb-docs-card p {
-      font-size: 13.5px;
-      color: #94a3b8;
-      line-height: 1.6;
-      margin-bottom: 14px;
-    }
-
-    .tb-docs-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 14px;
-    }
-
-    .tb-doc-box {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 10px;
-      padding: 14px;
-    }
-
-    .tb-doc-box h3 {
-      font-size: 13.5px;
-      font-weight: 700;
-      color: #fca5a5;
-      margin-bottom: 6px;
-    }
-
-    .tb-doc-box code {
-      background: rgba(255, 255, 255, 0.08);
-      color: #fef08a;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-family: monospace;
-    }
-
-    .tb-footer {
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 20px 0;
-      text-align: center;
-      font-size: 12.5px;
-      color: #64748b;
-      margin-top: auto;
-    }
-  </style>
 </head>
-
 <body>
 
-  <!-- Barra superior de pruebas -->
-  <header class="tb-header">
+  <!-- Barra de pruebas -->
+  <header class="tb-bar">
     <div class="tb-left">
-      <a href="../../index.html" class="tb-back-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        <span>Volver al Catálogo</span>
-      </a>
-      <div class="tb-title">
-        <span>Gift Card Minimalista (Correo & Tienda)</span>
-        <span class="tb-badge">gift_card.liquid</span>
-      </div>
+      <a class="tb-link" href="../../index.html">&larr; Catálogo</a>
+      <span class="tb-name">CHAOS TICKET · gift_card.liquid</span>
     </div>
-
-    <div class="tb-controls">
-      <button type="button" class="tb-btn active" id="btnModeDesktop" onclick="setMode('desktop')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-          <line x1="8" y1="21" x2="16" y2="21"></line>
-          <line x1="12" y1="17" x2="12" y2="21"></line>
-        </svg>
-        <span>Desktop</span>
-      </button>
-
-      <button type="button" class="tb-btn" id="btnModeMobile" onclick="setMode('mobile')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-          <line x1="12" y1="18" x2="12.01" y2="18"></line>
-        </svg>
-        <span>Móvil</span>
-      </button>
-
-      <button type="button" class="tb-btn" id="btnModeEmail" onclick="setMode('email')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-          <polyline points="22,6 12,13 2,6"></polyline>
-        </svg>
-        <span>Simulador Correo</span>
-      </button>
-
-      <button type="button" class="tb-btn" onclick="window.print()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="6 9 6 2 18 2 18 9"></polyline>
-          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-          <rect x="6" y="14" width="12" height="8"></rect>
-        </svg>
-        <span>Imprimir</span>
-      </button>
+    <div class="tb-modes" role="group" aria-label="Vista">
+      <button type="button" class="tb-btn is-active" data-mode="desktop">Desktop</button>
+      <button type="button" class="tb-btn" data-mode="mobile">Móvil</button>
+      <button type="button" class="tb-btn" data-mode="email">Correo</button>
+      <button type="button" class="tb-btn" data-mode="print">Imprimir</button>
     </div>
   </header>
 
-  <!-- Escenario de previsualización -->
   <main class="tb-stage" id="tbStage">
 
-    <!-- Simulador de ventana de correo cliente -->
-    <div class="tb-email-window">
-      <div class="tb-email-header">
-        <div class="tb-email-row">
-          <span class="tb-email-label">De:</span>
-          <span class="tb-email-val">Tienda Oficial &lt;notificaciones@w-belm.com&gt;</span>
-        </div>
-        <div class="tb-email-row">
-          <span class="tb-email-label">Para:</span>
-          <span class="tb-email-val">cliente@ejemplo.com</span>
-        </div>
-        <div class="tb-email-row">
-          <span class="tb-email-label">Asunto:</span>
-          <span class="tb-email-val">Te damos la bienvenida al caos — Disfruta tu 10% de descuento</span>
-        </div>
-      </div>
+    <!-- Encabezado simulado de cliente de correo -->
+    <div class="tb-mail">
+      <div class="tb-mail-row"><b>De</b><span>w-belm &lt;hola@w-belm.com&gt;</span></div>
+      <div class="tb-mail-row"><b>Asunto</b><span>Te damos la bienvenida al caos · 10% en tu primera compra</span></div>
     </div>
 
-    <!-- TARJETA DE REGALO MINIMALISTA (Fondo Completo con fondoini.jpg) -->
-    <article class="gc-card-container" aria-label="Tarjeta de descuento y bienvenida">
-      <div class="gc-card-overlay">
+    <div class="tb-frame">
+      <!-- ===================== TICKET (mismo marcado que gift_card.liquid) ===================== -->
+      <table class="ct-wrap" width="600" cellpadding="0" cellspacing="0" border="0" role="presentation"
+             style="width:100%; max-width:600px; background-color:#0d0101; background-image:url('fondoini.jpg'); background-size:cover; background-position:center; background-repeat:no-repeat;">
 
-        <!-- 1. Encabezado minimalista: Logo Spike discreto -->
-        <img
-          class="gc-logo-minimal"
-          src="spike.png"
-          alt="Spike Logo"
-        >
+        <!-- 1. Franja superior -->
+        <tr>
+          <td style="background-color:#780606; padding:0;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+              <tr>
+                <td width="44" valign="middle" style="padding:10px 0 10px 18px;">
+                  <img src="spike.png" width="26" height="26" alt="Spike" style="width:26px; height:26px;">
+                </td>
+                <td valign="middle" class="ct-title" style="padding:10px 8px; font-size:15px; letter-spacing:3px; color:#ffffff; text-transform:uppercase;">
+                  Welcome to the chaos
+                </td>
+                <td align="right" valign="middle" class="ct-display ct-hide-sm" style="padding:10px 18px 10px 8px; font-size:12px; letter-spacing:2px; color:#000000; text-transform:uppercase;">
+                  Ticket Nº 001
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
 
-        <!-- 2. Insignia minimalista: Oferta especial -->
-        <div class="gc-badge-minimal">
-          <span class="gc-badge-text">Oferta especial</span>
-        </div>
+        <tr>
+          <td style="background-color:rgba(8,0,0,0.80); padding:0;">
 
-        <!-- 3. Título principal: "Te damos la bienvenida al caos." -->
-        <h1 class="gc-title-text">Te damos la bienvenida al caos.</h1>
+            <!-- 2. Héroe -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+              <tr>
+                <td class="ct-col ct-pad" width="330" valign="bottom" style="padding:40px 0 10px 34px;">
+                  <table cellpadding="0" cellspacing="0" border="0" role="presentation">
+                    <tr>
+                      <td class="ct-display" style="border-left:5px solid #780606; padding:2px 0 2px 10px; font-size:13px; letter-spacing:3px; color:#ffffff; text-transform:uppercase;">
+                        Oferta especial
+                      </td>
+                    </tr>
+                  </table>
+                  <div class="ct-title ct-giant" style="font-size:138px; line-height:128px; color:#ffffff; letter-spacing:-2px; text-shadow:7px 7px 0 #780606; margin-top:14px;">
+                    10%
+                  </div>
+                </td>
+                <td class="ct-col ct-pad" valign="bottom" style="padding:40px 34px 18px 10px;">
+                  <div class="ct-title" style="font-size:34px; line-height:34px; color:#ffffff; text-transform:uppercase;">
+                    de<br>descuento
+                  </div>
+                  <div class="ct-display" style="font-size:15px; color:#ff4d4d; margin-top:8px; letter-spacing:1px;">
+                    en Página de inicio
+                  </div>
+                  <div style="width:56px; height:6px; background-color:#780606; margin-top:14px; font-size:1px; line-height:1px;">&nbsp;</div>
+                </td>
+              </tr>
+            </table>
 
-        <!-- 4. Subtítulo: "¡Qué bueno tenerte aquí! Disfruta este descuento..." -->
-        <p class="gc-subtitle-text">
-          ¡Qué bueno tenerte aquí! Disfruta este descuento en tu primera compra.
-        </p>
+            <!-- 3. Título nota de rescate -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+              <tr>
+                <td class="ct-pad ct-title ct-ransom" style="padding:26px 34px 6px 34px; font-size:28px; line-height:50px; text-transform:uppercase;">
+                  <span style="background-color:#ffffff; color:#000000; padding:4px 10px;">Te</span>
+                  <span style="background-color:#000000; color:#ffffff; padding:4px 10px; border:2px solid #ffffff;">damos</span>
+                  <span style="background-color:#780606; color:#ffffff; padding:4px 10px;">la</span>
+                  <span style="background-color:#ffffff; color:#780606; padding:4px 10px;">bienvenida</span>
+                  <span style="background-color:#000000; color:#ffffff; padding:4px 10px; border:2px solid #780606;">al</span>
+                  <span style="background-color:#780606; color:#000000; padding:4px 12px;">caos.</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="ct-pad" style="padding:14px 34px 0 34px; font-size:15px; line-height:24px; color:#e5e5e5;">
+                  ¡Qué bueno tenerte aquí! Disfruta este descuento en tu primera compra.
+                </td>
+              </tr>
+            </table>
 
-        <!-- Divisor sutil -->
-        <hr class="gc-divider">
+            <!-- 4. Código en fichas -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+              <tr>
+                <td class="ct-pad ct-display" style="padding:30px 34px 10px 34px; font-size:12px; letter-spacing:3px; color:#ff4d4d; text-transform:uppercase;">
+                  Usa el código
+                </td>
+              </tr>
+              <tr>
+                <td class="ct-pad" style="padding:0 34px;">
+                  <table cellpadding="0" cellspacing="0" border="0" role="presentation" id="ctTiles" onclick="ctCopyCode()" title="Copiar código">
+                    <tr id="ctTilesRow"></tr>
+                  </table>
+                  <span id="ctCode" style="display:none;">WELCOME10</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="ct-pad" style="padding:14px 34px 0 34px; font-size:13.5px; line-height:22px; color:#a3a3a3;">
+                  Usa el código: <strong style="color:#ffffff;">WELCOME10</strong> al pagar, o haz clic en el enlace de abajo para aplicar el descuento automáticamente a tu pedido.
+                  <span id="ctCopyMsg" style="color:#ff4d4d; font-weight:700;"></span>
+                </td>
+              </tr>
+            </table>
 
-        <!-- 5. Destacado central minimalista: "10% de descuento en Página de inicio" -->
-        <div class="gc-offer-val">10% de descuento</div>
-        <div class="gc-offer-label">en Página de inicio</div>
+            <!-- 5. CTA -->
+            <table class="ct-cta-row" width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+              <tr>
+                <td style="padding:30px 0 0 0;">
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+                    <tr>
+                      <td style="background-color:#780606;">
+                        <a href="https://tu-tienda.myshopify.com/discount/WELCOME10?redirect=/" target="_blank" rel="noopener" class="ct-title ct-cta-main"
+                           style="display:block; background-color:#780606; color:#ffffff; text-decoration:none; font-size:21px; letter-spacing:3px; text-transform:uppercase; padding:22px 0 20px 34px;">
+                          Aplicar descuento
+                        </a>
+                      </td>
+                      <td width="76" style="background-color:#000000;">
+                        <a href="https://tu-tienda.myshopify.com/discount/WELCOME10?redirect=/" target="_blank" rel="noopener" class="ct-cta-arrow"
+                           style="display:block; background-color:#000000; color:#ffffff; text-decoration:none; text-align:center; font-family:Arial, sans-serif; font-size:30px; font-weight:700; padding:16px 0 18px 0;">
+                          &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
 
-        <!-- 6. Instrucciones del código -->
-        <p class="gc-instructions-text">
-          Usa el código: <strong>WELCOME10</strong> al pagar, o haz clic en el enlace de abajo para aplicar el descuento automáticamente a tu pedido.
-        </p>
+            <!-- 6. Pie -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+              <tr>
+                <td class="ct-col ct-pad" valign="middle" style="padding:24px 0 26px 34px;">
+                  <table cellpadding="0" cellspacing="0" border="0" role="presentation">
+                    <tr id="ctBarcode"></tr>
+                  </table>
+                  <div class="ct-display" style="font-size:10px; letter-spacing:5px; color:#737373; margin-top:4px;">WELCOME10</div>
+                </td>
+                <td class="ct-col ct-pad" align="right" valign="middle" style="padding:24px 34px 26px 10px; font-size:12px; line-height:19px; color:#737373; text-align:right;">
+                  <span class="ct-display" style="color:#ffffff; font-size:14px;">w-belm</span><br>
+                  <a href="https://tu-tienda.myshopify.com" target="_blank" rel="noopener" style="color:#ff4d4d; text-decoration:none;">Visitar la tienda &rsaquo;</a>
+                </td>
+              </tr>
+            </table>
 
-        <!-- 7. Caja minimalista del código (Ticket pill con copiado en un clic) -->
-        <div>
-          <div class="gc-coupon-pill" id="gcCouponPill" onclick="copyGiftCardCode()" title="Haz clic para copiar">
-            <div>
-              <span style="font-size: 10px; font-family: -apple-system, sans-serif; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; display: block; margin-bottom: 2px;">CÓDIGO</span>
-              <span class="gc-code-display" id="gcCodeDisplay">WELCOME10</span>
-            </div>
-            <span class="gc-copy-label" id="gcCopyLabel">Copiar</span>
-          </div>
-        </div>
+          </td>
+        </tr>
 
-        <!-- 8. Botón Principal CTA: [Aplicar descuento] -->
-        <div>
-          <a
-            href="https://tu-tienda.myshopify.com/discount/WELCOME10?redirect=/"
-            class="gc-btn-cta"
-            target="_blank"
-            rel="noopener"
-          >
-            Aplicar descuento
-          </a>
-        </div>
-
-        <!-- 9. Pie minimalista -->
-        <div class="gc-footer-meta">
-          w-belm • El descuento se aplica automáticamente al hacer clic.<br>
-          <a href="https://tu-tienda.myshopify.com" target="_blank" rel="noopener" class="gc-footer-link">
-            Visitar la tienda
-          </a>
-        </div>
-
-      </div>
-    </article>
-
+        <!-- 7. Franja inferior -->
+        <tr>
+          <td style="background-color:#780606; height:8px; font-size:1px; line-height:1px;">&nbsp;</td>
+        </tr>
+      </table>
+    </div>
   </main>
 
-  <!-- Documentación -->
-  <section class="tb-docs">
-    <div class="tb-docs-card">
-      <h2>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="16" x2="12" y2="12"></line>
-          <line x1="12" y1="8" x2="12.01" y2="8"></line>
-        </svg>
-        <span>Diferencias clave respecto al desplegable de Spike</span>
-      </h2>
-      <p>
-        A diferencia del modal de Spike (que tiene banner recortado, fondo blanco tipo popup y avatar circular sobre el corte), esta tarjeta de regalo está concebida como un <strong>voucher digital / email template minimalista</strong>:
-      </p>
-
-      <div class="tb-docs-grid">
-        <div class="tb-doc-box">
-          <h3>Fondo Integral con fondoini.jpg</h3>
-          <p>
-            Toda la tarjeta está envuelta en la textura artística de <code>fondoini.jpg</code> con oscurecimiento carmesí de alto contraste.
-          </p>
-        </div>
-
-        <div class="tb-doc-box">
-          <h3>100% Compatible con Clientes de Correo</h3>
-          <p>
-            Construida con tablas HTML híbridas, estilos inlined y etiquetas VML para Outlook, garantizando que llegue perfecta a Gmail, Outlook y Apple Mail.
-          </p>
-        </div>
-
-        <div class="tb-doc-box">
-          <h3>Composición Minimalista</h3>
-          <p>
-            Logotipo Spike discreto en cabecera, ticket pill para el cupón y botón sólido carmesí <code>[Aplicar descuento]</code> con auto-aplicación en Shopify.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <footer class="tb-footer">
-    <p>w-belm • Elemento Gift Card Minimalista • <a href="https://github.com/whoisgiov2/w-belm" style="color: #a5b4fc; text-decoration: none;" target="_blank" rel="noopener">github.com/whoisgiov2/w-belm</a></p>
+  <footer class="tb-foot">
+    w-belm · Chaos Ticket · <a href="https://github.com/whoisgiov2/w-belm" target="_blank" rel="noopener">github.com/whoisgiov2/w-belm</a>
   </footer>
 
   <script>
-    function setMode(mode) {
+    (function () {
+      // Fichas del código (en Liquid se generan con un bucle sobre discount_code)
+      var code = document.getElementById('ctCode').textContent.trim();
+      var row = document.getElementById('ctTilesRow');
+      code.split('').forEach(function (ch, i) {
+        var td = document.createElement('td');
+        td.style.padding = '0 4px 0 0';
+        var odd = i % 2 === 0;
+        td.innerHTML = '<div class="ct-tile ct-title" style="width:38px;height:50px;line-height:52px;text-align:center;font-size:26px;' +
+          (odd ? 'background-color:#ffffff;color:#000000;' : 'background-color:#780606;color:#ffffff;') + '">' + ch + '</div>';
+        row.appendChild(td);
+      });
+
+      // Código de barras decorativo (mismo patrón que en Liquid)
+      var bars = [3,1,1,2,4,1,2,1,1,3,2,1,1,1,4,2,1,2,3,1,1,2,2,1,3,1,1,4,1,2];
+      var bc = document.getElementById('ctBarcode');
+      bars.forEach(function (w, i) {
+        var td = document.createElement('td');
+        var px = w * 2;
+        td.style.cssText = 'width:' + px + 'px;height:34px;font-size:1px;line-height:1px;background-color:' + (i % 2 === 0 ? '#ffffff' : 'transparent') + ';';
+        td.innerHTML = '&nbsp;';
+        bc.appendChild(td);
+      });
+
+      // Modos de vista
       var stage = document.getElementById('tbStage');
-      var btnDesktop = document.getElementById('btnModeDesktop');
-      var btnMobile = document.getElementById('btnModeMobile');
-      var btnEmail = document.getElementById('btnModeEmail');
+      document.querySelectorAll('.tb-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var mode = btn.getAttribute('data-mode');
+          if (mode === 'print') { window.print(); return; }
+          document.querySelectorAll('.tb-btn').forEach(function (b) { b.classList.remove('is-active'); });
+          btn.classList.add('is-active');
+          stage.classList.toggle('is-mobile', mode === 'mobile');
+          stage.classList.toggle('is-email', mode === 'email');
+        });
+      });
+    })();
 
-      stage.classList.remove('mode-mobile', 'mode-email');
-      btnDesktop.classList.remove('active');
-      btnMobile.classList.remove('active');
-      btnEmail.classList.remove('active');
-
-      if (mode === 'mobile') {
-        stage.classList.add('mode-mobile');
-        btnMobile.classList.add('active');
-      } else if (mode === 'email') {
-        stage.classList.add('mode-email');
-        btnEmail.classList.add('active');
-      } else {
-        btnDesktop.classList.add('active');
+    function ctCopyCode() {
+      var code = document.getElementById('ctCode').textContent.trim();
+      var msg = document.getElementById('ctCopyMsg');
+      function done() {
+        msg.textContent = ' ¡Código copiado!';
+        setTimeout(function () { msg.textContent = ''; }, 2200);
       }
-    }
-
-    function copyGiftCardCode() {
-      var codeElem = document.getElementById('gcCodeDisplay');
-      var labelElem = document.getElementById('gcCopyLabel');
-      var code = (codeElem ? codeElem.innerText : 'WELCOME10').trim();
-
+      function fallback() {
+        var t = document.createElement('textarea');
+        t.value = code;
+        t.style.position = 'fixed';
+        t.style.left = '-9999px';
+        document.body.appendChild(t);
+        t.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(t);
+      }
       if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(code).then(showSuccess, fallbackCopy);
+        navigator.clipboard.writeText(code).then(done, fallback);
       } else {
-        fallbackCopy();
-      }
-
-      function fallbackCopy() {
-        var textarea = document.createElement('textarea');
-        textarea.value = code;
-        textarea.style.position = 'fixed';
-        textarea.style.left = '-9999px';
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        try {
-          document.execCommand('copy');
-          showSuccess();
-        } catch (e) {
-          console.error(e);
-        }
-        document.body.removeChild(textarea);
-      }
-
-      function showSuccess() {
-        if (!labelElem) return;
-        var prev = labelElem.innerText;
-        labelElem.innerText = '¡Copiado!';
-        labelElem.style.color = '#ffffff';
-        setTimeout(function() {
-          labelElem.innerText = prev;
-          labelElem.style.color = '#fca5a5';
-        }, 2200);
+        fallback();
       }
     }
   </script>
-
 </body>
-
 </html>
