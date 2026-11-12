@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bubb Widget - Prototipo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Carter+One&family=Luckiest+Guy&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
     /* Estilos base mínimos de página para previsualización (Modo Claro y Modo Oscuro) */
@@ -20,14 +23,19 @@
       background: radial-gradient(circle at 50% 50%, #131622 0%, #07080d 100%);
       color: #f8fafc;
     }
+
+    body.bb-demo-crimson {
+      background: radial-gradient(circle at 50% 50%, #1a0808 0%, #070202 100%);
+      color: #f8fafc;
+    }
   </style>
 </head>
 
-<body>
+<body class="bb-demo-crimson">
 
   <!-- PANEL DE PRUEBAS: BORRAR AL INTEGRAR EN SHOPIFY -->
   <aside id="bb-test-panel" class="bb-test-panel" aria-label="Controles de prueba">
-    <button id="bb-btn-toggle-theme" class="bb-test-btn bb-test-btn-accent" type="button">Tema: Claro (Ver Oscuro)</button>
+    <button id="bb-btn-toggle-theme" class="bb-test-btn bb-test-btn-accent" type="button">Tema: Crimson (#780606)</button>
     <button id="bb-btn-toggle-mode" class="bb-test-btn bb-test-btn-accent" type="button">Modo: Silueta Spike</button>
     <button id="bb-btn-jelly" class="bb-test-btn" type="button">Pulso Gelatina</button>
     <button id="bb-btn-curious" class="bb-test-btn" type="button">Gesto Curioso</button>
@@ -44,7 +52,7 @@
        CONTENEDOR RAÍZ AISLADO (#bb-root)
        Se integra en Shopify con pointer-events: none; z-index: 9999;
        ====================================================================== -->
-  <div id="bb-root">
+  <div id="bb-root" class="is-crimson-theme">
       <!-- Filtro óptico SVG: transforma la silueta de spike.png en una burbuja de jabón 3D translúcida -->
       <svg class="bb-svg-defs" aria-hidden="true" width="0" height="0" focusable="false">
         <defs>
@@ -163,6 +171,65 @@
               <feMergeNode in="bb-dark-rim" />
             </feMerge>
           </filter>
+
+          <!-- Filtro óptico SVG para Variante Crimson (#780606) -->
+          <filter id="bb-spike-soap-filter-crimson" x="-25%" y="-25%" width="150%" height="150%"
+            color-interpolation-filters="sRGB">
+            <!-- 1. Cuerpo base translúcido con tinte vino profundo (#780606) -->
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0.47
+                    0 0 0 0 0.024
+                    0 0 0 0 0.024
+                    0 0 0 0.35 0" result="bb-crimson-base" />
+
+            <!-- 2. Cojín interior rubí / carmesí vibrante en el contorno interno -->
+            <feMorphology in="SourceAlpha" operator="erode" radius="4" result="bb-crimson-erode" />
+            <feComposite in="SourceAlpha" in2="bb-crimson-erode" operator="out" result="bb-crimson-band" />
+            <feGaussianBlur in="bb-crimson-band" stdDeviation="3.2" result="bb-crimson-blur" />
+            <feComposite in="bb-crimson-blur" in2="SourceAlpha" operator="in" result="bb-crimson-masked" />
+            <feColorMatrix in="bb-crimson-masked" type="matrix" values="0 0 0 0 0.88
+                    0 0 0 0 0.12
+                    0 0 0 0 0.16
+                    0 0 0 0.70 0" result="bb-crimson-cushion" />
+
+            <!-- 3. Refracción iridiscente rosa escarlata / ámbar desplazada -->
+            <feOffset in="bb-crimson-blur" dx="-4" dy="-4" result="bb-crimson-offset" />
+            <feComposite in="bb-crimson-offset" in2="SourceAlpha" operator="in" result="bb-crimson-irid-mask" />
+            <feColorMatrix in="bb-crimson-irid-mask" type="matrix" values="0 0 0 0 0.98
+                    0 0 0 0 0.32
+                    0 0 0 0 0.38
+                    0 0 0 0.55 0" result="bb-crimson-pink" />
+
+            <!-- 4. Iluminación especular 3D blanca brillante sobre los picos y cabeza -->
+            <feGaussianBlur in="SourceAlpha" stdDeviation="4.5" result="bb-crimson-bump" />
+            <feSpecularLighting in="bb-crimson-bump" surfaceScale="6.2" specularConstant="1.4" specularExponent="24"
+              lighting-color="#ffffff" result="bb-crimson-spec-raw">
+              <fePointLight x="-45" y="-55" z="92" />
+            </feSpecularLighting>
+            <feComposite in="bb-crimson-spec-raw" in2="SourceAlpha" operator="in" result="bb-crimson-spec" />
+
+            <!-- 5. Película perimetral blanca fina con sutil brillo rubí -->
+            <feMorphology in="SourceAlpha" operator="erode" radius="1.4" result="bb-crimson-rim-erode" />
+            <feComposite in="SourceAlpha" in2="bb-crimson-rim-erode" operator="out" result="bb-crimson-rim-raw" />
+            <feGaussianBlur in="bb-crimson-rim-raw" stdDeviation="0.35" result="bb-crimson-rim-soft" />
+            <feColorMatrix in="bb-crimson-rim-soft" type="matrix" values="0 0 0 0 1
+                    0 0 0 0 0.95
+                    0 0 0 0 0.95
+                    0 0 0 0.95 0" result="bb-crimson-rim" />
+
+            <!-- 6. Sombra exterior flotante con resplandor en #780606 -->
+            <feDropShadow in="SourceAlpha" dx="0" dy="7" stdDeviation="7" flood-color="#780606" flood-opacity="0.45"
+              result="bb-crimson-shadow" />
+
+            <!-- 7. Composición final de la silueta en Variante Crimson -->
+            <feMerge>
+              <feMergeNode in="bb-crimson-shadow" />
+              <feMergeNode in="bb-crimson-base" />
+              <feMergeNode in="bb-crimson-cushion" />
+              <feMergeNode in="bb-crimson-pink" />
+              <feMergeNode in="bb-crimson-spec" />
+              <feMergeNode in="bb-crimson-rim" />
+            </feMerge>
+          </filter>
         </defs>
       </svg>
 
@@ -183,25 +250,36 @@
       <!-- En Shopify: JOIN THE CHAOS redirige a {{ routes.account_register_url }} (/account/register) y ¿yA tIEnES cuEnTa? redirige a {{ routes.account_login_url }} (/account/login) -->
       <div class="bb-panel-wrap" id="bb-panel-wrap">
         <div class="bb-panel" id="bb-panel" role="dialog" aria-label="Welcome to The Chaos" hidden>
-          <button class="bb-panel-close" id="bb-panel-close" type="button" aria-label="Cerrar panel">&times;</button>
-
-          <div class="bb-panel-header">
-            <img class="bb-panel-logo" src="spike.png" alt="" draggable="false">
-            <h2 class="bb-panel-title">Welcome to<br>The Chaos</h2>
+          <!-- Banner superior con fondoini.jpg -->
+          <div class="bb-panel-banner">
+            <img class="bb-panel-banner-img" src="fondoini.jpg" alt="" loading="lazy" draggable="false">
+            <div class="bb-panel-banner-overlay" aria-hidden="true"></div>
+            <button class="bb-panel-close" id="bb-panel-close" type="button" aria-label="Cerrar panel">&times;</button>
           </div>
 
-          <div class="bb-form bb-chaos-body" id="bb-form">
-            <p class="bb-chaos-desc">Recibe alertas de lo más popular y obtén una sorpresa para tu cumpleaños.</p>
-
-            <a href="/account/register" class="bb-btn-submit bb-btn-chaos" id="bb-btn-join" role="button">JOIN THE CHAOS</a>
-
-            <div class="bb-login-wrap">
-              <a href="/account/login" class="bb-login-link" id="bb-link-login">¿yA tIEnES cuEnTa?</a>
+          <!-- Cuerpo del panel -->
+          <div class="bb-panel-body">
+            <div class="bb-panel-logo-wrap">
+              <img class="bb-panel-logo" src="spike.png" alt="Spike" draggable="false">
             </div>
-          </div>
 
-          <div class="bb-panel-success" id="bb-panel-success" hidden>
-            <p class="bb-success-text" id="bb-success-text">¡Bienvenido al Caos! Redirigiendo a registro...</p>
+            <div class="bb-panel-header">
+              <h2 class="bb-panel-title">Welcome to<br>The Chaos</h2>
+            </div>
+
+            <div class="bb-form bb-chaos-body" id="bb-form">
+              <p class="bb-chaos-desc">Recibe alertas de lo más popular y obtén una sorpresa para tu cumpleaños.</p>
+
+              <a href="/account/register" class="bb-btn-submit bb-btn-chaos" id="bb-btn-join" role="button">JOIN THE CHAOS</a>
+
+              <div class="bb-login-wrap">
+                <a href="/account/login" class="bb-login-link" id="bb-link-login">¿yA tIEnES cuEnTa?</a>
+              </div>
+            </div>
+
+            <div class="bb-panel-success" id="bb-panel-success" hidden>
+              <p class="bb-success-text" id="bb-success-text">¡Bienvenido al Caos! Redirigiendo a registro...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -348,8 +426,8 @@
 
           const { vw, vh, offsetLeft, offsetTop } = getViewportBounds();
           const margin = 16;
-          const pWidth = Math.min(340, vw - 32);
-          const pHeight = panel.offsetHeight || 245;
+          const pWidth = Math.min(356, vw - 28);
+          const pHeight = panel.offsetHeight || 420;
 
           const bCenterX = bRect.left + bRect.width / 2;
           const bCenterY = bRect.top + bRect.height / 2;
@@ -853,20 +931,25 @@
 
         // 7. Acciones de redirección ("JOIN THE CHAOS" -> /account/register y "¿yA tIEnES cuEnTa?" -> /account/login)
         function handleChaosAction(e, targetUrl, message) {
-          e.preventDefault();
+          const dest = (e.currentTarget && e.currentTarget.getAttribute('href')) || targetUrl;
           formSubmitted = true;
           if (form) form.hidden = true;
           if (successText) successText.textContent = message;
           if (successMsg) successMsg.hidden = false;
 
-          // En producción en Shopify descomentar para redirigir:
-          // window.location.href = targetUrl;
-
-          autoCloseTimeoutId = setTimeout(() => {
-            if (currentState === 'form-open') {
-              closeForm();
-            }
-          }, 1600);
+          // Si es un enlace real de cuenta o página personalizada, redirigir tras breve confirmación
+          if (dest && dest !== '#' && !dest.startsWith('javascript:')) {
+            e.preventDefault();
+            autoCloseTimeoutId = setTimeout(() => {
+              window.location.href = dest;
+            }, 700);
+          } else {
+            autoCloseTimeoutId = setTimeout(() => {
+              if (currentState === 'form-open') {
+                closeForm();
+              }
+            }, 1600);
+          }
         }
 
         if (joinBtn) {
@@ -884,13 +967,22 @@
         /* === FIN BLOQUE SHOPIFY === */
 
         /* Panel de pruebas: controles para pruebas locales (eliminar al integrar en Shopify) */
+        let currentThemeIndex = 2; // Inicia en Crimson (#780606) que es la variante activa de la tienda
+        const themes = [
+          { name: 'Tema: Claro (Original)', rootClass: '', bodyClass: '' },
+          { name: 'Tema: Oscuro Invertido', rootClass: 'is-dark-theme', bodyClass: 'bb-demo-dark' },
+          { name: 'Tema: Crimson (#780606)', rootClass: 'is-crimson-theme', bodyClass: 'bb-demo-crimson' }
+        ];
+
         if (toggleThemeBtn) {
           toggleThemeBtn.addEventListener('click', () => {
-            const isDark = root.classList.toggle('is-dark-theme');
-            document.body.classList.toggle('bb-demo-dark', isDark);
-            toggleThemeBtn.textContent = isDark
-              ? 'Tema: Oscuro Invertido (Ver Claro)'
-              : 'Tema: Claro (Ver Oscuro)';
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            const theme = themes[currentThemeIndex];
+            root.classList.remove('is-dark-theme', 'is-crimson-theme');
+            document.body.classList.remove('bb-demo-dark', 'bb-demo-crimson');
+            if (theme.rootClass) root.classList.add(theme.rootClass);
+            if (theme.bodyClass) document.body.classList.add(theme.bodyClass);
+            toggleThemeBtn.textContent = theme.name;
             triggerJellyPulse();
           });
         }
